@@ -8,7 +8,7 @@ async function bootstrap() {
 
   // Configuration CORS
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     credentials: true,
   });
 
@@ -24,12 +24,19 @@ async function bootstrap() {
   // Configuration Swagger
   const config = new DocumentBuilder()
     .setTitle('Boycotteur API')
-    .setDescription('API pour la plateforme de référencement des entreprises liées aux médias')
+    .setDescription(
+      'API pour la plateforme de référencement des entreprises liées aux médias',
+    )
     .setVersion('1.0')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+
+  // Expose OpenAPI JSON for type generation
+  app.use('/api-json', (req, res) => {
+    res.json(document);
+  });
 
   const port = process.env.PORT || 3001;
   await app.listen(port);

@@ -16,7 +16,8 @@
     "clean": "pnpm --recursive clean",
     "db:up": "docker-compose up -d postgres",
     "db:down": "docker-compose down",
-    "db:logs": "docker-compose logs -f postgres"
+    "db:logs": "docker-compose logs -f postgres",
+    "generate:types": "pnpm --filter frontend generate:types",
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

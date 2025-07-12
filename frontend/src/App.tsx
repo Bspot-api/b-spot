@@ -1,34 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useQuery } from '@tanstack/react-query'
 import './App.css'
+import { apiClient } from './lib/api-client'
+
+// Simple API call function
+const fetchHealth = async () => {
+  const response = await apiClient.get('/health')
+  return response.data
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['health'],
+    queryFn: fetchHealth,
+  })
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
+    <div className="App">
+      <h1>Boycotteur</h1>
+      
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+        <h2>API Status</h2>
+        
+        {isLoading && <p>Loading...</p>}
+        
+        {error && (
+          <div style={{ color: 'red' }}>
+            <p>Error: {error.message}</p>
+          </div>
+        )}
+        
+        {data && (
+          <div style={{ color: 'green' }}>
+            <p>Status: {data.status}</p>
+            <p>Uptime: {data.uptime.toFixed(2)}s</p>
+          </div>
+        )}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
   )
 }
 
