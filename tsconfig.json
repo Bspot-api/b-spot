@@ -19,9 +19,9 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["frontend/src", "backend/src"],
+  "include": ["frontend/src", "api/src"],
   "references": [
     { "path": "./frontend" },
-    { "path": "./backend" }
+    { "path": "./api" }
   ]
 } 

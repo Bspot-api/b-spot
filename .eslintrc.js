@@ -36,7 +36,7 @@ module.exports = {
       },
     },
     {
-      files: ['backend/**/*'],
+      files: ['api/**/*'],
       env: {
         node: true,
       },

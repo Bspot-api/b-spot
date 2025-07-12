@@ -1,23 +1,23 @@
 {
   "name": "boycotteur",
   "version": "1.0.0",
-  "description": "A platform for referencing companies related to mass media",
+  "description": "A platform for referencing companies linked to investment funds or influential networks, aiming to inform the public and provide an open API for research and analysis.",
   "private": true,
   "packageManager": "pnpm@8.15.0",
   "scripts": {
     "dev": "pnpm --parallel dev",
     "dev:frontend": "pnpm --filter frontend dev",
-    "dev:backend": "pnpm --filter backend start:dev",
+    "dev:api": "pnpm --filter api start:dev",
     "build": "pnpm --recursive build",
     "build:frontend": "pnpm --filter frontend build",
-    "build:backend": "pnpm --filter backend build",
+    "build:api": "pnpm --filter api build",
     "test": "pnpm --recursive test",
     "lint": "pnpm --recursive lint",
     "clean": "pnpm --recursive clean",
     "db:up": "docker-compose up -d postgres",
     "db:down": "docker-compose down",
     "db:logs": "docker-compose logs -f postgres",
-    "generate:types": "pnpm --filter frontend generate:types",
+    "generate:types": "pnpm --filter frontend generate:types"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

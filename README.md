@@ -17,8 +17,10 @@ This project aims to:
 
 ## 🏗️ Technical Architecture
 
-### Backend (NestJS + TypeScript)
+### API (NestJS + TypeScript)
+- `Company` entity: company name, investment fund, source (link), sector
 - Documented RESTful API (Swagger/OpenAPI)
+- Smart search (full-text/fuzzy)
 - PostgreSQL + TypeORM + Migrations
 
 ### Frontend (React + TypeScript)
