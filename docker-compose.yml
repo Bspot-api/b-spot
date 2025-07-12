@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: boycotteur-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: boycotteur
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - boycotteur-network
+
+  # Optionnel : pgAdmin pour gérer la base de données
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: boycotteur-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@boycotteur.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - boycotteur-network
+
+volumes:
+  postgres_data:
+
+networks:
+  boycotteur-network:
+    driver: bridge 
