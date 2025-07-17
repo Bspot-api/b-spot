@@ -40,4 +40,14 @@ export class PersonalityService {
     await this.em.removeAndFlush(personality);
     return true;
   }
+
+  async getCompanies(id: string) {
+    const personality = await this.em.findOne(
+      Personality,
+      { id },
+      { populate: ['companies'] },
+    );
+    if (!personality) return [];
+    return personality.companies.getItems();
+  }
 }

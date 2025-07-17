@@ -8,7 +8,8 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Company } from '../company/company.entity';
 import { Fund } from './fund.entity';
 import { FundService } from './fund.service';
 
@@ -32,6 +33,16 @@ export class FundController {
     const fund = await this.service.findOne(id);
     if (!fund) throw new NotFoundException('Fund not found');
     return fund;
+  }
+
+  @Get(':id/companies')
+  @ApiOkResponse({
+    type: Company,
+    isArray: true,
+    description: 'List all companies for this fund',
+  })
+  async getCompanies(@Param('id') id: string): Promise<Company[]> {
+    return this.service.getCompanies(id);
   }
 
   @Put(':id')

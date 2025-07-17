@@ -1,14 +1,15 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  NotFoundException,
-  Param,
-  Post,
-  Put,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    NotFoundException,
+    Param,
+    Post,
+    Put,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Company } from '../company/company.entity';
 import { Personality } from './personality.entity';
 import { PersonalityService } from './personality.service';
 
@@ -32,6 +33,16 @@ export class PersonalityController {
     const personality = await this.service.findOne(id);
     if (!personality) throw new NotFoundException('Personality not found');
     return personality;
+  }
+
+  @Get(':id/companies')
+  @ApiOkResponse({
+    type: Company,
+    isArray: true,
+    description: 'List all companies for this personality',
+  })
+  async getCompanies(@Param('id') id: string): Promise<Company[]> {
+    return this.service.getCompanies(id);
   }
 
   @Put(':id')

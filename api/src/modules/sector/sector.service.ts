@@ -34,4 +34,14 @@ export class SectorService {
     await this.em.removeAndFlush(sector);
     return true;
   }
+
+  async getCompanies(id: string) {
+    const sector = await this.em.findOne(
+      Sector,
+      { id },
+      { populate: ['companies'] },
+    );
+    if (!sector) return [];
+    return sector.companies.getItems();
+  }
 }

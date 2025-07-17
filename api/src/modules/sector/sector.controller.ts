@@ -8,7 +8,8 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Company } from '../company/company.entity';
 import { Sector } from './sector.entity';
 import { SectorService } from './sector.service';
 
@@ -32,6 +33,16 @@ export class SectorController {
     const sector = await this.service.findOne(id);
     if (!sector) throw new NotFoundException('Sector not found');
     return sector;
+  }
+
+  @Get(':id/companies')
+  @ApiOkResponse({
+    type: Company,
+    isArray: true,
+    description: 'List all companies for this sector',
+  })
+  async getCompanies(@Param('id') id: string): Promise<Company[]> {
+    return this.service.getCompanies(id);
   }
 
   @Put(':id')

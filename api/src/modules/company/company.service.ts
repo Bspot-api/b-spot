@@ -17,7 +17,11 @@ export class CompanyService {
   }
 
   async findOne(id: string): Promise<Company | null> {
-    return this.em.findOne(Company, { id });
+    return this.em.findOne(
+      Company,
+      { id },
+      { populate: ['sector', 'fund', 'personalities'] },
+    );
   }
 
   async update(id: string, data: Partial<Company>): Promise<Company | null> {

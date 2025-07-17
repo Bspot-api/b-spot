@@ -34,4 +34,14 @@ export class FundService {
     await this.em.removeAndFlush(fund);
     return true;
   }
+
+  async getCompanies(id: string) {
+    const fund = await this.em.findOne(
+      Fund,
+      { id },
+      { populate: ['companies'] },
+    );
+    if (!fund) return [];
+    return fund.companies.getItems();
+  }
 }
