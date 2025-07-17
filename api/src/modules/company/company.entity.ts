@@ -1,20 +1,21 @@
 import {
   Collection,
   Entity,
+  Index,
   ManyToMany,
   ManyToOne,
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
-import { Fund } from './fund.entity';
-import { Personality } from './personality.entity';
+import { Fund } from '../fund/fund.entity';
+import { Personality } from '../personality/personality.entity';
+import { Sector } from '../sector/sector.entity';
 
 @Entity({ tableName: 'companies' })
 export class Company {
-  @ApiProperty({ description: 'Unique identifier' })
-  @PrimaryKey()
-  id: string = crypto.randomUUID();
+  @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
+  id!: string;
 
   @ApiProperty({ description: 'Company name' })
   @Property()
@@ -24,27 +25,24 @@ export class Company {
   @Property()
   source!: string;
 
-  @ApiProperty({ description: 'Sector' })
-  @Property()
-  sector!: string;
-
   @ApiProperty({ description: 'Published status', default: false })
   @Property({ default: false })
   published: boolean = false;
 
   @ApiProperty({ description: 'Date added' })
-  @Property({ onCreate: () => new Date() })
+  @Property({ fieldName: 'createdAt' })
   createdAt: Date = new Date();
 
-  @ApiProperty({ description: 'Investment fund', type: () => Fund })
   @ManyToOne(() => Fund)
+  @Index()
   fund!: Fund;
 
-  @ApiProperty({
-    description: 'Linked personalities',
-    type: () => [Personality],
-    required: false,
+  @ManyToOne(() => Sector)
+  @Index()
+  sector!: Sector;
+
+  @ManyToMany(() => Personality, (personality) => personality.companies, {
+    owner: true,
   })
-  @ManyToMany(() => Personality, (personality) => personality.companies)
   personalities = new Collection<Personality>(this);
 }

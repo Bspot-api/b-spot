@@ -1,21 +1,24 @@
 import {
   Collection,
   Entity,
-  ManyToMany,
+  Index,
+  OneToMany,
   PrimaryKey,
   Property,
+  Unique,
 } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
-import { Company } from './company.entity';
+import { Company } from '../company/company.entity';
 
-@Entity({ tableName: 'personalities' })
-export class Personality {
-  @ApiProperty({ description: 'Unique identifier' })
-  @PrimaryKey()
-  id: string = crypto.randomUUID();
+@Entity({ tableName: 'sectors' })
+export class Sector {
+  @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
+  id!: string;
 
-  @ApiProperty({ description: 'Personality name' })
+  @ApiProperty({ description: 'Sector name' })
   @Property({ unique: true })
+  @Unique()
+  @Index()
   name!: string;
 
   @ApiProperty({ description: 'Description', required: false })
@@ -27,14 +30,9 @@ export class Personality {
   published: boolean = false;
 
   @ApiProperty({ description: 'Date added' })
-  @Property({ onCreate: () => new Date() })
+  @Property({ fieldName: 'createdAt' })
   createdAt: Date = new Date();
 
-  @ApiProperty({
-    description: 'Companies linked to this personality',
-    type: () => [String],
-    required: false,
-  })
-  @ManyToMany(() => Company, (company) => company.personalities)
+  @OneToMany(() => Company, (company) => company.sector)
   companies = new Collection<Company>(this);
 }

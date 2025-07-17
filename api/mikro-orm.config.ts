@@ -8,8 +8,6 @@ const config: Options<PostgreSqlDriver> = {
   user: process.env.DB_USERNAME || 'postgres',
   password: process.env.DB_PASSWORD || 'password',
   dbName: process.env.DB_NAME || 'boycotteur',
-  entities: ['./dist/entities/*.js'],
-  entitiesTs: ['./src/entities/*.ts'],
   migrations: {
     path: './src/migrations',
     pathTs: './src/migrations',
