@@ -1,12 +1,12 @@
 import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    NotFoundException,
-    Param,
-    Post,
-    Put,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Company } from '../company/company.entity';
