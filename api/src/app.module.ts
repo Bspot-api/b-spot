@@ -4,6 +4,7 @@ import { ConfigModule as NestConfigModule } from '@nestjs/config';
 import mikroOrmConfig from '../mikro-orm.config';
 import { AppService } from './app.service';
 import { AppController } from './controllers/app.controller';
+import { AuthModule } from './modules/auth/auth.module';
 import { CompanyModule } from './modules/company/company.module';
 import { FundModule } from './modules/fund/fund.module';
 import { PersonalityModule } from './modules/personality/personality.module';
@@ -88,6 +89,7 @@ import { SectorModule } from './modules/sector/sector.module';
       ...mikroOrmConfig,
       autoLoadEntities: true,
     }),
+    AuthModule,
     CompanyModule,
     FundModule,
     PersonalityModule,
