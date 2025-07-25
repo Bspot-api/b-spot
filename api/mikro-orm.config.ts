@@ -23,6 +23,11 @@ const config: Options<PostgreSqlDriver> = {
     pathTs: './src/migrations',
     glob: '!(*.d).{js,ts}',
   },
+  seeder: {
+    path: './src/seeders',
+    pathTs: './src/seeders',
+    glob: '!(*.d).{js,ts}',
+  },
   debug: process.env.NODE_ENV !== 'production',
 };
 
