@@ -1,5 +1,6 @@
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import { AuthProvider } from '@/contexts/auth-context';
+import { AccountPage } from '@/pages/account';
 import { Dashboard } from '@/pages/dashboard';
 import { HelloWorldPage } from '@/pages/hello-world';
 import { LoginPage } from '@/pages/login';
@@ -19,6 +20,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/account" 
+              element={
+                <ProtectedRoute>
+                  <AccountPage />
                 </ProtectedRoute>
               } 
             />

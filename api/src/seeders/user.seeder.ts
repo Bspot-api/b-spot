@@ -1,6 +1,6 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
-import * as bcrypt from 'bcrypt';
+import { hashPassword } from 'better-auth/crypto';
 import { User } from '../modules/user/user.entity';
 
 export class UserSeeder extends Seeder {
@@ -13,19 +13,19 @@ export class UserSeeder extends Seeder {
       return;
     }
 
-    // Hash the password securely
-    const saltRounds = 12;
-    const plainPassword = 'pleasechangethisuglypassword'; //password123
-    const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
+    // Plain password for seeding
+    const plainPassword = 'pleasechangethisuglypassword';
 
-    // Create the user
-    const user = em.create(User, {
-      email: 'perso@tgrange.com',
-      password: hashedPassword,
-      name: 'Tat',
-      emailVerified: true,
-      isActive: true,
-    });
+    // Hash the password using better-auth
+    const hashedPassword = await hashPassword(plainPassword);
+
+    // Create the user with hashed password
+    const user = new User();
+    user.email = 'perso@tgrange.com';
+    user.password = hashedPassword;
+    user.name = 'Tat';
+    user.emailVerified = true;
+    user.isActive = true;
 
     await em.persistAndFlush(user);
 
