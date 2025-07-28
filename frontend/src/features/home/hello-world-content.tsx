@@ -6,6 +6,8 @@ export function HelloWorldContent() {
   const { user } = useAuth();
   const { t } = useTranslation();
 
+  
+
   return (
     <div className="min-h-svh relative">
       {/* Admin link - only visible when connected */}
