@@ -1,0 +1,57 @@
+{
+  "pages": {
+    "helloWorld": {
+      "title": "Hello world",
+      "adminLink": "Admin"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "welcomeMessage": "Welcome to your dashboard. This page is only accessible to connected users.",
+      "myAccount": "My account",
+      "logout": "Logout"
+    },
+    "account": {
+      "title": "My account",
+      "myAccount": "My account",
+      "logout": "Logout",
+      "accountInfo": {
+        "title": "Account Information",
+        "description": "Manage your personal information and password",
+        "email": "Email",
+        "name": "Name"
+      },
+      "changePassword": {
+        "title": "Change password",
+        "currentPassword": "Current password",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm new password",
+        "submit": "Change password",
+        "loading": "Modifying...",
+        "success": "Password changed successfully!",
+        "errors": {
+          "passwordsMismatch": "New passwords do not match",
+          "passwordTooShort": "New password must be at least 6 characters long",
+          "changeError": "Error changing password",
+          "generalError": "An error occurred"
+        }
+      }
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Login to your account",
+      "description": "Enter your email below to login to your account",
+      "email": "Email",
+      "password": "Password",
+      "forgotPassword": "Forgot your password?",
+      "submit": "Login",
+      "loading": "Signing in...",
+      "error": "An error occurred"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  }
+} 

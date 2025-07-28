@@ -1,0 +1,57 @@
+{
+  "pages": {
+    "helloWorld": {
+      "title": "Hello world",
+      "adminLink": "Admin"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "welcomeMessage": "Bienvenue sur votre tableau de bord. Cette page n'est accessible qu'aux utilisateurs connectés.",
+      "myAccount": "Mon compte",
+      "logout": "Se déconnecter"
+    },
+    "account": {
+      "title": "Mon compte",
+      "myAccount": "Mon compte",
+      "logout": "Se déconnecter",
+      "accountInfo": {
+        "title": "Informations du compte",
+        "description": "Gérez vos informations personnelles et votre mot de passe",
+        "email": "Email",
+        "name": "Nom"
+      },
+      "changePassword": {
+        "title": "Changer le mot de passe",
+        "currentPassword": "Mot de passe actuel",
+        "newPassword": "Nouveau mot de passe",
+        "confirmPassword": "Confirmer le nouveau mot de passe",
+        "submit": "Changer le mot de passe",
+        "loading": "Modification en cours...",
+        "success": "Mot de passe modifié avec succès !",
+        "errors": {
+          "passwordsMismatch": "Les nouveaux mots de passe ne correspondent pas",
+          "passwordTooShort": "Le nouveau mot de passe doit contenir au moins 6 caractères",
+          "changeError": "Erreur lors du changement de mot de passe",
+          "generalError": "Une erreur est survenue"
+        }
+      }
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Login to your account",
+      "description": "Enter your email below to login to your account",
+      "email": "Email",
+      "password": "Password",
+      "forgotPassword": "Forgot your password?",
+      "submit": "Login",
+      "loading": "Signing in...",
+      "error": "An error occurred"
+    }
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès"
+  }
+} 

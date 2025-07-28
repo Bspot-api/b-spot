@@ -5,9 +5,11 @@ import { Label } from '@/components/shadcn/label';
 import { useAuth } from '@/contexts/auth-context';
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export function AccountPage() {
   const { user, logout } = useAuth();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const [success, setSuccess] = useState<string | undefined>();
@@ -27,13 +29,13 @@ export function AccountPage() {
 
     // Validation
     if (newPassword !== confirmPassword) {
-      setError('Les nouveaux mots de passe ne correspondent pas');
+      setError(t('pages.account.changePassword.errors.passwordsMismatch'));
       setIsLoading(false);
       return;
     }
 
     if (newPassword.length < 6) {
-      setError('Le nouveau mot de passe doit contenir au moins 6 caractères');
+      setError(t('pages.account.changePassword.errors.passwordTooShort'));
       setIsLoading(false);
       return;
     }
@@ -52,15 +54,15 @@ export function AccountPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erreur lors du changement de mot de passe');
+        throw new Error(errorData.message || t('pages.account.changePassword.errors.changeError'));
       }
 
-      setSuccess('Mot de passe modifié avec succès !');
+      setSuccess(t('pages.account.changePassword.success'));
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+      setError(err instanceof Error ? err.message : t('pages.account.changePassword.errors.generalError'));
     } finally {
       setIsLoading(false);
     }
@@ -75,45 +77,45 @@ export function AccountPage() {
           className="text-gray-700 hover:text-gray-900"
           disabled
         >
-          Mon compte
+          {t('pages.account.myAccount')}
         </Button>
         <Button 
           onClick={logout} 
           variant="secondary"
         >
-          Se déconnecter
+          {t('pages.account.logout')}
         </Button>
       </div>
       
       <div className="mx-auto max-w-2xl">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Mon compte</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('pages.account.title')}</h1>
         
         <Card>
           <CardHeader>
-            <CardTitle>Informations du compte</CardTitle>
+            <CardTitle>{t('pages.account.accountInfo.title')}</CardTitle>
             <CardDescription>
-              Gérez vos informations personnelles et votre mot de passe
+              {t('pages.account.accountInfo.description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
               {/* User info */}
               <div className="space-y-2">
-                <Label>Email</Label>
+                <Label>{t('pages.account.accountInfo.email')}</Label>
                 <Input value={user?.email || ''} disabled />
               </div>
               
               <div className="space-y-2">
-                <Label>Nom</Label>
+                <Label>{t('pages.account.accountInfo.name')}</Label>
                 <Input value={user?.name || ''} disabled />
               </div>
 
               {/* Change password form */}
               <form onSubmit={handleChangePassword} className="space-y-4 pt-6 border-t">
-                <h3 className="text-lg font-semibold">Changer le mot de passe</h3>
+                <h3 className="text-lg font-semibold">{t('pages.account.changePassword.title')}</h3>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="currentPassword">Mot de passe actuel</Label>
+                  <Label htmlFor="currentPassword">{t('pages.account.changePassword.currentPassword')}</Label>
                   <div className="relative">
                     <Input
                       id="currentPassword"
@@ -141,7 +143,7 @@ export function AccountPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="newPassword">Nouveau mot de passe</Label>
+                  <Label htmlFor="newPassword">{t('pages.account.changePassword.newPassword')}</Label>
                   <div className="relative">
                     <Input
                       id="newPassword"
@@ -169,7 +171,7 @@ export function AccountPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirmer le nouveau mot de passe</Label>
+                  <Label htmlFor="confirmPassword">{t('pages.account.changePassword.confirmPassword')}</Label>
                   <div className="relative">
                     <Input
                       id="confirmPassword"
@@ -209,7 +211,7 @@ export function AccountPage() {
                 )}
 
                 <Button type="submit" disabled={isLoading}>
-                  {isLoading ? 'Modification en cours...' : 'Changer le mot de passe'}
+                  {isLoading ? t('pages.account.changePassword.loading') : t('pages.account.changePassword.submit')}
                 </Button>
               </form>
             </div>

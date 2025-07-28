@@ -1,15 +1,16 @@
 import { Button } from '@/components/shadcn/button';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
 } from '@/components/shadcn/card';
 import { Input } from '@/components/shadcn/input';
 import { Label } from '@/components/shadcn/label';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface LoginFormProps {
   onSubmit: (email: string, password: string) => void;
@@ -19,6 +20,7 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onSubmit, isLoading = false, error, className, ...props }: LoginFormProps) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -31,16 +33,16 @@ export function LoginForm({ onSubmit, isLoading = false, error, className, ...pr
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle>Login to your account</CardTitle>
+          <CardTitle>{t('auth.login.title')}</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            {t('auth.login.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('auth.login.email')}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -53,12 +55,12 @@ export function LoginForm({ onSubmit, isLoading = false, error, className, ...pr
               </div>
               <div className="grid gap-3">
                 <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t('auth.login.password')}</Label>
                   <a
                     href="#"
                     className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                   >
-                    Forgot your password?
+                    {t('auth.login.forgotPassword')}
                   </a>
                 </div>
                 <Input 
@@ -77,7 +79,7 @@ export function LoginForm({ onSubmit, isLoading = false, error, className, ...pr
               )}
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Signing in...' : 'Login'}
+                  {isLoading ? t('auth.login.loading') : t('auth.login.submit')}
                 </Button>
               </div>
             </div>

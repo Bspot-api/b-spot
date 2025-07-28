@@ -1,9 +1,11 @@
 import { LoginForm } from '@/components/auth/login-form';
 import { useAuth } from '@/contexts/auth-context';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 export function LoginPage() {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const { user, login } = useAuth();
@@ -24,7 +26,7 @@ export function LoginPage() {
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : t('auth.login.error'));
     } finally {
       setIsLoading(false);
     }
