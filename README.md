@@ -1,4 +1,4 @@
-# Boycotteur
+# Kikakoi
 
 A platform for referencing companies linked to investment funds or influential networks, aiming to inform the public and provide an open API for research and analysis.
 
@@ -12,7 +12,7 @@ This project aims to:
 ## ✊ Political Motivation
 
 - Offer a transparency tool on the economic and ideological networks shaping French society.
-- Allow everyone to make informed choices (consumption, engagement, boycott, etc.).
+- Allow everyone to make informed choices
 - Support citizen monitoring and the fight against the opacity of major funds and their ramifications.
 
 ## 🏗️ Technical Architecture
