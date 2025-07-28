@@ -1,5 +1,5 @@
-import { LoginForm } from '@/components/auth/login-form';
 import { useAuth } from '@/contexts/auth-context';
+import { LoginForm } from '@/features/auth/login-form';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
