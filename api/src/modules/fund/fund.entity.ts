@@ -2,13 +2,15 @@ import {
   Collection,
   Entity,
   Index,
+  ManyToMany,
   OneToMany,
   PrimaryKey,
   Property,
-  Unique,
 } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
 import { Company } from '../company/company.entity';
+import { Personality } from '../personality/personality.entity';
+import { Sector } from '../sector/sector.entity';
 
 @Entity({ tableName: 'funds' })
 export class Fund {
@@ -17,7 +19,6 @@ export class Fund {
 
   @ApiProperty({ description: 'Fund name' })
   @Property({ unique: true })
-  @Unique()
   @Index()
   name!: string;
 
@@ -35,4 +36,14 @@ export class Fund {
 
   @OneToMany(() => Company, (company) => company.fund)
   companies = new Collection<Company>(this);
+
+  @ManyToMany(() => Personality, (personality) => personality.funds, {
+    owner: true,
+  })
+  personalities = new Collection<Personality>(this);
+
+  @ManyToMany(() => Sector, (sector) => sector.funds, {
+    owner: true,
+  })
+  sectors = new Collection<Sector>(this);
 }

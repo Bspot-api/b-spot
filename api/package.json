@@ -22,8 +22,9 @@
     "migration:create": "npx mikro-orm migration:create",
     "migration:up": "npx mikro-orm migration:up",
     "migration:down": "npx mikro-orm migration:down",
-    "seed": "npx mikro-orm seeder:run",
-    "seed:create": "npx mikro-orm seeder:create"
+    "seed": "npx mikro-orm schema:fresh --run &&npx mikro-orm seeder:run",
+    "seed:create": "npx mikro-orm seeder:create",
+    "seed:clear": "npx mikro-orm schema:fresh --run"
   },
   "dependencies": {
     "@better-auth/utils": "^0.2.6",

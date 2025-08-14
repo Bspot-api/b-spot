@@ -1,11 +1,11 @@
 import {
-  Collection,
-  Entity,
-  Index,
-  ManyToMany,
-  ManyToOne,
-  PrimaryKey,
-  Property,
+    Collection,
+    Entity,
+    Index,
+    ManyToMany,
+    ManyToOne,
+    PrimaryKey,
+    Property,
 } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
 import { Fund } from '../fund/fund.entity';

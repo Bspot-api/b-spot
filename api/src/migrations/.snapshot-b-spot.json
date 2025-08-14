@@ -81,16 +81,6 @@
           "unique": true
         },
         {
-          "keyName": "funds_name_unique",
-          "columnNames": [
-            "name"
-          ],
-          "composite": false,
-          "constraint": true,
-          "primary": false,
-          "unique": true
-        },
-        {
           "keyName": "funds_pkey",
           "columnNames": [
             "id"
@@ -182,16 +172,6 @@
           "unique": true
         },
         {
-          "keyName": "personalities_name_unique",
-          "columnNames": [
-            "name"
-          ],
-          "composite": false,
-          "constraint": true,
-          "primary": false,
-          "unique": true
-        },
-        {
           "keyName": "personalities_pkey",
           "columnNames": [
             "id"
@@ -204,6 +184,73 @@
       ],
       "checks": [],
       "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "fund_id": {
+          "name": "fund_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
+        },
+        "personality_id": {
+          "name": "personality_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
+        }
+      },
+      "name": "funds_personalities",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "funds_personalities_pkey",
+          "columnNames": [
+            "fund_id",
+            "personality_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "funds_personalities_fund_id_foreign": {
+          "constraintName": "funds_personalities_fund_id_foreign",
+          "columnNames": [
+            "fund_id"
+          ],
+          "localTableName": "public.funds_personalities",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.funds",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        },
+        "funds_personalities_personality_id_foreign": {
+          "constraintName": "funds_personalities_personality_id_foreign",
+          "columnNames": [
+            "personality_id"
+          ],
+          "localTableName": "public.funds_personalities",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.personalities",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        }
+      },
       "nativeEnums": {}
     },
     {
@@ -283,16 +330,6 @@
           "unique": true
         },
         {
-          "keyName": "sectors_name_unique",
-          "columnNames": [
-            "name"
-          ],
-          "composite": false,
-          "constraint": true,
-          "primary": false,
-          "unique": true
-        },
-        {
           "keyName": "sectors_pkey",
           "columnNames": [
             "id"
@@ -305,6 +342,73 @@
       ],
       "checks": [],
       "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "fund_id": {
+          "name": "fund_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
+        },
+        "sector_id": {
+          "name": "sector_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
+        }
+      },
+      "name": "funds_sectors",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "funds_sectors_pkey",
+          "columnNames": [
+            "fund_id",
+            "sector_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "funds_sectors_fund_id_foreign": {
+          "constraintName": "funds_sectors_fund_id_foreign",
+          "columnNames": [
+            "fund_id"
+          ],
+          "localTableName": "public.funds_sectors",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.funds",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        },
+        "funds_sectors_sector_id_foreign": {
+          "constraintName": "funds_sectors_sector_id_foreign",
+          "columnNames": [
+            "sector_id"
+          ],
+          "localTableName": "public.funds_sectors",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.sectors",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        }
+      },
       "nativeEnums": {}
     },
     {
