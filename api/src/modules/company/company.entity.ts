@@ -1,11 +1,11 @@
 import {
-    Collection,
-    Entity,
-    Index,
-    ManyToMany,
-    ManyToOne,
-    PrimaryKey,
-    Property,
+  Collection,
+  Entity,
+  Index,
+  ManyToMany,
+  ManyToOne,
+  PrimaryKey,
+  Property,
 } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
 import { Fund } from '../fund/fund.entity';
@@ -14,6 +14,7 @@ import { Sector } from '../sector/sector.entity';
 
 @Entity({ tableName: 'companies' })
 export class Company {
+  @ApiProperty({ description: 'Company unique identifier' })
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id!: string;
 
@@ -33,14 +34,20 @@ export class Company {
   @Property({ fieldName: 'createdAt' })
   createdAt: Date = new Date();
 
+  @ApiProperty({ description: 'Investment fund', type: () => Fund })
   @ManyToOne(() => Fund)
   @Index()
   fund!: Fund;
 
+  @ApiProperty({ description: 'Business sector', type: () => Sector })
   @ManyToOne(() => Sector)
   @Index()
   sector!: Sector;
 
+  @ApiProperty({
+    description: 'Involved personalities',
+    type: () => [Personality],
+  })
   @ManyToMany(() => Personality, (personality) => personality.companies, {
     owner: true,
   })

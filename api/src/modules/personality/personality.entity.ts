@@ -12,6 +12,7 @@ import { Fund } from '../fund/fund.entity';
 
 @Entity({ tableName: 'personalities' })
 export class Personality {
+  @ApiProperty({ description: 'Personality unique identifier' })
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id!: string;
 

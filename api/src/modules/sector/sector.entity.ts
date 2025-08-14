@@ -13,6 +13,7 @@ import { Fund } from '../fund/fund.entity';
 
 @Entity({ tableName: 'sectors' })
 export class Sector {
+  @ApiProperty({ description: 'Sector unique identifier' })
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })
   id!: string;
 
