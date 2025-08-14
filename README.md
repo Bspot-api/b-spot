@@ -1,4 +1,4 @@
-# Kikakoi
+# B-Spot
 
 A platform for referencing companies linked to investment funds or influential networks, aiming to inform the public and provide an open API for research and analysis.
 

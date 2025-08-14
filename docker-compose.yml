@@ -3,10 +3,10 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: kikakoi-db
+    container_name: b-spot-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: kikakoi
+      POSTGRES_DB: b-spot
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     ports:
@@ -14,26 +14,26 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - kikakoi-network
+      - b-spot-network
 
   # Optionnel : pgAdmin pour gérer la base de données
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: kikakoi-pgadmin
+    container_name: b-spot-pgadmin
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@kikakoi.com
+      PGADMIN_DEFAULT_EMAIL: admin@b-spot.com
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "5050:80"
     depends_on:
       - postgres
     networks:
-      - kikakoi-network
+      - b-spot-network
 
 volumes:
   postgres_data:
 
 networks:
-  kikakoi-network:
+  b-spot-network:
     driver: bridge 

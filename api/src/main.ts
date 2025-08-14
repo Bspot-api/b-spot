@@ -23,7 +23,7 @@ async function bootstrap() {
 
   // Configuration Swagger
   const config = new DocumentBuilder()
-    .setTitle('Kikakoi API')
+    .setTitle('b-spot API')
     .setDescription(
       'API pour la plateforme de référencement des entreprises liées aux médias',
     )

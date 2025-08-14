@@ -7,7 +7,7 @@ const config: Options<PostgreSqlDriver> = {
   port: +(process.env.DB_PORT || 5432),
   user: process.env.DB_USERNAME || 'postgres',
   password: process.env.DB_PASSWORD || 'password',
-  dbName: process.env.DB_NAME || 'kikakoi',
+  dbName: process.env.DB_NAME || 'b-spot',
   entities: [
     'dist/modules/**/entities/*.entity.js',
     'dist/modules/**/*.entity.js',
