@@ -3,63 +3,113 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
+  Patch,
   Post,
-  Put,
+  Query,
 } from '@nestjs/common';
-import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreateCompanyDto } from './company.dto';
 import { Company } from './company.entity';
 import { CompanyService } from './company.service';
+
+export interface PaginatedCompaniesResponse {
+  data: Company[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
 
 @ApiTags('companies')
 @Controller('companies')
 export class CompanyController {
-  constructor(private readonly service: CompanyService) {}
+  constructor(private readonly companyService: CompanyService) {}
 
   @Post()
-  @ApiOkResponse({ type: Company, description: 'Created company' })
-  async create(@Body() data: Partial<Company>): Promise<Company> {
-    return this.service.create(data);
+  @ApiOperation({ summary: 'Create a new company' })
+  @ApiResponse({
+    status: 201,
+    description: 'Company created successfully',
+    type: Company,
+  })
+  create(@Body() createCompanyDto: CreateCompanyDto) {
+    return this.companyService.create(createCompanyDto);
   }
 
   @Get()
-  @ApiOkResponse({
-    type: Company,
-    isArray: true,
-    description: 'List all companies',
+  @ApiOperation({ summary: 'Get all companies with pagination' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Page number (default: 1)',
+    type: Number,
   })
-  async findAll(): Promise<Company[]> {
-    return this.service.findAll();
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Items per page (default: 30)',
+    type: Number,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Companies retrieved successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'array',
+          items: { $ref: '#/components/schemas/Company' },
+        },
+        pagination: {
+          type: 'object',
+          properties: {
+            page: { type: 'number' },
+            limit: { type: 'number' },
+            total: { type: 'number' },
+            totalPages: { type: 'number' },
+          },
+        },
+      },
+    },
+  })
+  async findAll(
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ): Promise<PaginatedCompaniesResponse> {
+    const pageNum = page ? parseInt(page.toString(), 10) : 1;
+    const limitNum = limit ? parseInt(limit.toString(), 10) : 30;
+
+    return this.companyService.findAllPaginated(pageNum, limitNum);
   }
 
   @Get(':id')
-  @ApiOkResponse({ type: Company, description: 'Get company by id' })
-  @ApiNotFoundResponse({ description: 'Company not found' })
-  async findOne(@Param('id') id: string): Promise<Company> {
-    const company = await this.service.findOne(id);
-    if (!company) throw new NotFoundException('Company not found');
-    return company;
+  @ApiOperation({ summary: 'Get a company by ID' })
+  @ApiResponse({ status: 200, description: 'Company found', type: Company })
+  findOne(@Param('id') id: string) {
+    return this.companyService.findOne(id);
   }
 
-  @Put(':id')
-  @ApiOkResponse({ type: Company, description: 'Update company by id' })
-  @ApiNotFoundResponse({ description: 'Company not found' })
-  async update(
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update a company' })
+  @ApiResponse({
+    status: 200,
+    description: 'Company updated successfully',
+    type: Company,
+  })
+  update(
     @Param('id') id: string,
-    @Body() data: Partial<Company>,
-  ): Promise<Company> {
-    const company = await this.service.update(id, data);
-    if (!company) throw new NotFoundException('Company not found');
-    return company;
+    @Body() updateCompanyDto: Partial<CreateCompanyDto>,
+  ) {
+    return this.companyService.update(id, updateCompanyDto);
   }
 
   @Delete(':id')
-  @ApiOkResponse({ description: 'Delete company by id', type: Object })
-  @ApiNotFoundResponse({ description: 'Company not found' })
-  async remove(@Param('id') id: string): Promise<{ success: true }> {
-    const ok = await this.service.remove(id);
-    if (!ok) throw new NotFoundException('Company not found');
-    return { success: true };
+  @ApiOperation({ summary: 'Delete a company' })
+  @ApiResponse({ status: 200, description: 'Company deleted successfully' })
+  remove(@Param('id') id: string) {
+    return this.companyService.remove(id);
   }
 }

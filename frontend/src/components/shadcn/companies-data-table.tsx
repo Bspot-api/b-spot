@@ -8,7 +8,6 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
@@ -16,10 +15,17 @@ import { ArrowUpDown, ExternalLink } from "lucide-react"
 import React from "react"
 
 import type { Company } from "@/api/hooks"
+import { CompaniesPagination } from "../ui/companies-pagination"
 import { Button } from "./button"
-import { DataTablePagination } from "./data-table-pagination"
 import { Input } from "./input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./table"
+
+export interface CompaniesDataTableProps {
+  companies: Company[]
+  currentPage: number
+  totalPages: number
+  onPageChange: (page: number) => void
+}
 
 export const columns: ColumnDef<Company>[] = [
   {
@@ -112,15 +118,10 @@ export const columns: ColumnDef<Company>[] = [
   },
 ]
 
-interface CompaniesDataTableProps {
-  companies: Company[]
-}
-
-export function CompaniesDataTable({ companies }: CompaniesDataTableProps) {
+export function CompaniesDataTable({ companies, currentPage, totalPages, onPageChange }: CompaniesDataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
 
   const table = useReactTable({
     data: companies,
@@ -128,21 +129,13 @@ export function CompaniesDataTable({ companies }: CompaniesDataTableProps) {
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    initialState: {
-      pagination: {
-        pageSize: 30, // Pagination de 30 entreprises par page
-      },
-    },
     state: {
       sorting,
       columnFilters,
       columnVisibility,
-      rowSelection,
     },
   })
 
@@ -208,8 +201,16 @@ export function CompaniesDataTable({ companies }: CompaniesDataTableProps) {
           </TableBody>
         </Table>
       </div>
+      
+      {/* Shadcn/ui pagination component */}
       <div className="py-4">
-        <DataTablePagination table={table} />
+        <CompaniesPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={onPageChange}
+          hasNextPage={currentPage < totalPages}
+          hasPreviousPage={currentPage > 1}
+        />
       </div>
     </div>
   )
