@@ -16,9 +16,9 @@ export interface PaginatedCompaniesResponse {
 
 export interface CompanySearchFilters {
   search?: string;
-  fundId?: string;
-  sectorId?: string;
-  personalityId?: string;
+  fundIds?: string[];
+  sectorIds?: string[];
+  personalityIds?: string[];
 }
 
 @Injectable()
@@ -49,36 +49,61 @@ export class CompanyService {
     const offset = (page - 1) * limit;
     const whereConditions: any = {};
 
-    if (filters.fundId) {
-      whereConditions.fund = filters.fundId;
+    // Build complex filter conditions
+    const filterConditions = [];
+
+    if (filters.fundIds && filters.fundIds.length > 0) {
+      // Use $or to find companies that belong to ANY of the specified funds
+      filterConditions.push({
+        $or: filters.fundIds.map((fundId) => ({ fund: fundId })),
+      });
     }
 
-    if (filters.sectorId) {
-      whereConditions.sector = filters.sectorId;
+    if (filters.sectorIds && filters.sectorIds.length > 0) {
+      // Use $or to find companies that belong to ANY of the specified sectors
+      filterConditions.push({
+        $or: filters.sectorIds.map((sectorId) => ({ sector: sectorId })),
+      });
     }
 
-    if (filters.personalityId) {
-      whereConditions.personalities = { $in: [filters.personalityId] };
+    if (filters.personalityIds && filters.personalityIds.length > 0) {
+      // Use $or to find companies that have ANY of the specified personalities
+      filterConditions.push({
+        $or: filters.personalityIds.map((personalityId) => ({
+          personalities: { $in: [personalityId] },
+        })),
+      });
+    }
+
+    // Combine all filter conditions with $and
+    if (filterConditions.length > 0) {
+      if (filterConditions.length === 1) {
+        Object.assign(whereConditions, filterConditions[0]);
+      } else {
+        whereConditions.$and = filterConditions;
+      }
     }
 
     let total: number;
     let companies: Company[];
-    
+
     if (filters.search) {
-      const searchResult = await this.searchCompanies(filters.search, whereConditions, limit, offset);
+      const searchResult = await this.searchCompanies(
+        filters.search,
+        whereConditions,
+        limit,
+        offset,
+      );
       companies = searchResult.companies;
       total = searchResult.total;
     } else {
       total = await this.companyRepository.count(whereConditions);
-      companies = await this.companyRepository.find(
-        whereConditions,
-        {
-          populate: ['fund', 'sector', 'personalities'],
-          limit,
-          offset,
-          orderBy: { name: 'ASC' },
-        },
-      );
+      companies = await this.companyRepository.find(whereConditions, {
+        populate: ['fund', 'sector', 'personalities'],
+        limit,
+        offset,
+        orderBy: { name: 'ASC' },
+      });
     }
 
     const totalPages = Math.ceil(total / limit);
@@ -101,7 +126,7 @@ export class CompanyService {
     offset: number,
   ): Promise<{ companies: Company[]; total: number }> {
     const searchPattern = `%${searchTerm}%`;
-    
+
     // First, get the total count for search results
     const total = await this.companyRepository.count({
       $or: [

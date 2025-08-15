@@ -61,21 +61,21 @@ export class CompanyController {
     type: String,
   })
   @ApiQuery({
-    name: 'fundId',
+    name: 'fundIds',
     required: false,
-    description: 'Filter by fund ID',
+    description: 'Filter by fund IDs (comma-separated values)',
     type: String,
   })
   @ApiQuery({
-    name: 'sectorId',
+    name: 'sectorIds',
     required: false,
-    description: 'Filter by sector ID',
+    description: 'Filter by sector IDs (comma-separated values)',
     type: String,
   })
   @ApiQuery({
-    name: 'personalityId',
+    name: 'personalityIds',
     required: false,
-    description: 'Filter by personality ID',
+    description: 'Filter by personality IDs (comma-separated values)',
     type: String,
   })
   @ApiResponse({
@@ -104,18 +104,45 @@ export class CompanyController {
     @Query('page') page?: number,
     @Query('limit') limit?: number,
     @Query('search') search?: string,
-    @Query('fundId') fundId?: string,
-    @Query('sectorId') sectorId?: string,
-    @Query('personalityId') personalityId?: string,
+    @Query('fundIds') fundIds?: string,
+    @Query('sectorIds') sectorIds?: string,
+    @Query('personalityIds') personalityIds?: string,
   ): Promise<PaginatedCompaniesResponse> {
     const pageNum = page ? parseInt(page.toString(), 10) : 1;
     const limitNum = limit ? parseInt(limit.toString(), 10) : 30;
 
+    // Handle fundIds parameter - parse comma-separated string to array
+    let parsedFundIds: string[] | undefined;
+    if (fundIds) {
+      parsedFundIds = fundIds
+        .split(',')
+        .map((id) => id.trim())
+        .filter((id) => id.length > 0);
+    }
+
+    // Handle sectorIds parameter - parse comma-separated string to array
+    let parsedSectorIds: string[] | undefined;
+    if (sectorIds) {
+      parsedSectorIds = sectorIds
+        .split(',')
+        .map((id) => id.trim())
+        .filter((id) => id.length > 0);
+    }
+
+    // Handle personalityIds parameter - parse comma-separated string to array
+    let parsedPersonalityIds: string[] | undefined;
+    if (personalityIds) {
+      parsedPersonalityIds = personalityIds
+        .split(',')
+        .map((id) => id.trim())
+        .filter((id) => id.length > 0);
+    }
+
     const filters: CompanySearchFilters = {
       search,
-      fundId,
-      sectorId,
-      personalityId,
+      fundIds: parsedFundIds,
+      sectorIds: parsedSectorIds,
+      personalityIds: parsedPersonalityIds,
     };
 
     return this.companyService.findAllPaginated(pageNum, limitNum, filters);

@@ -216,17 +216,17 @@ export type CompanyControllerFindAllData = {
          */
         search?: string;
         /**
-         * Filter by fund ID
+         * Filter by fund IDs (comma-separated values)
          */
-        fundId?: string;
+        fundIds?: string;
         /**
-         * Filter by sector ID
+         * Filter by sector IDs (comma-separated values)
          */
-        sectorId?: string;
+        sectorIds?: string;
         /**
-         * Filter by personality ID
+         * Filter by personality IDs (comma-separated values)
          */
-        personalityId?: string;
+        personalityIds?: string;
     };
     url: '/companies';
 };
