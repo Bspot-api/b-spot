@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  type ColumnDef,
   type ColumnFiltersState,
   type SortingState,
   type VisibilityState,
@@ -9,21 +8,19 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
-  useReactTable,
+  useReactTable
 } from "@tanstack/react-table"
-import { ArrowUpDown, ExternalLink, Search } from "lucide-react"
 import React from "react"
 
 import type { Company } from "@/api/hooks"
 import { useDebounce } from "@/hooks/use-debounce"
-import { useSectors } from "@/hooks/use-sectors"
 
-import { Button } from "@/components/shadcn/button"
 import { Input } from "@/components/shadcn/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shadcn/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/shadcn/table"
 import { CompaniesPagination } from "./companies-pagination"
-import { DataTableFacetedFilter } from "./data-table-faceted-filter"
+import { FilterFunds, FilterPersonalities, FilterSectors } from "./filters"
+import { ShowNumberByPage } from "./table"
+import { columns } from "./table/columns"
 
 export interface CompaniesDataTableProps {
   companies: Company[]
@@ -37,116 +34,6 @@ export interface CompaniesDataTableProps {
   isSearching?: boolean
 }
 
-export const columns: ColumnDef<Company>[] = [
-  {
-    accessorKey: "name",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="h-8 px-2 lg:px-3"
-        >
-          Nom de l'entreprise
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-    cell: ({ row }) => {
-      const company = row.original
-      return (
-        <div className="font-medium">
-          <a
-            href={company.source}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
-          >
-            {company.name}
-            <ExternalLink className="ml-1 h-3 w-3 inline" />
-          </a>
-        </div>
-      )
-    },
-  },
-  {
-    accessorKey: "fund",
-    header: "Fond d'investissement",
-    enableColumnFilter: true,
-    id: "fund",
-    filterFn: (row, id, value) => {
-      const fund = row.getValue(id) as any;
-      return fund && value.includes(fund.id);
-    },
-    cell: ({ row }) => {
-      const fund = row.original.fund
-      return (
-        <div className="text-sm">
-          {fund ? (
-            <span className="font-medium text-gray-900">{fund.name}</span>
-          ) : (
-            <span className="text-gray-400">Non spécifié</span>
-          )}
-        </div>
-      )
-    },
-  },
-  {
-    accessorKey: "personalities",
-    header: "Personnalités impliquées",
-    enableColumnFilter: true,
-    id: "personalities",
-    filterFn: (row, id, value) => {
-      const personalities = row.getValue(id) as any[];
-      return value.some((v: string) => 
-        personalities?.some((p: any) => p.id === v)
-      );
-    },
-    cell: ({ row }) => {
-      const personalities = row.original.personalities
-      return (
-        <div className="text-sm">
-          {personalities && personalities.length > 0 ? (
-            <div className="flex flex-wrap gap-1">
-              {personalities.map((personality, index) => (
-                <span
-                  key={personality.id}
-                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                >
-                  {personality.name}
-                </span>
-              ))}
-            </div>
-          ) : (
-            <span className="text-gray-400">Aucune personnalité</span>
-          )}
-        </div>
-      )
-    },
-  },
-  {
-    accessorKey: "sector",
-    header: "Secteur",
-    enableColumnFilter: true,
-    id: "sector",
-    filterFn: (row, id, value) => {
-      const sector = row.getValue(id) as any;
-      return sector && value.includes(sector.id);
-    },
-    cell: ({ row }) => {
-      const sector = row.original.sector
-      return (
-        <div className="text-sm">
-          {sector ? (
-            <span className="text-gray-700">{sector.name}</span>
-          ) : (
-            <span className="text-gray-400">Non spécifié</span>
-          )}
-        </div>
-      )
-    },
-  },
-]
 
 export function CompaniesDataTable({ 
   companies, 
@@ -188,8 +75,7 @@ export function CompaniesDataTable({
     setLocalSearch(currentSearch)
   }, [currentSearch])
 
-  // Fetch sectors for the filter
-  const { data: sectors = [], isLoading: sectorsLoading } = useSectors()
+
 
   // Apply filters to companies
   const filteredCompanies = React.useMemo(() => {
@@ -232,7 +118,7 @@ export function CompaniesDataTable({
 
   const table = useReactTable({
     data: filteredCompanies,
-    columns,
+    columns: columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -249,54 +135,35 @@ export function CompaniesDataTable({
 
   return (
     <div className="w-full">
-      {/* Filters */}
-      <div className="flex items-center gap-2 py-4 border-b">
-        <DataTableFacetedFilter
-          column={table.getColumn("sector")}
-          title="Sectors"
-          options={sectors.map(sector => ({
-            label: sector.name,
-            value: sector.id,
-          }))}
-          loading={sectorsLoading}
-        />
-      </div>
-
-      <div className="flex items-center justify-between py-4">
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+      <div className="flex flex-col sm:flex-row items-center justify-between py-4">
+        <div className="flex flex-col lg:flex-row items-center gap-4">
+          <div className="relative flex flex-col lg:flex-row items-center gap-2">
             <Input
               placeholder="Rechercher une entreprise..."
               value={localSearch}
               onChange={(event) => setLocalSearch(event.target.value)}
-              className="pl-10 max-w-sm transition-all duration-200"
+              className="max-w-sm transition-all duration-200 w-80"
             />
-            {isSearching && (
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-              </div>
-            )}
+
+            <div className="flex items-center gap-2">
+              <FilterSectors
+                column={table.getColumn("sector")}
+              />
+              <FilterPersonalities
+                column={table.getColumn("personalities")}
+              />
+              <FilterFunds
+                column={table.getColumn("fund")}
+              />
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">Afficher :</span>
-          <Select 
-            value={(currentLimit || 30).toString()} 
-            onValueChange={(value) => onLimitChange(parseInt(value))}
-          >
-            <SelectTrigger className="w-20">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="20">20</SelectItem>
-              <SelectItem value="30">30</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-            </SelectContent>
-          </Select>
-          <span className="text-sm text-gray-600">par page</span>
-        </div>
+        
+        <ShowNumberByPage
+          currentLimit={currentLimit}
+          onLimitChange={onLimitChange}
+        />
+        
       </div>
       
       <div className="overflow-hidden rounded-md border">
