@@ -1,7 +1,7 @@
-import { DataTableFacetedFilter } from '@/features/home/components/data-table-faceted-filter'
+import { DataTableFilter } from '@/features/home/components/filters/data-table-filter'
 import { useFunds } from '@/hooks/use-funds'
-import { useTranslation } from 'react-i18next'
 import type { Column } from '@tanstack/react-table'
+import { useTranslation } from 'react-i18next'
 
 interface FilterFundsProps<TData, TValue> {
   column?: Column<TData, TValue>
@@ -12,7 +12,7 @@ export function FilterFunds<TData, TValue>({ column }: FilterFundsProps<TData, T
   const { t } = useTranslation()
 
   return (
-    <DataTableFacetedFilter
+    <DataTableFilter
       column={column}
       title={t('table.filters.funds')}
       options={funds.map(fund => ({

@@ -2,7 +2,7 @@ import { useCompaniesPagination } from "@/hooks/use-companies";
 import { useTranslation } from "react-i18next";
 import { CompaniesDataTable } from "./components/companies-data-table";
 
-export function HelloWorldContent() {
+export function HomeContent() {
   const { t } = useTranslation();
   const {
     companies,

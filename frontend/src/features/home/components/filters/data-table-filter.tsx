@@ -22,7 +22,7 @@ import {
 import { Separator } from "@/components/shadcn/separator"
 import { cn } from "@/lib/utils"
 
-interface DataTableFacetedFilterProps<TData, TValue> {
+interface DataTableFilterProps<TData, TValue> {
   column?: Column<TData, TValue>
   title?: string
   loading?: boolean
@@ -33,12 +33,12 @@ interface DataTableFacetedFilterProps<TData, TValue> {
   }[]
 }
 
-export function DataTableFacetedFilter<TData, TValue>({
+export function DataTableFilter<TData, TValue>({
   column,
   title,
   options,
   loading = false
-}: DataTableFacetedFilterProps<TData, TValue>) {
+}: DataTableFilterProps<TData, TValue>) {
   const { t } = useTranslation();
   
   const facets = column?.getFacetedUniqueValues()

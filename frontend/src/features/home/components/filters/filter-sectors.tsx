@@ -1,7 +1,7 @@
-import { DataTableFacetedFilter } from '@/features/home/components/data-table-faceted-filter'
+import { DataTableFilter } from '@/features/home/components/filters/data-table-filter'
 import { useSectors } from '@/hooks/use-sectors'
-import { useTranslation } from 'react-i18next'
 import type { Column } from '@tanstack/react-table'
+import { useTranslation } from 'react-i18next'
 
 interface FilterSectorsProps<TData, TValue> {
   column?: Column<TData, TValue>
@@ -12,7 +12,7 @@ export function FilterSectors<TData, TValue>({ column }: FilterSectorsProps<TDat
   const { t } = useTranslation()
 
   return (
-    <DataTableFacetedFilter
+    <DataTableFilter
       column={column}
       title={t('table.filters.sectors')}
       options={sectors.map(sector => ({

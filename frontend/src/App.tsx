@@ -3,7 +3,7 @@ import { FaviconManager } from '@/components/ui/favicon-manager';
 import { AuthProvider } from '@/contexts/auth-context';
 import { AccountPage } from '@/pages/account';
 import { Dashboard } from '@/pages/dashboard';
-import { HelloWorldPage } from '@/pages/hello-world';
+import { HomePage } from '@/pages/home';
 import { LoginPage } from '@/pages/login';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
@@ -16,7 +16,7 @@ function App() {
         <div className="App">
           <Routes>
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/" element={<HelloWorldPage />} />
+            <Route path="/" element={<HomePage />} />
             <Route 
               path="/dashboard" 
               element={

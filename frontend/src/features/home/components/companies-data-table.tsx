@@ -18,8 +18,8 @@ import { useDebounce } from "@/hooks/use-debounce"
 
 import { Input } from "@/components/shadcn/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/shadcn/table"
-import { CompaniesPagination } from "./companies-pagination"
 import { FilterFunds, FilterPersonalities, FilterSectors } from "./filters"
+import { CompaniesPagination } from "./filters/pagination"
 import { ShowNumberByPage } from "./table"
 import { useCompanyColumns } from "./table/columns"
 
