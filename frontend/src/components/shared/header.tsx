@@ -23,7 +23,7 @@ export function Header() {
             </Link>
           </div>
 
-          {/* Right side - Admin link and user actions */}
+          
           <div className="flex items-center space-x-4">
             {user && (
               <Link 
@@ -34,16 +34,13 @@ export function Header() {
               </Link>
             )}
             
-            {user && (
-              <div className="flex items-center space-x-2">
-                <Link 
-                  to="/account" 
-                  className="text-gray-600 hover:text-gray-900 text-sm font-medium"
-                >
-                  {t('navigation.account')}
-                </Link>
-              </div>
-          )}
+            {/* About page */}
+            <Link 
+              to="/about" 
+              className="text-gray-600 hover:text-gray-900 text-sm font-medium"
+            >
+              {t('pages.helloWorld.aboutLink')}
+            </Link>
           </div>
         </div>
       </div>

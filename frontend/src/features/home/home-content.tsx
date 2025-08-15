@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { CompaniesDataTable } from "./components/companies-data-table";
 
 export function HomeContent() {
-  const { t } = useTranslation();
   const {
     companies,
     pagination,
@@ -17,6 +16,8 @@ export function HomeContent() {
     updateLimit,
     isFetching,
   } = useCompaniesPagination();
+
+  const { t } = useTranslation();
 
   if (isLoading) {
     return (
@@ -40,11 +41,6 @@ export function HomeContent() {
   return (
     <div className="container mx-auto py-10 lg:px-0">
       <h1 className="text-3xl font-bold mb-8">{t('companies.title')}</h1>
-      
-      <div className="mb-4 text-sm text-gray-600">
-        {t('companies.pagination.page', { page, totalPages: pagination?.totalPages || 1 })} 
-        {t('companies.pagination.total', { total: pagination?.total || 0 })}
-      </div>
       
       <CompaniesDataTable 
         companies={companies} 

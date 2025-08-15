@@ -2,7 +2,40 @@
   "pages": {
     "helloWorld": {
       "title": "Hello world",
-      "adminLink": "Admin"
+      "adminLink": "Admin",
+      "aboutLink": "About"
+    },
+    "about": {
+      "title": "About B-Spot",
+      "subtitle": "When your Business gets Spotted!",
+      "mission": {
+        "title": "Mission",
+        "description": "B-Spot aims to make transparent the links between companies and investors, by facilitating access to public information on capital structures."
+      },
+      "whatWeDo": {
+        "title": "What B-Spot does",
+        "description": "B-Spot provides a searchable database of companies, investment funds and involved personalities, based on verified public information."
+      },
+      "howItWorks": {
+        "title": "How it works",
+        "description": "Consult our database to identify links between companies and investors."
+      },
+      "underConstruction": {
+        "title": "🚧 Under Construction",
+        "description": "B-Spot is actively under development. Here are the features coming soon:",
+        "features": {
+          "title": "Upcoming Features",
+          "suggestions": "Suggest missing information",
+          "reporting": "Report false information",
+          "aiUpdates": "Automatic database updates using AI"
+        },
+        "mobile": {
+          "title": "Mobile App",
+          "scanner": "Article scanner to identify companies",
+          "accounts": "User account creation",
+          "preferences": "Manage preferences and personalized alerts"
+        }
+      }
     },
     "dashboard": {
       "title": "Dashboard",

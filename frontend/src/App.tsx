@@ -1,6 +1,7 @@
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import { FaviconManager } from '@/components/ui/favicon-manager';
 import { AuthProvider } from '@/contexts/auth-context';
+import { AboutPage } from '@/pages/about';
 import { AccountPage } from '@/pages/account';
 import { Dashboard } from '@/pages/dashboard';
 import { HomePage } from '@/pages/home';
@@ -17,6 +18,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutPage />} />
             <Route 
               path="/dashboard" 
               element={

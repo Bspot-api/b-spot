@@ -2,7 +2,40 @@
   "pages": {
     "helloWorld": {
       "title": "Hello world",
-      "adminLink": "Admin"
+      "adminLink": "Admin",
+      "aboutLink": "À propos"
+    },
+    "about": {
+      "title": "À propos de B-Spot",
+      "subtitle": "Quand ton Business est Spotted !",
+      "mission": {
+        "title": "Mission",
+        "description": "B-Spot vise à rendre transparents les liens entre entreprises et investisseurs, en facilitant l'accès aux informations publiques sur les structures de capital."
+      },
+      "whatWeDo": {
+        "title": "Ce que fait B-Spot",
+        "description": "B-Spot fournit une base de données consultable des entreprises, fonds d'investissement et personnalités impliquées, basée sur des informations publiques vérifiées."
+      },
+      "howItWorks": {
+        "title": "Comment ça marche",
+        "description": "Consultez notre base de données pour identifier les liens entre entreprises et investisseurs."
+      },
+      "underConstruction": {
+        "title": "🚧 En cours de construction",
+        "description": "B-Spot est en développement actif. Voici les fonctionnalités qui arrivent prochainement :",
+        "features": {
+          "title": "Fonctionnalités à venir",
+          "suggestions": "Suggestion d'informations manquantes",
+          "reporting": "Signalement de fausses informations",
+          "aiUpdates": "Mise à jour automatique de la base de données grâce à l'IA"
+        },
+        "mobile": {
+          "title": "Application mobile",
+          "scanner": "Scanner d'articles pour identifier les entreprises",
+          "accounts": "Création de compte utilisateur",
+          "preferences": "Gestion des préférences et alertes personnalisées"
+        }
+      }
     },
     "dashboard": {
       "title": "Dashboard",
