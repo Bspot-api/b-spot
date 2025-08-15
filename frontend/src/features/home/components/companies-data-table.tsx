@@ -16,12 +16,14 @@ import React from "react"
 
 import type { Company } from "@/api/hooks"
 import { useDebounce } from "@/hooks/use-debounce"
+import { useSectors } from "@/hooks/use-sectors"
 
 import { Button } from "@/components/shadcn/button"
 import { Input } from "@/components/shadcn/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shadcn/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/shadcn/table"
 import { CompaniesPagination } from "./companies-pagination"
+import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 
 export interface CompaniesDataTableProps {
   companies: Company[]
@@ -186,8 +188,50 @@ export function CompaniesDataTable({
     setLocalSearch(currentSearch)
   }, [currentSearch])
 
+  // Fetch sectors for the filter
+  const { data: sectors = [], isLoading: sectorsLoading } = useSectors()
+
+  // Apply filters to companies
+  const filteredCompanies = React.useMemo(() => {
+    return companies.filter(company => {
+      // Get filter values for each column
+      const sectorFilter = columnFilters.find(f => f.id === 'sector')?.value as string[] | undefined
+      const fundFilter = columnFilters.find(f => f.id === 'fund')?.value as string[] | undefined
+      const personalitiesFilter = columnFilters.find(f => f.id === 'personalities')?.value as string[] | undefined
+
+      // Filter by sectors
+      if (sectorFilter && sectorFilter.length > 0) {
+        if (!company.sector || !sectorFilter.includes(company.sector.id)) {
+          return false
+        }
+      }
+
+      // Filter by funds
+      if (fundFilter && fundFilter.length > 0) {
+        if (!company.fund || !fundFilter.includes(company.fund.id)) {
+          return false
+        }
+      }
+
+      // Filter by personalities
+      if (personalitiesFilter && personalitiesFilter.length > 0) {
+        if (!company.personalities || company.personalities.length === 0) {
+          return false
+        }
+        const hasSelectedPersonality = company.personalities.some(personality => 
+          personalitiesFilter.includes(personality.id)
+        )
+        if (!hasSelectedPersonality) {
+          return false
+        }
+      }
+
+      return true
+    })
+  }, [companies, columnFilters])
+
   const table = useReactTable({
-    data: companies,
+    data: filteredCompanies,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -203,11 +247,19 @@ export function CompaniesDataTable({
     },
   })
 
-
   return (
     <div className="w-full">
       {/* Filters */}
       <div className="flex items-center gap-2 py-4 border-b">
+        <DataTableFacetedFilter
+          column={table.getColumn("sector")}
+          title="Sectors"
+          options={sectors.map(sector => ({
+            label: sector.name,
+            value: sector.id,
+          }))}
+          loading={sectorsLoading}
+        />
       </div>
 
       <div className="flex items-center justify-between py-4">

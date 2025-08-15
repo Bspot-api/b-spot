@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils"
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>
   title?: string
+  loading?: boolean
   options: {
     label: string
     value: string
@@ -35,14 +36,21 @@ export function DataTableFacetedFilter<TData, TValue>({
   column,
   title,
   options,
+  loading = false
 }: DataTableFacetedFilterProps<TData, TValue>) {
+  
   const facets = column?.getFacetedUniqueValues()
   const selectedValues = new Set(column?.getFilterValue() as string[])
 
   return (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 border-dashed">
+      <PopoverTrigger>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="h-8 border-dashed"
+          disabled={loading}
+        >
           <PlusCircle />
           {title}
           {selectedValues?.size > 0 && (
@@ -80,6 +88,7 @@ export function DataTableFacetedFilter<TData, TValue>({
           )}
         </Button>
       </PopoverTrigger>
+      {!loading && (
       <PopoverContent className="w-[200px] p-0" align="start">
         <Command>
           <CommandInput placeholder={title} />
@@ -92,12 +101,14 @@ export function DataTableFacetedFilter<TData, TValue>({
                   <CommandItem
                     key={option.value}
                     onSelect={() => {
+                      console.log('Option selected:', option.value)
                       if (isSelected) {
                         selectedValues.delete(option.value)
                       } else {
                         selectedValues.add(option.value)
                       }
                       const filterValues = Array.from(selectedValues)
+                      console.log('Setting filter value:', filterValues)
                       column?.setFilterValue(
                         filterValues.length ? filterValues : undefined
                       )
@@ -141,7 +152,8 @@ export function DataTableFacetedFilter<TData, TValue>({
             )}
           </CommandList>
         </Command>
-      </PopoverContent>
+        </PopoverContent>
+      )}
     </Popover>
   )
 }
