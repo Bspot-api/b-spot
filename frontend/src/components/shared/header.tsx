@@ -1,3 +1,4 @@
+import bSpotLogo from '@/assets/b-spot-logo-removebg.png';
 import { useAuth } from '@/contexts/auth-context';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -7,33 +8,20 @@ export function Header() {
   const { t } = useTranslation();
 
   return (
-    <header className="w-full bg-white shadow-sm border-b border-gray-200">
+    <header className="w-full bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo/Brand */}
-          <div className="flex items-center">
-            <Link to="/" className="text-xl font-bold text-gray-900">
+          <div className="flex items-center  pl-1 pr-3 py-1 rounded-md">
+            <Link to="/" className="flex items-center gap-2 text-xl font-bold text-gray-900">
+              <img 
+                src={bSpotLogo} 
+                alt="B-Spot Logo" 
+                className="h-12 w-12 object-contain"
+              />
               {t('brand.name')}
             </Link>
           </div>
-
-          {/* Navigation */}
-          <nav className="hidden md:flex space-x-8">
-            <Link 
-              to="/" 
-              className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
-            >
-              {t('navigation.home')}
-            </Link>
-            {user && (
-              <Link 
-                to="/dashboard" 
-                className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
-              >
-                {t('navigation.dashboard')}
-              </Link>
-            )}
-          </nav>
 
           {/* Right side - Admin link and user actions */}
           <div className="flex items-center space-x-4">
@@ -46,7 +34,7 @@ export function Header() {
               </Link>
             )}
             
-            {user ? (
+            {user && (
               <div className="flex items-center space-x-2">
                 <Link 
                   to="/account" 
@@ -55,14 +43,7 @@ export function Header() {
                   {t('navigation.account')}
                 </Link>
               </div>
-            ) : (
-              <Link 
-                to="/login" 
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-              >
-                {t('navigation.login')}
-              </Link>
-            )}
+          )}
           </div>
         </div>
       </div>
