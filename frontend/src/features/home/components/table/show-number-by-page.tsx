@@ -1,4 +1,5 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shadcn";
+import { useTranslation } from "react-i18next";
 
 export interface ShowNumberByPageProps {
   currentLimit: number
@@ -6,9 +7,11 @@ export interface ShowNumberByPageProps {
 }
 
 export function ShowNumberByPage({ currentLimit, onLimitChange }: ShowNumberByPageProps) {
+  const { t } = useTranslation();
+  
   return (
     <div className="lg:flex items-center gap-2 hidden">
-      <span className="text-sm text-gray-600">Afficher :</span>
+      <span className="text-sm text-gray-600">{t('companies.pagination.show')}</span>
       <Select 
         value={(currentLimit || 30).toString()} 
         onValueChange={(value) => onLimitChange(parseInt(value))}
@@ -23,7 +26,7 @@ export function ShowNumberByPage({ currentLimit, onLimitChange }: ShowNumberByPa
           <SelectItem value="50">50</SelectItem>
         </SelectContent>
       </Select>
-      <span className="text-sm text-gray-600">par page</span>
+      <span className="text-sm text-gray-600">{t('companies.pagination.perPage')}</span>
     </div>
   )
 }

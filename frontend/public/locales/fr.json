@@ -52,6 +52,82 @@
   "common": {
     "loading": "Chargement...",
     "error": "Erreur",
-    "success": "Succès"
+    "success": "Succès",
+    "close": "Fermer"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "dashboard": "Tableau de bord",
+    "account": "Mon compte",
+    "login": "Se connecter"
+  },
+  "brand": {
+    "name": "B-Spot"
+  },
+  "companies": {
+    "title": "Liste des entreprises",
+    "loading": "Chargement des entreprises...",
+    "loadingParams": "Chargement des paramètres...",
+    "error": "Erreur lors du chargement des entreprises",
+    "searchPlaceholder": "Rechercher une entreprise...",
+    "noResults": "Aucune entreprise trouvée",
+    "noResultsForSearch": "Aucune entreprise trouvée pour \"{search}\"",
+    "pagination": {
+      "page": "Page {page} sur {totalPages}",
+      "total": "({total} entreprises au total)",
+      "show": "Afficher :",
+      "perPage": "par page"
+    }
+  },
+  "table": {
+    "columns": {
+      "companyName": "Nom de l'entreprise",
+      "fund": "Fond d'investissement",
+      "personalities": "Personnalités impliquées",
+      "sector": "Secteur"
+    },
+    "filters": {
+      "funds": "Fonds",
+      "personalities": "Personnalités",
+      "sectors": "Secteurs"
+    },
+    "values": {
+      "notSpecified": "Non spécifié",
+      "noPersonalities": "Aucune personnalité"
+    },
+    "pagination": {
+      "rowsPerPage": "Lignes par page",
+      "page": "Page",
+      "of": "sur",
+      "rowsSelected": "ligne(s) sélectionnée(s)",
+      "goToFirstPage": "Aller à la première page",
+      "goToPreviousPage": "Aller à la page précédente",
+      "goToNextPage": "Aller à la page suivante",
+      "goToLastPage": "Aller à la dernière page",
+      "previous": "Précédent",
+      "next": "Suivant"
+    }
+  },
+  "filters": {
+    "noResults": "Aucun résultat trouvé",
+    "clearFilters": "Effacer les filtres",
+    "selected": "sélectionné(s)"
+  },
+  "dashboard": {
+    "companies": "Entreprises"
+  },
+  "loading": {
+    "general": "Chargement...",
+    "loading": "Chargement..."
+  },
+  "languages": {
+    "english": "English",
+    "french": "Français"
+  },
+  "command": {
+    "palette": {
+      "title": "Palette de commandes",
+      "description": "Rechercher une commande à exécuter..."
+    }
   }
 } 

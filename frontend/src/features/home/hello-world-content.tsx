@@ -1,7 +1,9 @@
 import { useCompaniesPagination } from "@/hooks/use-companies";
+import { useTranslation } from "react-i18next";
 import { CompaniesDataTable } from "./components/companies-data-table";
 
 export function HelloWorldContent() {
+  const { t } = useTranslation();
   const {
     companies,
     pagination,
@@ -19,7 +21,7 @@ export function HelloWorldContent() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-lg">Chargement des entreprises...</div>
+        <div className="text-lg">{t('companies.loading')}</div>
       </div>
     );
   }
@@ -28,7 +30,7 @@ export function HelloWorldContent() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-lg text-red-600">
-          Erreur lors du chargement des entreprises
+          {t('companies.error')}
         </div>
       </div>
     );
@@ -37,11 +39,11 @@ export function HelloWorldContent() {
 
   return (
     <div className="container mx-auto py-10 lg:px-0">
-      <h1 className="text-3xl font-bold mb-8">Liste des entreprises</h1>
+      <h1 className="text-3xl font-bold mb-8">{t('companies.title')}</h1>
       
       <div className="mb-4 text-sm text-gray-600">
-        Page {page} sur {pagination?.totalPages || 1} 
-        ({pagination?.total || 0} entreprises au total)
+        {t('companies.pagination.page', { page, totalPages: pagination?.totalPages || 1 })} 
+        {t('companies.pagination.total', { total: pagination?.total || 0 })}
       </div>
       
       <CompaniesDataTable 

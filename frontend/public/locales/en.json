@@ -52,6 +52,82 @@
   "common": {
     "loading": "Loading...",
     "error": "Error",
-    "success": "Success"
+    "success": "Success",
+    "close": "Close"
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "account": "My account",
+    "login": "Login"
+  },
+  "brand": {
+    "name": "B-Spot"
+  },
+  "companies": {
+    "title": "Companies List",
+    "loading": "Loading companies...",
+    "loadingParams": "Loading parameters...",
+    "error": "Error loading companies",
+    "searchPlaceholder": "Search for a company...",
+    "noResults": "No companies found",
+    "noResultsForSearch": "No companies found for \"{search}\"",
+    "pagination": {
+      "page": "Page {page} of {totalPages}",
+      "total": "({total} companies total)",
+      "show": "Show:",
+      "perPage": "per page"
+    }
+  },
+  "table": {
+    "columns": {
+      "companyName": "Company Name",
+      "fund": "Investment Fund",
+      "personalities": "Involved Personalities",
+      "sector": "Sector"
+    },
+    "filters": {
+      "funds": "Funds",
+      "personalities": "Personalities",
+      "sectors": "Sectors"
+    },
+    "values": {
+      "notSpecified": "Not specified",
+      "noPersonalities": "No personalities"
+    },
+    "pagination": {
+      "rowsPerPage": "Rows per page",
+      "page": "Page",
+      "of": "of",
+      "rowsSelected": "row(s) selected",
+      "goToFirstPage": "Go to first page",
+      "goToPreviousPage": "Go to previous page",
+      "goToNextPage": "Go to next page",
+      "goToLastPage": "Go to last page",
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
+  "filters": {
+    "noResults": "No results found",
+    "clearFilters": "Clear filters",
+    "selected": "selected"
+  },
+  "dashboard": {
+    "companies": "Companies"
+  },
+  "loading": {
+    "general": "Loading...",
+    "loading": "Loading..."
+  },
+  "languages": {
+    "english": "English",
+    "french": "Français"
+  },
+  "command": {
+    "palette": {
+      "title": "Command Palette",
+      "description": "Search for a command to run..."
+    }
   }
 } 

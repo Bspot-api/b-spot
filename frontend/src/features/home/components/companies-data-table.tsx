@@ -11,6 +11,7 @@ import {
   useReactTable
 } from "@tanstack/react-table"
 import React from "react"
+import { useTranslation } from "react-i18next"
 
 import type { Company } from "@/api/hooks"
 import { useDebounce } from "@/hooks/use-debounce"
@@ -20,7 +21,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { CompaniesPagination } from "./companies-pagination"
 import { FilterFunds, FilterPersonalities, FilterSectors } from "./filters"
 import { ShowNumberByPage } from "./table"
-import { columns } from "./table/columns"
+import { useCompanyColumns } from "./table/columns"
 
 export interface CompaniesDataTableProps {
   companies: Company[]
@@ -46,11 +47,14 @@ export function CompaniesDataTable({
   onLimitChange,
   isSearching = false
 }: CompaniesDataTableProps) {
+  const { t } = useTranslation();
+  const columns = useCompanyColumns();
+  
   // Safety check to ensure all required props are valid
   if (typeof currentPage !== 'number' || typeof totalPages !== 'number' || typeof currentLimit !== 'number') {
     return (
       <div className="w-full text-center py-8">
-        <p className="text-gray-600">Chargement des paramètres...</p>
+        <p className="text-gray-600">{t('companies.loadingParams')}</p>
       </div>
     );
   }
@@ -139,7 +143,7 @@ export function CompaniesDataTable({
         <div className="flex flex-col lg:flex-row items-center gap-4">
           <div className="relative flex flex-col lg:flex-row items-center gap-2">
             <Input
-              placeholder="Rechercher une entreprise..."
+              placeholder={t('companies.searchPlaceholder')}
               value={localSearch}
               onChange={(event) => setLocalSearch(event.target.value)}
               className="max-w-sm transition-all duration-200 w-80"
@@ -209,7 +213,7 @@ export function CompaniesDataTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  {currentSearch ? `Aucune entreprise trouvée pour "${currentSearch}"` : 'Aucune entreprise trouvée.'}
+                  {currentSearch ? t('companies.noResultsForSearch', { search: currentSearch }) : t('companies.noResults')}
                 </TableCell>
               </TableRow>
             )}

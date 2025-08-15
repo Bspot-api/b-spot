@@ -47,17 +47,17 @@ export function DashboardContent() {
         <h1 className="text-3xl font-bold text-gray-900 mb-8">{t('pages.dashboard.title')}</h1>
         
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Entreprises</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('dashboard.companies')}</h2>
           
           {isLoading && (
             <div className="text-center py-8">
-              <p className="text-gray-600">Chargement des entreprises...</p>
+              <p className="text-gray-600">{t('companies.loading')}</p>
             </div>
           )}
           
           {error && (
             <div className="text-center py-8">
-              <p className="text-red-600">Erreur lors du chargement des entreprises</p>
+              <p className="text-red-600">{t('companies.error')}</p>
             </div>
           )}
           
@@ -78,7 +78,7 @@ export function DashboardContent() {
           {!isLoading && !error && companies && companies.length === 0 && (
             <div className="text-center py-8">
               <p className="text-gray-600">
-                {search ? `Aucune entreprise trouvée pour "${search}"` : 'Aucune entreprise trouvée'}
+                {search ? t('companies.noResultsForSearch', { search }) : t('companies.noResults')}
               </p>
             </div>
           )}
