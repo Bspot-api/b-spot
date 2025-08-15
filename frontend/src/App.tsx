@@ -1,4 +1,5 @@
 import { ProtectedRoute } from '@/components/auth/protected-route';
+import { FaviconManager } from '@/components/ui/favicon-manager';
 import { AuthProvider } from '@/contexts/auth-context';
 import { AccountPage } from '@/pages/account';
 import { Dashboard } from '@/pages/dashboard';
@@ -11,6 +12,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <FaviconManager />
         <div className="App">
           <Routes>
             <Route path="/login" element={<LoginPage />} />

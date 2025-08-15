@@ -11,4 +11,20 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  // Optimisation des assets statiques
+  build: {
+    rollupOptions: {
+      output: {
+        assetFileNames: (assetInfo) => {
+          // Garder les noms originaux pour les icônes
+          if (assetInfo.name && assetInfo.name.match(/\.(ico|png|svg)$/)) {
+            return assetInfo.name;
+          }
+          return 'assets/[name]-[hash][extname]';
+        },
+      },
+    },
+  },
+  // Configuration des assets publics
+  publicDir: 'public',
 })
