@@ -5,20 +5,22 @@ import React from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useApiClient } from "./use-api-client";
 
-export function useCompanies(page: number = 1, limit: number = 30) {
+export function useCompanies(page: number = 1, limit: number = 30, search?: string) {
   // Ensure the API client is configured
   useApiClient();
 
   return useQuery({
-    queryKey: ["companies", page, limit],
+    queryKey: ["companies", page, limit, search],
     queryFn: async () => {
       const options: CompanyControllerFindAllData = {
-        query: { page, limit },
+        query: { page, limit, search },
         url: '/companies'
       };
       const response = await companyControllerFindAll(options);
       return response.data;
     },
+    // Keep previous data while loading new data to prevent blinking
+    placeholderData: (previousData) => previousData,
   });
 }
 
@@ -31,14 +33,14 @@ export function useCompaniesPagination(initialPage: number = 1, initialLimit: nu
   // Get current values from URL params or use defaults with proper fallbacks
   const currentPage = Math.max(1, parseInt(searchParams.get('page') || initialPage.toString(), 10) || initialPage);
   const currentLimit = Math.max(1, parseInt(searchParams.get('limit') || initialLimit.toString(), 10) || initialLimit);
-  const currentFilter = searchParams.get('filter') || '';
+  const currentSearch = searchParams.get('search') || '';
   
   const [page, setPage] = React.useState(currentPage);
   const [limit, setLimit] = React.useState(currentLimit);
-  const [filter, setFilter] = React.useState(currentFilter);
+  const [search, setSearch] = React.useState(currentSearch);
   const [isInitialized, setIsInitialized] = React.useState(false);
   
-  const { data: response, isLoading, error } = useCompanies(page, limit);
+  const { data: response, isLoading, error, isFetching } = useCompanies(page, limit, search);
 
   const companies = response?.data || [];
   const pagination = response?.pagination;
@@ -51,11 +53,11 @@ export function useCompaniesPagination(initialPage: number = 1, initialLimit: nu
   }, [response, isInitialized]);
 
   // Update URL params when state changes
-  const updateURLParams = React.useCallback((newPage: number, newLimit: number, newFilter: string) => {
+  const updateURLParams = React.useCallback((newPage: number, newLimit: number, newSearch: string) => {
     const params = new URLSearchParams();
     if (newPage > 1) params.set('page', newPage.toString());
     if (newLimit !== initialLimit) params.set('limit', newLimit.toString());
-    if (newFilter) params.set('filter', newFilter);
+    if (newSearch) params.set('search', newSearch);
     
     setSearchParams(params, { replace: true });
   }, [setSearchParams, initialLimit]);
@@ -68,52 +70,53 @@ export function useCompaniesPagination(initialPage: number = 1, initialLimit: nu
     if (currentLimit !== limit) {
       setLimit(currentLimit);
     }
-    if (currentFilter !== filter) {
-      setFilter(currentFilter);
+    if (currentSearch !== search) {
+      setSearch(currentSearch);
     }
-  }, [currentPage, currentLimit, currentFilter, page, limit, filter]);
+  }, [currentPage, currentLimit, currentSearch, page, limit, search]);
 
   const goToPage = (newPage: number) => {
     setPage(newPage);
-    updateURLParams(newPage, limit, filter);
+    updateURLParams(newPage, limit, search);
   };
 
   const goToNextPage = () => {
     const newPage = page + 1;
     setPage(newPage);
-    updateURLParams(newPage, limit, filter);
+    updateURLParams(newPage, limit, search);
   };
 
   const goToPreviousPage = () => {
     const newPage = Math.max(1, page - 1);
     setPage(newPage);
-    updateURLParams(newPage, limit, filter);
+    updateURLParams(newPage, limit, search);
   };
 
-  const updateFilter = (newFilter: string) => {
-    setFilter(newFilter);
-    setPage(1); // Reset to first page when filter changes
-    updateURLParams(1, limit, newFilter);
+  const updateSearch = (newSearch: string) => {
+    setSearch(newSearch);
+    setPage(1); // Reset to first page when search changes
+    updateURLParams(1, limit, newSearch);
   };
 
   const updateLimit = (newLimit: number) => {
     setLimit(newLimit);
     setPage(1); // Reset to first page when limit changes
-    updateURLParams(1, newLimit, filter);
+    updateURLParams(1, newLimit, search);
   };
 
   return {
     companies,
     pagination,
     isLoading: isLoading || !isInitialized,
+    isFetching,
     error,
     page,
     limit,
-    filter,
+    search,
     goToPage,
     goToNextPage,
     goToPreviousPage,
-    updateFilter,
+    updateSearch,
     updateLimit,
     hasNextPage: pagination?.totalPages ? page < pagination.totalPages : companies.length === limit,
     hasPreviousPage: page > 1

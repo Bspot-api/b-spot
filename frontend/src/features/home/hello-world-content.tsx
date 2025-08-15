@@ -9,10 +9,11 @@ export function HelloWorldContent() {
     error,
     page,
     limit,
-    filter,
+    search,
     goToPage,
-    updateFilter,
+    updateSearch,
     updateLimit,
+    isFetching,
   } = useCompaniesPagination();
 
   if (isLoading) {
@@ -36,7 +37,9 @@ export function HelloWorldContent() {
   if (!companies || companies.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-lg">Aucune entreprise trouvée</div>
+        <div className="text-lg">
+          {search ? `Aucune entreprise trouvée pour "${search}"` : 'Aucune entreprise trouvée'}
+        </div>
       </div>
     );
   }
@@ -55,10 +58,11 @@ export function HelloWorldContent() {
         currentPage={page}
         totalPages={pagination?.totalPages || 1}
         onPageChange={goToPage}
-        currentFilter={filter}
-        onFilterChange={updateFilter}
+        currentSearch={search}
+        onSearchChange={updateSearch}
         currentLimit={limit}
         onLimitChange={updateLimit}
+        isSearching={isFetching}
       />
     </div>
   );

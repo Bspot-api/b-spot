@@ -172,7 +172,7 @@ export const authControllerChangePasswordMutation = (options?: Partial<Options<A
 export const companyControllerFindAllQueryKey = (options?: Options<CompanyControllerFindAllData>) => createQueryKey('companyControllerFindAll', options);
 
 /**
- * Get all companies with pagination
+ * Get all companies with pagination and search
  */
 export const companyControllerFindAllOptions = (options?: Options<CompanyControllerFindAllData>) => {
     return queryOptions({
@@ -223,7 +223,7 @@ const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'hea
 export const companyControllerFindAllInfiniteQueryKey = (options?: Options<CompanyControllerFindAllData>): QueryKey<Options<CompanyControllerFindAllData>> => createQueryKey('companyControllerFindAll', options, true);
 
 /**
- * Get all companies with pagination
+ * Get all companies with pagination and search
  */
 export const companyControllerFindAllInfiniteOptions = (options?: Options<CompanyControllerFindAllData>) => {
     return infiniteQueryOptions<CompanyControllerFindAllResponse, DefaultError, InfiniteData<CompanyControllerFindAllResponse>, QueryKey<Options<CompanyControllerFindAllData>>, number | Pick<QueryKey<Options<CompanyControllerFindAllData>>[0], 'body' | 'headers' | 'path' | 'query'>>(

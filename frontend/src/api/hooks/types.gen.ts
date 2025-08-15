@@ -211,6 +211,22 @@ export type CompanyControllerFindAllData = {
          * Items per page (default: 30)
          */
         limit?: number;
+        /**
+         * Search term for company name, fund name, sector name, or personality name
+         */
+        search?: string;
+        /**
+         * Filter by fund ID
+         */
+        fundId?: string;
+        /**
+         * Filter by sector ID
+         */
+        sectorId?: string;
+        /**
+         * Filter by personality ID
+         */
+        personalityId?: string;
     };
     url: '/companies';
 };

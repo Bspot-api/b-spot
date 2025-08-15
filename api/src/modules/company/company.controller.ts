@@ -11,7 +11,7 @@ import {
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateCompanyDto } from './company.dto';
 import { Company } from './company.entity';
-import { CompanyService } from './company.service';
+import { CompanySearchFilters, CompanyService } from './company.service';
 
 export interface PaginatedCompaniesResponse {
   data: Company[];
@@ -40,7 +40,7 @@ export class CompanyController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all companies with pagination' })
+  @ApiOperation({ summary: 'Get all companies with pagination and search' })
   @ApiQuery({
     name: 'page',
     required: false,
@@ -52,6 +52,31 @@ export class CompanyController {
     required: false,
     description: 'Items per page (default: 30)',
     type: Number,
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description:
+      'Search term for company name, fund name, sector name, or personality name',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'fundId',
+    required: false,
+    description: 'Filter by fund ID',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'sectorId',
+    required: false,
+    description: 'Filter by sector ID',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'personalityId',
+    required: false,
+    description: 'Filter by personality ID',
+    type: String,
   })
   @ApiResponse({
     status: 200,
@@ -78,11 +103,22 @@ export class CompanyController {
   async findAll(
     @Query('page') page?: number,
     @Query('limit') limit?: number,
+    @Query('search') search?: string,
+    @Query('fundId') fundId?: string,
+    @Query('sectorId') sectorId?: string,
+    @Query('personalityId') personalityId?: string,
   ): Promise<PaginatedCompaniesResponse> {
     const pageNum = page ? parseInt(page.toString(), 10) : 1;
     const limitNum = limit ? parseInt(limit.toString(), 10) : 30;
 
-    return this.companyService.findAllPaginated(pageNum, limitNum);
+    const filters: CompanySearchFilters = {
+      search,
+      fundId,
+      sectorId,
+      personalityId,
+    };
+
+    return this.companyService.findAllPaginated(pageNum, limitNum, filters);
   }
 
   @Get(':id')

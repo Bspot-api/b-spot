@@ -14,12 +14,13 @@ export function DashboardContent() {
     companies,
     pagination,
     isLoading,
+    isFetching,
     error,
     page,
     limit,
-    filter,
+    search,
     goToPage,
-    updateFilter,
+    updateSearch,
     updateLimit,
     hasNextPage,
     hasPreviousPage
@@ -68,16 +69,19 @@ export function DashboardContent() {
               currentPage={page}
               totalPages={pagination.totalPages || 1}
               onPageChange={goToPage}
-              currentFilter={filter}
-              onFilterChange={updateFilter}
+              currentSearch={search}
+              onSearchChange={updateSearch}
               currentLimit={limit}
               onLimitChange={updateLimit}
+              isSearching={isFetching}
             />
           )}
           
           {!isLoading && !error && companies && companies.length === 0 && (
             <div className="text-center py-8">
-              <p className="text-gray-600">Aucune entreprise trouvée</p>
+              <p className="text-gray-600">
+                {search ? `Aucune entreprise trouvée pour "${search}"` : 'Aucune entreprise trouvée'}
+              </p>
             </div>
           )}
         </div>

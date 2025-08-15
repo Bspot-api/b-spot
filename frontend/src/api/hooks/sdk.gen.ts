@@ -60,7 +60,7 @@ export const authControllerChangePassword = <ThrowOnError extends boolean = fals
 };
 
 /**
- * Get all companies with pagination
+ * Get all companies with pagination and search
  */
 export const companyControllerFindAll = <ThrowOnError extends boolean = false>(options?: Options<CompanyControllerFindAllData, ThrowOnError>) => {
     return (options?.client ?? _heyApiClient).get<CompanyControllerFindAllResponses, unknown, ThrowOnError>({

@@ -14,6 +14,13 @@ export interface PaginatedCompaniesResponse {
   };
 }
 
+export interface CompanySearchFilters {
+  search?: string;
+  fundId?: string;
+  sectorId?: string;
+  personalityId?: string;
+}
+
 @Injectable()
 export class CompanyService {
   constructor(
@@ -37,22 +44,42 @@ export class CompanyService {
   async findAllPaginated(
     page: number = 1,
     limit: number = 30,
+    filters: CompanySearchFilters = {},
   ): Promise<PaginatedCompaniesResponse> {
     const offset = (page - 1) * limit;
+    const whereConditions: any = {};
 
-    // Get total count
-    const total = await this.companyRepository.count();
+    if (filters.fundId) {
+      whereConditions.fund = filters.fundId;
+    }
 
-    // Get paginated data with relations
-    const companies = await this.companyRepository.find(
-      {},
-      {
-        populate: ['fund', 'sector', 'personalities'],
-        limit,
-        offset,
-        orderBy: { name: 'ASC' },
-      },
-    );
+    if (filters.sectorId) {
+      whereConditions.sector = filters.sectorId;
+    }
+
+    if (filters.personalityId) {
+      whereConditions.personalities = { $in: [filters.personalityId] };
+    }
+
+    let total: number;
+    let companies: Company[];
+    
+    if (filters.search) {
+      const searchResult = await this.searchCompanies(filters.search, whereConditions, limit, offset);
+      companies = searchResult.companies;
+      total = searchResult.total;
+    } else {
+      total = await this.companyRepository.count(whereConditions);
+      companies = await this.companyRepository.find(
+        whereConditions,
+        {
+          populate: ['fund', 'sector', 'personalities'],
+          limit,
+          offset,
+          orderBy: { name: 'ASC' },
+        },
+      );
+    }
 
     const totalPages = Math.ceil(total / limit);
 
@@ -65,6 +92,47 @@ export class CompanyService {
         totalPages,
       },
     };
+  }
+
+  private async searchCompanies(
+    searchTerm: string,
+    whereConditions: any,
+    limit: number,
+    offset: number,
+  ): Promise<{ companies: Company[]; total: number }> {
+    const searchPattern = `%${searchTerm}%`;
+    
+    // First, get the total count for search results
+    const total = await this.companyRepository.count({
+      $or: [
+        { name: { $ilike: searchPattern } },
+        { fund: { name: { $ilike: searchPattern } } },
+        { sector: { name: { $ilike: searchPattern } } },
+        { personalities: { name: { $ilike: searchPattern } } },
+      ],
+      ...whereConditions,
+    });
+
+    // Then get the paginated search results
+    const companies = await this.companyRepository.find(
+      {
+        $or: [
+          { name: { $ilike: searchPattern } },
+          { fund: { name: { $ilike: searchPattern } } },
+          { sector: { name: { $ilike: searchPattern } } },
+          { personalities: { name: { $ilike: searchPattern } } },
+        ],
+        ...whereConditions,
+      },
+      {
+        populate: ['fund', 'sector', 'personalities'],
+        limit,
+        offset,
+        orderBy: { name: 'ASC' },
+      },
+    );
+
+    return { companies, total };
   }
 
   async findOne(id: string): Promise<Company> {

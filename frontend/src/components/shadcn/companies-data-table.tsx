@@ -11,10 +11,11 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ExternalLink } from "lucide-react"
+import { ArrowUpDown, ExternalLink, Search } from "lucide-react"
 import React from "react"
 
 import type { Company } from "@/api/hooks"
+import { useDebounce } from "@/hooks/use-debounce"
 import { CompaniesPagination } from "../ui/companies-pagination"
 import { Button } from "./button"
 import { Input } from "./input"
@@ -26,10 +27,11 @@ export interface CompaniesDataTableProps {
   currentPage: number
   totalPages: number
   onPageChange: (page: number) => void
-  currentFilter: string
-  onFilterChange: (filter: string) => void
+  currentSearch: string
+  onSearchChange: (search: string) => void
   currentLimit: number
   onLimitChange: (limit: number) => void
+  isSearching?: boolean
 }
 
 export const columns: ColumnDef<Company>[] = [
@@ -128,10 +130,11 @@ export function CompaniesDataTable({
   currentPage, 
   totalPages, 
   onPageChange,
-  currentFilter,
-  onFilterChange,
+  currentSearch,
+  onSearchChange,
   currentLimit,
-  onLimitChange
+  onLimitChange,
+  isSearching = false
 }: CompaniesDataTableProps) {
   // Safety check to ensure all required props are valid
   if (typeof currentPage !== 'number' || typeof totalPages !== 'number' || typeof currentLimit !== 'number') {
@@ -145,6 +148,22 @@ export function CompaniesDataTable({
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
+  const [localSearch, setLocalSearch] = React.useState(currentSearch)
+
+  // Use debounce hook for search
+  const debouncedSearch = useDebounce(localSearch, 500)
+
+  // Update parent search when debounced value changes
+  React.useEffect(() => {
+    if (debouncedSearch !== currentSearch) {
+      onSearchChange(debouncedSearch)
+    }
+  }, [debouncedSearch, currentSearch, onSearchChange])
+
+  // Sync local search with prop changes
+  React.useEffect(() => {
+    setLocalSearch(currentSearch)
+  }, [currentSearch])
 
   const table = useReactTable({
     data: companies,
@@ -166,12 +185,20 @@ export function CompaniesDataTable({
     <div className="w-full">
       <div className="flex items-center justify-between py-4">
         <div className="flex items-center gap-4">
-          <Input
-            placeholder="Filtrer par nom d'entreprise..."
-            value={currentFilter}
-            onChange={(event) => onFilterChange(event.target.value)}
-            className="max-w-sm"
-          />
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Rechercher une entreprise..."
+              value={localSearch}
+              onChange={(event) => setLocalSearch(event.target.value)}
+              className="pl-10 max-w-sm transition-all duration-200"
+            />
+            {isSearching && (
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+              </div>
+            )}
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-600">Afficher :</span>
@@ -192,6 +219,7 @@ export function CompaniesDataTable({
           <span className="text-sm text-gray-600">par page</span>
         </div>
       </div>
+      
       <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
@@ -235,7 +263,7 @@ export function CompaniesDataTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Aucune entreprise trouvée.
+                  {currentSearch ? `Aucune entreprise trouvée pour "${currentSearch}"` : 'Aucune entreprise trouvée.'}
                 </TableCell>
               </TableRow>
             )}
