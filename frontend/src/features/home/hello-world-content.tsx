@@ -1,12 +1,19 @@
 import { CompaniesDataTable } from "@/components/shadcn/companies-data-table";
-import { useCompanies } from "@/hooks/use-companies";
-import { useState } from "react";
+import { useCompaniesPagination } from "@/hooks/use-companies";
 
 export function HelloWorldContent() {
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 30;
-  
-  const { data, isLoading, error } = useCompanies(currentPage, pageSize);
+  const {
+    companies,
+    pagination,
+    isLoading,
+    error,
+    page,
+    limit,
+    filter,
+    goToPage,
+    updateFilter,
+    updateLimit,
+  } = useCompaniesPagination();
 
   if (isLoading) {
     return (
@@ -26,7 +33,7 @@ export function HelloWorldContent() {
     );
   }
 
-  if (!data?.data || data.data.length === 0) {
+  if (!companies || companies.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-lg">Aucune entreprise trouvée</div>
@@ -39,15 +46,19 @@ export function HelloWorldContent() {
       <h1 className="text-3xl font-bold mb-8">Liste des entreprises</h1>
       
       <div className="mb-4 text-sm text-gray-600">
-        Page {currentPage} sur {data.pagination?.totalPages || 1} 
-        ({data.pagination?.total || 0} entreprises au total)
+        Page {page} sur {pagination?.totalPages || 1} 
+        ({pagination?.total || 0} entreprises au total)
       </div>
       
       <CompaniesDataTable 
-        companies={data.data} 
-        currentPage={currentPage}
-        totalPages={data.pagination?.totalPages || 1}
-        onPageChange={setCurrentPage}
+        companies={companies} 
+        currentPage={page}
+        totalPages={pagination?.totalPages || 1}
+        onPageChange={goToPage}
+        currentFilter={filter}
+        onFilterChange={updateFilter}
+        currentLimit={limit}
+        onLimitChange={updateLimit}
       />
     </div>
   );

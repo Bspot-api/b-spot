@@ -16,7 +16,11 @@ export function DashboardContent() {
     isLoading,
     error,
     page,
+    limit,
+    filter,
     goToPage,
+    updateFilter,
+    updateLimit,
     hasNextPage,
     hasPreviousPage
   } = useCompaniesPagination();
@@ -58,16 +62,20 @@ export function DashboardContent() {
             </div>
           )}
           
-          {companies && companies.length > 0 && (
+          {!isLoading && !error && companies && companies.length > 0 && pagination && (
             <CompaniesDataTable
               companies={companies}
               currentPage={page}
-              totalPages={pagination?.totalPages || 1}
+              totalPages={pagination.totalPages || 1}
               onPageChange={goToPage}
+              currentFilter={filter}
+              onFilterChange={updateFilter}
+              currentLimit={limit}
+              onLimitChange={updateLimit}
             />
           )}
           
-          {companies && companies.length === 0 && !isLoading && (
+          {!isLoading && !error && companies && companies.length === 0 && (
             <div className="text-center py-8">
               <p className="text-gray-600">Aucune entreprise trouvée</p>
             </div>

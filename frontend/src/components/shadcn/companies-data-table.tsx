@@ -18,6 +18,7 @@ import type { Company } from "@/api/hooks"
 import { CompaniesPagination } from "../ui/companies-pagination"
 import { Button } from "./button"
 import { Input } from "./input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./table"
 
 export interface CompaniesDataTableProps {
@@ -25,6 +26,10 @@ export interface CompaniesDataTableProps {
   currentPage: number
   totalPages: number
   onPageChange: (page: number) => void
+  currentFilter: string
+  onFilterChange: (filter: string) => void
+  currentLimit: number
+  onLimitChange: (limit: number) => void
 }
 
 export const columns: ColumnDef<Company>[] = [
@@ -118,7 +123,25 @@ export const columns: ColumnDef<Company>[] = [
   },
 ]
 
-export function CompaniesDataTable({ companies, currentPage, totalPages, onPageChange }: CompaniesDataTableProps) {
+export function CompaniesDataTable({ 
+  companies, 
+  currentPage, 
+  totalPages, 
+  onPageChange,
+  currentFilter,
+  onFilterChange,
+  currentLimit,
+  onLimitChange
+}: CompaniesDataTableProps) {
+  // Safety check to ensure all required props are valid
+  if (typeof currentPage !== 'number' || typeof totalPages !== 'number' || typeof currentLimit !== 'number') {
+    return (
+      <div className="w-full text-center py-8">
+        <p className="text-gray-600">Chargement des paramètres...</p>
+      </div>
+    );
+  }
+
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -141,15 +164,33 @@ export function CompaniesDataTable({ companies, currentPage, totalPages, onPageC
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filtrer par nom d'entreprise..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+      <div className="flex items-center justify-between py-4">
+        <div className="flex items-center gap-4">
+          <Input
+            placeholder="Filtrer par nom d'entreprise..."
+            value={currentFilter}
+            onChange={(event) => onFilterChange(event.target.value)}
+            className="max-w-sm"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-600">Afficher :</span>
+          <Select 
+            value={(currentLimit || 30).toString()} 
+            onValueChange={(value) => onLimitChange(parseInt(value))}
+          >
+            <SelectTrigger className="w-20">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="10">10</SelectItem>
+              <SelectItem value="20">20</SelectItem>
+              <SelectItem value="30">30</SelectItem>
+              <SelectItem value="50">50</SelectItem>
+            </SelectContent>
+          </Select>
+          <span className="text-sm text-gray-600">par page</span>
+        </div>
       </div>
       <div className="overflow-hidden rounded-md border">
         <Table>
