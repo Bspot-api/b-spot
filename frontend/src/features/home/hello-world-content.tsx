@@ -1,5 +1,5 @@
-import { CompaniesDataTable } from "@/components/shadcn/companies-data-table";
 import { useCompaniesPagination } from "@/hooks/use-companies";
+import { CompaniesDataTable } from "./components/companies-data-table";
 
 export function HelloWorldContent() {
   const {

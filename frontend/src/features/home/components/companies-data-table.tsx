@@ -16,11 +16,12 @@ import React from "react"
 
 import type { Company } from "@/api/hooks"
 import { useDebounce } from "@/hooks/use-debounce"
-import { CompaniesPagination } from "../ui/companies-pagination"
-import { Button } from "./button"
-import { Input } from "./input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./table"
+
+import { Button } from "@/components/shadcn/button"
+import { Input } from "@/components/shadcn/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shadcn/select"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/shadcn/table"
+import { CompaniesPagination } from "./companies-pagination"
 
 export interface CompaniesDataTableProps {
   companies: Company[]
@@ -69,6 +70,12 @@ export const columns: ColumnDef<Company>[] = [
   {
     accessorKey: "fund",
     header: "Fond d'investissement",
+    enableColumnFilter: true,
+    id: "fund",
+    filterFn: (row, id, value) => {
+      const fund = row.getValue(id) as any;
+      return fund && value.includes(fund.id);
+    },
     cell: ({ row }) => {
       const fund = row.original.fund
       return (
@@ -85,6 +92,14 @@ export const columns: ColumnDef<Company>[] = [
   {
     accessorKey: "personalities",
     header: "Personnalités impliquées",
+    enableColumnFilter: true,
+    id: "personalities",
+    filterFn: (row, id, value) => {
+      const personalities = row.getValue(id) as any[];
+      return value.some((v: string) => 
+        personalities?.some((p: any) => p.id === v)
+      );
+    },
     cell: ({ row }) => {
       const personalities = row.original.personalities
       return (
@@ -110,6 +125,12 @@ export const columns: ColumnDef<Company>[] = [
   {
     accessorKey: "sector",
     header: "Secteur",
+    enableColumnFilter: true,
+    id: "sector",
+    filterFn: (row, id, value) => {
+      const sector = row.getValue(id) as any;
+      return sector && value.includes(sector.id);
+    },
     cell: ({ row }) => {
       const sector = row.original.sector
       return (
@@ -174,6 +195,7 @@ export function CompaniesDataTable({
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
+    enableColumnFilters: true,
     state: {
       sorting,
       columnFilters,
@@ -181,8 +203,13 @@ export function CompaniesDataTable({
     },
   })
 
+
   return (
     <div className="w-full">
+      {/* Filters */}
+      <div className="flex items-center gap-2 py-4 border-b">
+      </div>
+
       <div className="flex items-center justify-between py-4">
         <div className="flex items-center gap-4">
           <div className="relative">

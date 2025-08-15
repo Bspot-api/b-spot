@@ -1,12 +1,13 @@
-export * from "./button";
-export * from "./card";
-export * from "./companies-data-table";
-export * from "./data-table-pagination";
-export * from "./dropdown-menu";
-export * from "./form";
-export * from "./input";
-export * from "./label";
-export * from "./pagination";
-export * from "./select";
-export * from "./table";
+export { Badge } from "./badge"
+export { Button, buttonVariants } from "./button"
+export { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./card"
+export { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "./command"
+export { DataTablePagination } from "./data-table-pagination"
+export { Input } from "./input"
+export { Label } from "./label"
+export { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "./pagination"
+export { Popover, PopoverContent, PopoverTrigger } from "./popover"
+export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select"
+export { Separator } from "./separator"
+export { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./table"
 

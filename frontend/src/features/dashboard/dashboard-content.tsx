@@ -1,6 +1,6 @@
 import { Button } from '@/components/shadcn/button';
-import { CompaniesDataTable } from '@/components/shadcn/companies-data-table';
 import { useAuth } from '@/contexts/auth-context';
+import { CompaniesDataTable } from '@/features/home/components/companies-data-table';
 import { useCompaniesPagination } from '@/hooks/use-companies';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -22,8 +22,6 @@ export function DashboardContent() {
     goToPage,
     updateSearch,
     updateLimit,
-    hasNextPage,
-    hasPreviousPage
   } = useCompaniesPagination();
 
   return (
