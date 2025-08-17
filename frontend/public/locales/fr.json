@@ -115,6 +115,7 @@
   "table": {
     "columns": {
       "companyName": "Nom de l'entreprise",
+      "description": "Description",
       "fund": "Fond d'investissement",
       "personalities": "Personnalités impliquées",
       "sector": "Secteur"
@@ -126,7 +127,8 @@
     },
     "values": {
       "notSpecified": "Non spécifié",
-      "noPersonalities": "Aucune personnalité"
+      "noPersonalities": "Aucune personnalité",
+      "noDescription": "Aucune description"
     },
     "pagination": {
       "rowsPerPage": "Lignes par page",

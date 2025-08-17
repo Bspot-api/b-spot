@@ -1,25 +1,31 @@
 import { DataTableFilter } from '@/features/home/components/filters/data-table-filter'
 import { useSectors } from '@/hooks/use-sectors'
-import type { Column } from '@tanstack/react-table'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 
-interface FilterSectorsProps<TData, TValue> {
-  column?: Column<TData, TValue>
+interface FilterSectorsProps {
+  currentSectorIds: string[]
+  onSectorIdsChange: (sectorIds: string[]) => void
 }
 
-export function FilterSectors<TData, TValue>({ column }: FilterSectorsProps<TData, TValue>) {
+export function FilterSectors({ currentSectorIds, onSectorIdsChange }: FilterSectorsProps) {
   const { data: sectors = [], isLoading: sectorsLoading } = useSectors()
   const { t } = useTranslation()
 
+  const handleFilterChange = React.useCallback((selectedIds: string[]) => {
+    onSectorIdsChange(selectedIds)
+  }, [onSectorIdsChange])
+
   return (
     <DataTableFilter
-      column={column}
       title={t('table.filters.sectors')}
       options={sectors.map(sector => ({
         label: sector.name,
         value: sector.id,
       }))}
       loading={sectorsLoading}
+      selectedValues={currentSectorIds}
+      onSelectionChange={handleFilterChange}
     />
   )
 }

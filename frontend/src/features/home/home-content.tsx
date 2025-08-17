@@ -11,9 +11,15 @@ export function HomeContent() {
     page,
     limit,
     search,
+    sectorIds,
+    fundIds,
+    personalityIds,
     goToPage,
     updateSearch,
     updateLimit,
+    updateSectorIds,
+    updateFundIds,
+    updatePersonalityIds,
     isFetching,
   } = useCompaniesPagination();
 
@@ -51,6 +57,12 @@ export function HomeContent() {
         onSearchChange={updateSearch}
         currentLimit={limit}
         onLimitChange={updateLimit}
+        currentSectorIds={sectorIds}
+        onSectorIdsChange={updateSectorIds}
+        currentFundIds={fundIds}
+        onFundIdsChange={updateFundIds}
+        currentPersonalityIds={personalityIds}
+        onPersonalityIdsChange={updatePersonalityIds}
         isSearching={isFetching}
       />
     </div>

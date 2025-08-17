@@ -6,6 +6,10 @@ export type CreateCompanyDto = {
      */
     name: string;
     /**
+     * Company description
+     */
+    description: string;
+    /**
      * Company source URL
      */
     source: string;
@@ -33,9 +37,9 @@ export type Fund = {
      */
     name: string;
     /**
-     * Description
+     * Fund description
      */
-    description?: string;
+    description: string;
     /**
      * Published status
      */
@@ -56,9 +60,9 @@ export type Sector = {
      */
     name: string;
     /**
-     * Description
+     * Sector description
      */
-    description?: string;
+    description: string;
     /**
      * Published status
      */
@@ -79,9 +83,9 @@ export type Personality = {
      */
     name: string;
     /**
-     * Description
+     * Personality description
      */
-    description?: string;
+    description: string;
     /**
      * Published status
      */
@@ -101,6 +105,10 @@ export type Company = {
      * Company name
      */
     name: string;
+    /**
+     * Company description
+     */
+    description: string;
     /**
      * Source link (URL)
      */

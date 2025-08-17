@@ -40,6 +40,22 @@ export const useCompanyColumns = (): ColumnDef<Company>[] => {
       },
     },
     {
+      accessorKey: "description",
+      header: t('table.columns.description'),
+      cell: ({ row }) => {
+        const description = row.original.description
+        return (
+          <div className="text-sm text-gray-600 max-w-xs">
+            {description ? (
+              <span className="line-clamp-2">{description}</span>
+            ) : (
+              <span className="text-gray-400">{t('table.values.noDescription')}</span>
+            )}
+          </div>
+        )
+      },
+    },
+    {
       accessorKey: "fund",
       header: t('table.columns.fund'),
       enableColumnFilter: true,
@@ -146,6 +162,22 @@ export function getCompanyColumns(): ColumnDef<Company>[] {
               {company.name}
               <ExternalLink className="ml-1 h-3 w-3 inline" />
             </a>
+          </div>
+        )
+      },
+    },
+    {
+      accessorKey: "description",
+      header: "Description",
+      cell: ({ row }) => {
+        const description = row.original.description
+        return (
+          <div className="text-sm text-gray-600 max-w-xs">
+            {description ? (
+              <span className="line-clamp-2">{description}</span>
+            ) : (
+              <span className="text-gray-400">No description</span>
+            )}
           </div>
         )
       },

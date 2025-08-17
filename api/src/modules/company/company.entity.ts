@@ -23,7 +23,7 @@ export class Company {
   name!: string;
 
   @ApiProperty({ description: 'Company description' })
-  @Property()
+  @Property({ type: 'text' })
   description!: string;
 
   @ApiProperty({ description: 'Source link (URL)' })

@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  type ColumnFiltersState,
   type SortingState,
   type VisibilityState,
   flexRender,
@@ -32,6 +31,12 @@ export interface CompaniesDataTableProps {
   onSearchChange: (search: string) => void
   currentLimit: number
   onLimitChange: (limit: number) => void
+  currentSectorIds: string[]
+  onSectorIdsChange: (sectorIds: string[]) => void
+  currentFundIds: string[]
+  onFundIdsChange: (fundIds: string[]) => void
+  currentPersonalityIds: string[]
+  onPersonalityIdsChange: (personalityIds: string[]) => void
   isSearching?: boolean
 }
 
@@ -45,6 +50,12 @@ export function CompaniesDataTable({
   onSearchChange,
   currentLimit,
   onLimitChange,
+  currentSectorIds,
+  onSectorIdsChange,
+  currentFundIds,
+  onFundIdsChange,
+  currentPersonalityIds,
+  onPersonalityIdsChange,
   isSearching = false
 }: CompaniesDataTableProps) {
   const { t } = useTranslation();
@@ -60,7 +71,6 @@ export function CompaniesDataTable({
   }
 
   const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [localSearch, setLocalSearch] = React.useState(currentSearch)
 
@@ -79,60 +89,23 @@ export function CompaniesDataTable({
     setLocalSearch(currentSearch)
   }, [currentSearch])
 
-
-
-  // Apply filters to companies
-  const filteredCompanies = React.useMemo(() => {
-    return companies.filter(company => {
-      // Get filter values for each column
-      const sectorFilter = columnFilters.find(f => f.id === 'sector')?.value as string[] | undefined
-      const fundFilter = columnFilters.find(f => f.id === 'fund')?.value as string[] | undefined
-      const personalitiesFilter = columnFilters.find(f => f.id === 'personalities')?.value as string[] | undefined
-
-      // Filter by sectors
-      if (sectorFilter && sectorFilter.length > 0) {
-        if (!company.sector || !sectorFilter.includes(company.sector.id)) {
-          return false
-        }
-      }
-
-      // Filter by funds
-      if (fundFilter && fundFilter.length > 0) {
-        if (!company.fund || !fundFilter.includes(company.fund.id)) {
-          return false
-        }
-      }
-
-      // Filter by personalities
-      if (personalitiesFilter && personalitiesFilter.length > 0) {
-        if (!company.personalities || company.personalities.length === 0) {
-          return false
-        }
-        const hasSelectedPersonality = company.personalities.some(personality => 
-          personalitiesFilter.includes(personality.id)
-        )
-        if (!hasSelectedPersonality) {
-          return false
-        }
-      }
-
-      return true
-    })
-  }, [companies, columnFilters])
+  // Update parent filters when column filters change
+  React.useEffect(() => {
+    // This will be handled by the filter components directly calling the parent functions
+  }, [])
 
   const table = useReactTable({
-    data: filteredCompanies,
+    data: companies, // Use companies directly from API (already filtered)
     columns: columns,
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
+    onColumnFiltersChange: () => {}, // Disable local filtering
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
-    enableColumnFilters: true,
+    enableColumnFilters: false, // Disable local filtering
     state: {
       sorting,
-      columnFilters,
       columnVisibility,
     },
   })
@@ -151,13 +124,16 @@ export function CompaniesDataTable({
 
             <div className="flex items-center gap-2">
               <FilterSectors
-                column={table.getColumn("sector")}
+                currentSectorIds={currentSectorIds}
+                onSectorIdsChange={onSectorIdsChange}
               />
               <FilterPersonalities
-                column={table.getColumn("personalities")}
+                currentPersonalityIds={currentPersonalityIds}
+                onPersonalityIdsChange={onPersonalityIdsChange}
               />
               <FilterFunds
-                column={table.getColumn("fund")}
+                currentFundIds={currentFundIds}
+                onFundIdsChange={onFundIdsChange}
               />
             </div>
           </div>

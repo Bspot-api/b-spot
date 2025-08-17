@@ -1,4 +1,3 @@
-import type { Column } from "@tanstack/react-table"
 import { Check, PlusCircle } from "lucide-react"
 import * as React from "react"
 import { useTranslation } from "react-i18next"
@@ -22,8 +21,7 @@ import {
 import { Separator } from "@/components/shadcn/separator"
 import { cn } from "@/lib/utils"
 
-interface DataTableFilterProps<TData, TValue> {
-  column?: Column<TData, TValue>
+interface DataTableFilterProps {
   title?: string
   loading?: boolean
   options: {
@@ -31,18 +29,34 @@ interface DataTableFilterProps<TData, TValue> {
     value: string
     icon?: React.ComponentType<{ className?: string }>
   }[]
+  selectedValues: string[]
+  onSelectionChange: (selectedValues: string[]) => void
 }
 
-export function DataTableFilter<TData, TValue>({
-  column,
+export function DataTableFilter({
   title,
   options,
-  loading = false
-}: DataTableFilterProps<TData, TValue>) {
+  loading = false,
+  selectedValues,
+  onSelectionChange
+}: DataTableFilterProps) {
   const { t } = useTranslation();
   
-  const facets = column?.getFacetedUniqueValues()
-  const selectedValues = new Set(column?.getFilterValue() as string[])
+  const selectedValuesSet = new Set(selectedValues)
+
+  const handleOptionSelect = (optionValue: string) => {
+    const newSelectedValues = new Set(selectedValues)
+    if (newSelectedValues.has(optionValue)) {
+      newSelectedValues.delete(optionValue)
+    } else {
+      newSelectedValues.add(optionValue)
+    }
+    onSelectionChange(Array.from(newSelectedValues))
+  }
+
+  const handleClearFilters = () => {
+    onSelectionChange([])
+  }
 
   return (
     <Popover>
@@ -55,26 +69,26 @@ export function DataTableFilter<TData, TValue>({
         >
           <PlusCircle />
           {title}
-          {selectedValues?.size > 0 && (
+          {selectedValuesSet?.size > 0 && (
             <>
               <Separator orientation="vertical" className="mx-2 h-4" />
               <Badge
                 variant="secondary"
                 className="rounded-sm px-1 font-normal lg:hidden"
               >
-                {selectedValues.size}
+                {selectedValuesSet.size}
               </Badge>
               <div className="hidden space-x-1 lg:flex">
-                {selectedValues.size > 2 ? (
+                {selectedValuesSet.size > 2 ? (
                   <Badge
                     variant="secondary"
                     className="rounded-sm px-1 font-normal"
                   >
-                    {selectedValues.size} {t('filters.selected')}
+                    {selectedValuesSet.size} {t('filters.selected')}
                   </Badge>
                 ) : (
                   options
-                    .filter((option) => selectedValues.has(option.value))
+                    .filter((option) => selectedValuesSet.has(option.value))
                     .map((option) => (
                       <Badge
                         variant="secondary"
@@ -98,23 +112,11 @@ export function DataTableFilter<TData, TValue>({
             <CommandEmpty>{t('filters.noResults')}</CommandEmpty>
             <CommandGroup>
               {options.map((option) => {
-                const isSelected = selectedValues.has(option.value)
+                const isSelected = selectedValuesSet.has(option.value)
                 return (
                   <CommandItem
                     key={option.value}
-                    onSelect={() => {
-                      console.log('Option selected:', option.value)
-                      if (isSelected) {
-                        selectedValues.delete(option.value)
-                      } else {
-                        selectedValues.add(option.value)
-                      }
-                      const filterValues = Array.from(selectedValues)
-                      console.log('Setting filter value:', filterValues)
-                      column?.setFilterValue(
-                        filterValues.length ? filterValues : undefined
-                      )
-                    }}
+                    onSelect={() => handleOptionSelect(option.value)}
                   >
                     <div
                       className={cn(
@@ -130,21 +132,16 @@ export function DataTableFilter<TData, TValue>({
                       <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
                     )}
                     <span>{option.label}</span>
-                    {facets?.get(option.value) && (
-                      <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
-                        {facets.get(option.value)}
-                      </span>
-                    )}
                   </CommandItem>
                 )
               })}
             </CommandGroup>
-            {selectedValues.size > 0 && (
+            {selectedValuesSet.size > 0 && (
               <>
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem
-                    onSelect={() => column?.setFilterValue(undefined)}
+                    onSelect={handleClearFilters}
                     className="justify-center text-center"
                   >
                     {t('filters.clearFilters')}
