@@ -1,0 +1,104 @@
+name: Sync Frontend to Public Repository
+
+on:
+  push:
+    branches: [develop, main]
+  workflow_dispatch: # Permet de déclencher manuellement
+  workflow_call: # Permet d'être appelé par d'autres workflows
+
+jobs:
+  sync-frontend:
+    runs-on: ubuntu-latest
+    name: Sync Frontend to b-spot-frontend public repo
+    
+    steps:
+      - name: Checkout private repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Pour avoir l'historique complet
+      
+      - name: Install pnpm
+        run: npm install -g pnpm@8
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: |
+          # Copier le fichier de lock pnpm dans le dossier frontend
+          cp pnpm-lock.yaml frontend/
+          cd frontend
+          pnpm install --frozen-lockfile
+      
+      - name: Build Frontend (test)
+        run: |
+          cd frontend
+          pnpm build
+      
+      - name: Sync to Frontend Public Repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FRONTEND_SYNC_TOKEN: ${{ secrets.FRONTEND_SYNC_TOKEN }}
+        run: |
+          # Configuration Git
+          git config --global user.name "B-Spot Bot"
+          git config --global user.email "bspot.api@gmail.com"
+          
+          # Clone le repo public
+          git clone https://x-access-token:${FRONTEND_SYNC_TOKEN}@github.com/Bspot-api/b-spot-frontend.git temp-frontend
+          
+          # Aller dans le repo temporaire
+          cd temp-frontend
+          
+          # Récupérer la branche correspondante
+          BRANCH_NAME="${{ github.ref_name}}"
+          if git ls-remote --heads origin $BRANCH_NAME | grep -q $BRANCH_NAME; then
+            git checkout $BRANCH_NAME
+            git pull origin $BRANCH_NAME
+          else
+            git checkout -b $BRANCH_NAME
+          fi
+          
+          # Nettoyer le repo (sauf .git)
+          find . -mindepth 1 -not -path './.git*' -delete
+          
+          # Copier les fichiers frontend
+          rsync -av ../frontend/ . --exclude=.git --exclude=node_modules --exclude=dist
+          
+          # Copier les fichiers de configuration racine
+          cp ../package.json .
+          cp ../tsconfig.json .
+          cp ../.gitignore .
+          
+          # Créer pnpm-workspace.yaml pour repo unique
+          echo "packages:" > pnpm-workspace.yaml
+          echo "  - '.'" >> pnpm-workspace.yaml
+          
+          # Adapter package.json pour repo unique
+          sed -i 's/"dev": "pnpm --parallel dev"/"dev": "pnpm dev"/' package.json
+          sed -i 's/"build": "pnpm --recursive build"/"build": "pnpm build"/' package.json
+          sed -i 's/"test": "pnpm --recursive test"/"test": "pnpm test"/' package.json
+          sed -i 's/"lint": "pnpm --recursive lint"/"lint": "pnpm lint"/' package.json
+          
+          # Supprimer les scripts API
+          sed -i '/dev:api/d' package.json
+          sed -i '/build:api/d' package.json
+          sed -i '/start:dev/d' package.json
+          
+          # Commit et push
+          if [ -n "$(git status --porcelain)" ]; then
+            git add .
+            git commit -m "Auto-sync from private repository - ${{ github.sha }} - ${{ github.event.head_commit.message }}"
+            git push origin $BRANCH_NAME
+            echo "✅ Frontend repository synced successfully to $BRANCH_NAME"
+          else
+            echo "ℹ️ No changes detected in Frontend repository"
+          fi
+      
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -rf temp-frontend
