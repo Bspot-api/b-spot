@@ -2,18 +2,18 @@
 node_modules/
 .pnpm-store/
 
-# Production builds
-dist/
-build/
-.next/
-out/
-
 # Environment variables
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Build outputs
+dist/
+build/
+.next/
+out/
 
 # Logs
 logs
@@ -40,14 +40,14 @@ coverage/
 # Dependency directories
 jspm_packages/
 
-# TypeScript cache
-*.tsbuildinfo
-
 # Optional npm cache directory
 .npm
 
 # Optional eslint cache
 .eslintcache
+
+# Optional stylelint cache
+.stylelintcache
 
 # Microbundle cache
 .rpt2_cache/
@@ -64,6 +64,9 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
+# dotenv environment variables file
+.env.test
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
@@ -78,7 +81,6 @@ dist
 # Gatsby files
 .cache/
 public
-!frontend/public/
 
 # Storybook build outputs
 .out
@@ -89,36 +91,55 @@ tmp/
 temp/
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
 # OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
 # Database
 *.db
 *.sqlite
+*.sqlite3
 
 # Docker
 .dockerignore
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
 # Testing
 coverage/
 .nyc_output/
+.jest/
 
-# Misc
-.DS_Store
-*.pem 
+# TypeScript
+*.tsbuildinfo
+
+# Vite
+.vite/
+
+# React
+*.tsbuildinfo
+
+# NestJS
+dist/
+node_modules/
+
+# MikroORM
+mikro-orm.log
+
+# Seeders
+seeds/
+
+# Migrations (keep in version control)
+# migrations/
+
+# Local development
+.local/ 
