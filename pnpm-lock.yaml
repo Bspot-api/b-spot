@@ -14,9 +14,6 @@ importers:
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.7
-      husky:
-        specifier: ^9.1.7
-        version: 9.1.7
       typescript:
         specifier: ^5.0.0
         version: 5.8.3
@@ -6532,12 +6529,6 @@ packages:
   /human-signals@4.3.1:
     resolution: {integrity: sha512-nZXjEF2nbo7lIw3mgYjItAfgQXog3OjJogSbKa2CQIIvSGWcKgeJnQlNXip6NglNzYH45nSRiEVimMvYL8DDqQ==}
     engines: {node: '>=14.18.0'}
-    dev: true
-
-  /husky@9.1.7:
-    resolution: {integrity: sha512-5gs5ytaNjBrh5Ow3zrvdUUY+0VxIuWVL4i9irt6friV+BqdCfmV11CQTWMiBYWHbXhco+J1kHfTOUkePhCDvMA==}
-    engines: {node: '>=18'}
-    hasBin: true
     dev: true
 
   /i18next-browser-languagedetector@8.2.0:
