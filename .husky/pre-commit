@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Auto-switch Git identity before commit
+echo "🔑 Auto-switching Git identity..."
+./scripts/auto-switch-identity.sh
+
+# Continue with commit
+echo "✅ Identity switched, proceeding with commit..."

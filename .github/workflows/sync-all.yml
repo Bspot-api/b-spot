@@ -1,0 +1,16 @@
+name: Sync All Public Repositories
+
+on:
+  push:
+    branches: [develop, main]
+  workflow_dispatch: # Permet de déclencher manuellement
+  workflow_call: # Permet d'être appelé par d'autres workflows
+
+jobs:
+  sync-api:
+    uses: ./.github/workflows/sync-api.yml
+    secrets: inherit
+    
+  sync-frontend:
+    uses: ./.github/workflows/sync-frontend.yml
+    secrets: inherit

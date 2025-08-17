@@ -1,0 +1,105 @@
+name: Sync API to Public Repository
+
+on:
+  push:
+    branches: [develop, main]
+  workflow_dispatch: # Permet de déclencher manuellement
+  workflow_call: # Permet d'être appelé par d'autres workflows
+
+jobs:
+  sync-api:
+    runs-on: ubuntu-latest
+    name: Sync API to b-spot-api public repo
+    
+    steps:
+      - name: Checkout private repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Pour avoir l'historique complet
+      
+      - name: Install pnpm
+        run: npm install -g pnpm@8
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: |
+          # Copier le fichier de lock pnpm dans le dossier api
+          cp pnpm-lock.yaml api/
+          cd api
+          pnpm install --frozen-lockfile
+      
+      - name: Build API (test)
+        run: |
+          cd api
+          pnpm build
+      
+      - name: Sync to API Public Repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          API_SYNC_TOKEN: ${{ secrets.API_SYNC_TOKEN }}
+        run: |
+          # Configuration Git
+          git config --global user.name "B-Spot Bot"
+          git config --global user.email "bspot.api@gmail.com"
+          
+          # Clone le repo public
+          git clone https://x-access-token:${API_SYNC_TOKEN}@github.com/Bspot-api/b-spot-api.git temp-api
+          
+          # Aller dans le repo temporaire
+          cd temp-api
+          
+          # Récupérer la branche correspondante
+          BRANCH_NAME="${{ github.ref_name}}"
+          if git ls-remote --heads origin $BRANCH_NAME | grep -q $BRANCH_NAME; then
+            git checkout $BRANCH_NAME
+            git pull origin $BRANCH_NAME
+          else
+            git checkout -b $BRANCH_NAME
+          fi
+          
+          # Nettoyer le repo (sauf .git)
+          find . -mindepth 1 -not -path './.git*' -delete
+          
+          # Copier les fichiers API
+          rsync -av ../api/ . --exclude=.git --exclude=node_modules --exclude=dist
+          
+          # Copier les fichiers de configuration racine
+          cp ../package.json .
+          cp ../tsconfig.json .
+          cp ../.gitignore .
+          cp ../docker-compose.yml .
+          
+          # Créer pnpm-workspace.yaml pour repo unique
+          echo "packages:" > pnpm-workspace.yaml
+          echo "  - '.'" >> pnpm-workspace.yaml
+          
+          # Adapter package.json pour repo unique
+          sed -i 's/"dev": "pnpm --parallel dev"/"dev": "pnpm start:dev"/' package.json
+          sed -i 's/"build": "pnpm --recursive build"/"build": "pnpm build"/' package.json
+          sed -i 's/"test": "pnpm --recursive test"/"test": "pnpm test"/' package.json
+          sed -i 's/"lint": "pnpm --recursive lint"/"lint": "pnpm lint"/' package.json
+          
+          # Supprimer les scripts frontend
+          sed -i '/dev:frontend/d' package.json
+          sed -i '/build:frontend/d' package.json
+          sed -i '/generate:types/d' package.json
+          
+          # Commit et push
+          if [ -n "$(git status --porcelain)" ]; then
+            git add .
+            git commit -m "Auto-sync from private repository - ${{ github.sha }} - ${{ github.event.head_commit.message }}"
+            git push origin $BRANCH_NAME
+            echo "✅ API repository synced successfully to $BRANCH_NAME"
+          else
+            echo "ℹ️ No changes detected in API repository"
+          fi
+      
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -rf temp-api
