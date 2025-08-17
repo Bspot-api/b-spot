@@ -17,13 +17,11 @@
     "db:up": "docker-compose up -d postgres",
     "db:down": "docker-compose down",
     "db:logs": "docker-compose logs -f postgres",
-    "generate:types": "pnpm --filter frontend generate:types",
-    "prepare": "husky"
+    "generate:types": "pnpm --filter frontend generate:types"
   },
   "devDependencies": {
     "@mikro-orm/cli": "^6.4.16",
     "@types/node": "^20.0.0",
-    "husky": "^9.1.7",
     "typescript": "^5.0.0"
   },
   "engines": {
