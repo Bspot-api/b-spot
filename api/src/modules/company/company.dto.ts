@@ -7,6 +7,9 @@ export class CreateCompanyDto {
   @ApiProperty({ description: 'Company name' })
   name: string;
 
+  @ApiProperty({ description: 'Company description' })
+  description: string;
+
   @ApiProperty({ description: 'Company source URL' })
   source: string;
 
@@ -26,6 +29,9 @@ export class CompanyDto {
 
   @ApiProperty()
   name: string;
+
+  @ApiProperty()
+  description: string;
 
   @ApiProperty()
   source: string;

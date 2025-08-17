@@ -32,7 +32,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": true,
+          "nullable": false,
           "length": 255,
           "mappedType": "string"
         },
@@ -123,7 +123,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": true,
+          "nullable": false,
           "length": 255,
           "mappedType": "string"
         },
@@ -281,7 +281,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": true,
+          "nullable": false,
           "length": 255,
           "mappedType": "string"
         },
@@ -425,6 +425,16 @@
         },
         "name": {
           "name": "name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "description": {
+          "name": "description",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,

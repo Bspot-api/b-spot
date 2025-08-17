@@ -23,9 +23,9 @@ export class Fund {
   @Index()
   name!: string;
 
-  @ApiProperty({ description: 'Description', required: false })
-  @Property({ nullable: true })
-  description?: string;
+  @ApiProperty({ description: 'Fund description' })
+  @Property()
+  description!: string;
 
   @ApiProperty({ description: 'Published status', default: false })
   @Property({ default: false })

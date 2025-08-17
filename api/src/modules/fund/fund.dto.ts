@@ -8,8 +8,8 @@ export class FundDto {
   @ApiProperty()
   name: string;
 
-  @ApiProperty({ required: false })
-  description?: string;
+  @ApiProperty()
+  description: string;
 
   @ApiProperty()
   published: boolean;

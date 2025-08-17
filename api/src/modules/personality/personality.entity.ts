@@ -21,9 +21,9 @@ export class Personality {
   @Index()
   name!: string;
 
-  @ApiProperty({ description: 'Description', required: false })
-  @Property({ nullable: true })
-  description?: string;
+  @ApiProperty({ description: 'Personality description' })
+  @Property()
+  description!: string;
 
   @ApiProperty({ description: 'Published status', default: false })
   @Property({ default: false })

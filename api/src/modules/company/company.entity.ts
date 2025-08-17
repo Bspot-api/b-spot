@@ -22,6 +22,10 @@ export class Company {
   @Property()
   name!: string;
 
+  @ApiProperty({ description: 'Company description' })
+  @Property()
+  description!: string;
+
   @ApiProperty({ description: 'Source link (URL)' })
   @Property()
   source!: string;

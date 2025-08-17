@@ -22,9 +22,9 @@ export class Sector {
   @Index()
   name!: string;
 
-  @ApiProperty({ description: 'Description', required: false })
-  @Property({ nullable: true })
-  description?: string;
+  @ApiProperty({ description: 'Sector description' })
+  @Property()
+  description!: string;
 
   @ApiProperty({ description: 'Published status', default: false })
   @Property({ default: false })
