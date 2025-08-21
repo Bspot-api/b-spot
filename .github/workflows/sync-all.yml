@@ -1,10 +1,10 @@
 name: Sync All Public Repositories
 
 on:
-  push:
+  pull_request:
     branches: [develop, main]
-  workflow_dispatch: # Permet de déclencher manuellement
-  workflow_call: # Permet d'être appelé par d'autres workflows
+  workflow_dispatch: # Allows manual triggering
+  workflow_call: # Allows to be called by other workflows
 
 jobs:
   sync-api:

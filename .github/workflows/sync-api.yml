@@ -1,10 +1,10 @@
 name: Sync API to Public Repository
 
 on:
-  push:
+  pull_request:
     branches: [develop, main]
-  workflow_dispatch: # Permet de déclencher manuellement
-  workflow_call: # Permet d'être appelé par d'autres workflows
+  workflow_dispatch: # Allows manual triggering
+  workflow_call: # Allows being called by other workflows
 
 jobs:
   sync-api:
@@ -15,7 +15,7 @@ jobs:
       - name: Checkout private repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Pour avoir l'historique complet
+          fetch-depth: 0 # To have complete history
       
       - name: Install pnpm
         run: npm install -g pnpm@8
@@ -28,7 +28,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          # Copier le fichier de lock pnpm dans le dossier api
+          # Copy pnpm lock file to api folder
           cp pnpm-lock.yaml api/
           cd api
           pnpm install --frozen-lockfile
@@ -43,17 +43,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           API_SYNC_TOKEN: ${{ secrets.API_SYNC_TOKEN }}
         run: |
-          # Configuration Git
+          # Git configuration
           git config --global user.name "B-Spot Bot"
           git config --global user.email "bspot.api@gmail.com"
           
-          # Clone le repo public
+          # Clone public repository
           git clone https://x-access-token:${API_SYNC_TOKEN}@github.com/Bspot-api/b-spot-api.git temp-api
           
-          # Aller dans le repo temporaire
+          # Go to temporary repository
           cd temp-api
           
-          # Récupérer la branche correspondante
+          # Get corresponding branch
           BRANCH_NAME="${{ github.ref_name}}"
           if git ls-remote --heads origin $BRANCH_NAME | grep -q $BRANCH_NAME; then
             git checkout $BRANCH_NAME
@@ -62,37 +62,46 @@ jobs:
             git checkout -b $BRANCH_NAME
           fi
           
-          # Nettoyer le repo (sauf .git)
+          # Clean repository (except .git)
           find . -mindepth 1 -not -path './.git*' -delete
           
-          # Copier les fichiers API
+          # Copy API files
           rsync -av ../api/ . --exclude=.git --exclude=node_modules --exclude=dist
           
-          # Copier les fichiers de configuration racine
+          # Copy root configuration files
           cp ../package.json .
           cp ../tsconfig.json .
           cp ../.gitignore .
           cp ../docker-compose.yml .
           
-          # Créer pnpm-workspace.yaml pour repo unique
+          # Create pnpm-workspace.yaml for single repository
           echo "packages:" > pnpm-workspace.yaml
           echo "  - '.'" >> pnpm-workspace.yaml
           
-          # Adapter package.json pour repo unique
+          # Adapt package.json for single repository
           sed -i 's/"dev": "pnpm --parallel dev"/"dev": "pnpm start:dev"/' package.json
           sed -i 's/"build": "pnpm --recursive build"/"build": "pnpm build"/' package.json
           sed -i 's/"test": "pnpm --recursive test"/"test": "pnpm test"/' package.json
           sed -i 's/"lint": "pnpm --recursive lint"/"lint": "pnpm lint"/' package.json
           
-          # Supprimer les scripts frontend
+          # Remove frontend scripts
           sed -i '/dev:frontend/d' package.json
           sed -i '/build:frontend/d' package.json
           sed -i '/generate:types/d' package.json
           
-          # Commit et push
+          # Commit and push
           if [ -n "$(git status --porcelain)" ]; then
             git add .
-            git commit -m "Auto-sync from private repository - ${{ github.sha }} - ${{ github.event.head_commit.message }}"
+            
+            # Get PR title if this is a PR, otherwise use commit message
+            COMMIT_MESSAGE="${{ github.sha }}"
+            if [ "${{ github.event_name }}" == "pull_request" ]; then
+              COMMIT_MESSAGE="${{ github.event.pull_request.title }}"
+            elif [ "${{ github.event_name }}" == "push" ] && [ -n "${{ github.event.head_commit.message }}" ]; then
+              COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
+            fi
+            
+            git commit -m "$COMMIT_MESSAGE"
             git push origin $BRANCH_NAME
             echo "✅ API repository synced successfully to $BRANCH_NAME"
           else
