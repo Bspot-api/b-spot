@@ -1,4 +1,4 @@
-import { Header } from '@/components/shared';
+import { AppVersion, Header } from '@/components/shared';
 import { HomeContent } from '@/features/home/home-content';
 
 export function HomePage() {
@@ -6,6 +6,7 @@ export function HomePage() {
     <div>
       <Header />
       <HomeContent />
+      <AppVersion />
     </div>
   );
 } 
