@@ -39,76 +39,10 @@ jobs:
           pnpm build
       
       - name: Sync to API Public Repository
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          API_SYNC_TOKEN: ${{ secrets.API_SYNC_TOKEN }}
-        run: |
-          # Git configuration
-          git config --global user.name "B-Spot Bot"
-          git config --global user.email "bspot.api@gmail.com"
-          
-          # Clone public repository
-          git clone https://x-access-token:${API_SYNC_TOKEN}@github.com/Bspot-api/b-spot-api.git temp-api
-          
-          # Go to temporary repository
-          cd temp-api
-          
-          # Get corresponding branch
-          BRANCH_NAME="${{ github.ref_name}}"
-          if git ls-remote --heads origin $BRANCH_NAME | grep -q $BRANCH_NAME; then
-            git checkout $BRANCH_NAME
-            git pull origin $BRANCH_NAME
-          else
-            git checkout -b $BRANCH_NAME
-          fi
-          
-          # Clean repository (except .git)
-          find . -mindepth 1 -not -path './.git*' -delete
-          
-          # Copy API files
-          rsync -av ../api/ . --exclude=.git --exclude=node_modules --exclude=dist
-          
-          # Copy root configuration files
-          cp ../package.json .
-          cp ../tsconfig.json .
-          cp ../.gitignore .
-          cp ../docker-compose.yml .
-          
-          # Create pnpm-workspace.yaml for single repository
-          echo "packages:" > pnpm-workspace.yaml
-          echo "  - '.'" >> pnpm-workspace.yaml
-          
-          # Adapt package.json for single repository
-          sed -i 's/"dev": "pnpm --parallel dev"/"dev": "pnpm start:dev"/' package.json
-          sed -i 's/"build": "pnpm --recursive build"/"build": "pnpm build"/' package.json
-          sed -i 's/"test": "pnpm --recursive test"/"test": "pnpm test"/' package.json
-          sed -i 's/"lint": "pnpm --recursive lint"/"lint": "pnpm lint"/' package.json
-          
-          # Remove frontend scripts
-          sed -i '/dev:frontend/d' package.json
-          sed -i '/build:frontend/d' package.json
-          sed -i '/generate:types/d' package.json
-          
-          # Commit and push
-          if [ -n "$(git status --porcelain)" ]; then
-            git add .
-            
-            # Get PR title if this is a PR, otherwise use commit message
-            COMMIT_MESSAGE="${{ github.sha }}"
-            if [ "${{ github.event_name }}" == "pull_request" ]; then
-              COMMIT_MESSAGE="${{ github.event.pull_request.title }}"
-            elif [ "${{ github.event_name }}" == "push" ] && [ -n "${{ github.event.head_commit.message }}" ]; then
-              COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
-            fi
-            
-            git commit -m "$COMMIT_MESSAGE"
-            git push origin $BRANCH_NAME
-            echo "✅ API repository synced successfully to $BRANCH_NAME"
-          else
-            echo "ℹ️ No changes detected in API repository"
-          fi
-      
-      - name: Cleanup
-        if: always()
-        run: |
-          rm -rf temp-api
+        uses: ./.github/actions/sync-repo
+        with:
+          source-folder: 'api'
+          public-repo: 'Bspot-api/b-spot-api'
+          sync-token: ${{ secrets.API_SYNC_TOKEN }}
+          target-branch: ${{ github.base_ref }}
+          source-branch: ${{ github.head_ref }}
