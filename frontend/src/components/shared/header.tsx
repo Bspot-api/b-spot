@@ -1,5 +1,6 @@
 import bSpotLogo from '@/assets/b-spot-logo-removebg.png';
 import { useAuth } from '@/contexts/auth-context';
+import { Github } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -25,6 +26,17 @@ export function Header() {
 
           
           <div className="flex items-center space-x-4">
+            {/* GitHub Repository Link */}
+            <a 
+              href="https://github.com/Bspot-api?tab=repositories" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-gray-600 hover:text-gray-900 p-2 rounded-md hover:bg-gray-100 transition-colors"
+              title="View on GitHub"
+            >
+              <Github className="h-5 w-5" />
+            </a>
+            
             {user && (
               <Link 
                 to="/dashboard" 

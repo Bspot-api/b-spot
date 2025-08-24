@@ -25,7 +25,29 @@ export class AppController {
     return {
       message: this.appService.getHello(),
       timestamp: new Date().toISOString(),
-      version: '1.0.0',
+      version: this.appService.getVersion(),
+    };
+  }
+
+  @Get('version')
+  @ApiOperation({ summary: 'Get application version' })
+  @ApiResponse({
+    status: 200,
+    description: 'Application version',
+    schema: {
+      type: 'object',
+      properties: {
+        version: { type: 'string' },
+        name: { type: 'string' },
+        description: { type: 'string' },
+      },
+    },
+  })
+  getVersion(): { version: string; name: string; description: string } {
+    return {
+      version: this.appService.getVersion(),
+      name: 'b-spot-api',
+      description: 'B-Spot API Backend',
     };
   }
 
