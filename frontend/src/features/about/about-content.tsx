@@ -1,3 +1,4 @@
+import { Github } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export function AboutContent() {
@@ -42,6 +43,33 @@ export function AboutContent() {
                 <p className="text-gray-700 leading-relaxed">
                   {t('pages.about.howItWorks.description')}
                 </p>
+              </section>
+
+              {/* GitHub Repositories Section */}
+              <section className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+                  Code Source
+                </h2>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <a 
+                    href="https://github.com/Bspot-api/b-spot-private" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+                  >
+                    <Github className="h-5 w-5" />
+                    <span className="font-medium">Frontend</span>
+                  </a>
+                  <a 
+                    href="https://github.com/Bspot-api/b-spot-api" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+                  >
+                    <Github className="h-5 w-5" />
+                    <span className="font-medium">API</span>
+                  </a>
+                </div>
               </section>
 
               <section className="bg-blue-50 border border-blue-200 rounded-lg p-6">
