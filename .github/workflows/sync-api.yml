@@ -1,15 +1,17 @@
 name: Sync API to Public Repository
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [develop, main]
-  workflow_dispatch: # Allows manual triggering
-  workflow_call: # Allows being called by other workflows
+    types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
   sync-api:
     runs-on: ubuntu-latest
     name: Sync API to b-spot-api public repo
+    
+    # This job must pass before merge is allowed
+    # Add this job as a required status check in branch protection rules
     
     steps:
       - name: Checkout private repository
