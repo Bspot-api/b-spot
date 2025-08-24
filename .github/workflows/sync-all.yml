@@ -1,10 +1,9 @@
 name: Sync All Public Repositories
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [develop, main]
-  workflow_dispatch: # Allows manual triggering
-  workflow_call: # Allows to be called by other workflows
+    types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
   sync-api:
