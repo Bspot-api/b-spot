@@ -1,0 +1,34 @@
+name: "🚀 Sync to Main"
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  sync-to-main:
+    runs-on: ubuntu-latest
+    name: Sync to Main Public Repositories
+    
+    steps:
+      - name: Checkout private repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # To have complete history
+      
+      - name: Sync Frontend to Main
+        uses: ./.github/actions/sync-repo
+        with:
+          source-folder: 'frontend'
+          public-repo: 'Bspot-api/b-spot-frontend'
+          sync-token: ${{ secrets.FRONTEND_SYNC_TOKEN }}
+          target-branch: 'main'
+          source-branch: ${{ github.event.head_commit.message }}
+      
+      - name: Sync API to Main
+        uses: ./.github/actions/sync-repo
+        with:
+          source-folder: 'api'
+          public-repo: 'Bspot-api/b-spot-api'
+          sync-token: ${{ secrets.API_SYNC_TOKEN }}
+          target-branch: 'main'
+          source-branch: ${{ github.event.head_commit.message }}
