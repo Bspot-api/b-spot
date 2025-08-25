@@ -52,7 +52,7 @@ export function AboutContent() {
                 </h2>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <a 
-                    href="https://github.com/Bspot-api/b-spot-private" 
+                    href="https://github.com/Bspot-api/b-spot-frontend" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
