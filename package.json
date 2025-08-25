@@ -17,7 +17,11 @@
     "db:up": "docker-compose up -d postgres",
     "db:down": "docker-compose down",
     "db:logs": "docker-compose logs -f postgres",
-    "generate:types": "pnpm --filter frontend generate:types"
+    "generate:types": "pnpm --filter frontend generate:types",
+    "sync:to-pr": "./scripts/sync-to-pr.sh",
+    "sync:from-public": "./scripts/sync-from-public.sh",
+    "sync:from-public:main": "./scripts/sync-from-public.sh main",
+    "sync:from-public:develop": "./scripts/sync-from-public.sh develop"
   },
   "devDependencies": {
     "@mikro-orm/cli": "^6.4.16",

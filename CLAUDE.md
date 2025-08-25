@@ -41,6 +41,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `cd frontend && pnpm generate:hooks` - Generate API client hooks from OpenAPI
 
+### Repository Synchronization
+
+- `pnpm sync:to-pr` - Create PR on public repositories (interactive)
+- `pnpm sync:from-public` - Pull changes from public repositories (current branch)
+- `pnpm sync:from-public:main` - Pull changes from public main branch
+- `pnpm sync:from-public:develop` - Pull changes from public develop branch
+
 ## Architecture Overview
 
 ### Monorepo Structure
