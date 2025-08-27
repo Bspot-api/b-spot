@@ -1,0 +1,50 @@
+{
+  "name": "b-spot",
+  "version": "0.0.1",
+  "description": "An open-source platform for referencing companies linked to investment funds or influential networks, aiming to inform the public and provide an open API for research and analysis.",
+  "packageManager": "pnpm@8.15.0",
+  "scripts": {
+    "dev": "pnpm --parallel dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:api": "pnpm --filter api start:dev",
+    "build": "pnpm --recursive build",
+    "build:frontend": "pnpm --filter frontend build",
+    "build:api": "pnpm --filter api build",
+    "test": "pnpm --recursive test",
+    "lint": "pnpm --recursive lint",
+    "clean": "pnpm --recursive clean",
+    "db:up": "docker-compose up -d postgres",
+    "db:down": "docker-compose down",
+    "db:logs": "docker-compose logs -f postgres",
+    "generate:types": "pnpm --filter frontend generate:types",
+  },
+  "devDependencies": {
+    "@mikro-orm/cli": "^6.4.16",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Bspot-api/b-spot.git"
+  },
+  "homepage": "https://github.com/Bspot-api/b-spot",
+  "bugs": {
+    "url": "https://github.com/Bspot-api/b-spot/issues"
+  },
+  "keywords": [
+    "transparency",
+    "investment-funds",
+    "companies",
+    "research",
+    "open-data",
+    "api",
+    "nestjs",
+    "react",
+    "typescript"
+  ]
+}
