@@ -1,0 +1,52 @@
+name: "✅ Check and Build Projects"
+
+on:
+  pull_request:
+    branches: [develop, main]
+
+jobs:
+  check-and-build-all:
+    runs-on: ubuntu-latest
+    name: Check and Build All Projects
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # To have complete history
+      
+      - name: Install pnpm
+        run: npm install -g pnpm@8
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+      
+      - name: Clear cache
+        run: |
+          pnpm store prune
+          rm -rf node_modules
+          rm -rf .pnpm-store
+      
+      - name: Check and Build Frontend
+        run: |
+          # Copy pnpm lock file to frontend folder
+          cp pnpm-lock.yaml frontend/
+          cd frontend
+          pnpm install --frozen-lockfile
+          pnpm build
+          pnpm lint
+      
+      - name: Check and Build API
+        run: |
+          # Copy pnpm lock file to api folder
+          cp pnpm-lock.yaml api/
+          cd api
+          pnpm install --frozen-lockfile
+          pnpm build
+          pnpm lint
+    
+    # This job must pass before merge is allowed
+    # Add this job as a required status check in branch protection rules
