@@ -101,7 +101,9 @@ export class PericlesSeeder extends Seeder {
         await em.persistAndFlush(sterinPersonality);
         console.log('✅ Created Pierre-Édouard Stérin personality');
       } catch (error) {
-        console.log('   ⚠️  Pierre-Édouard Stérin personality already exists, skipping...');
+        console.log(
+          '   ⚠️  Pierre-Édouard Stérin personality already exists, skipping...',
+        );
         sterinPersonality = await em.findOne(Personality, {
           name: 'Pierre-Édouard Stérin',
         });
@@ -156,7 +158,9 @@ export class PericlesSeeder extends Seeder {
       await em.persistAndFlush(periclesCompany);
       console.log('✅ Linked Périclès company to Stérin personality');
     } catch (error) {
-      console.log('   ⚠️  Périclès already linked to personality, continuing...');
+      console.log(
+        '   ⚠️  Périclès already linked to personality, continuing...',
+      );
     }
 
     // Create additional sectors
