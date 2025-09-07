@@ -28,12 +28,13 @@
         },
         "description": {
           "name": "description",
-          "type": "text",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "text"
+          "length": 255,
+          "mappedType": "string"
         },
         "published": {
           "name": "published",
@@ -118,12 +119,13 @@
         },
         "description": {
           "name": "description",
-          "type": "text",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "text"
+          "length": 255,
+          "mappedType": "string"
         },
         "published": {
           "name": "published",
@@ -275,12 +277,13 @@
         },
         "description": {
           "name": "description",
-          "type": "text",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "text"
+          "length": 255,
+          "mappedType": "string"
         },
         "published": {
           "name": "published",

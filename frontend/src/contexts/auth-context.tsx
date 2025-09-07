@@ -43,7 +43,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch('http://localhost:3001/auth/signin', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/auth/signin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

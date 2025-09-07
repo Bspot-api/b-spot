@@ -3,15 +3,15 @@ import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 
 const config: Options<PostgreSqlDriver> = {
   driver: PostgreSqlDriver,
-  host: process.env.DB_HOST || 'localhost',
-  port: +(process.env.DB_PORT || 5432),
-  user: process.env.DB_USERNAME || 'postgres',
-  password: process.env.DB_PASSWORD || 'password',
-  dbName: process.env.DB_NAME || 'b-spot',
+  host: process.env.DATABASE_HOST || 'localhost',
+  port: +(process.env.DATABASE_PORT || 5432),
+  user: process.env.DATABASE_USER || 'postgres',
+  password: process.env.DATABASE_PASSWORD || 'password',
+  dbName: process.env.DATABASE_NAME || 'b-spot',
   entities: [
-    'dist/modules/**/entities/*.entity.js',
-    'dist/modules/**/*.entity.js',
-    'dist/utils/**/*.embeddable.js',
+    'src/modules/**/entities/*.entity.ts',
+    'src/modules/**/*.entity.ts', 
+    'src/utils/**/*.embeddable.ts',
   ],
   entitiesTs: [
     'src/modules/**/entities/*.entity.ts',

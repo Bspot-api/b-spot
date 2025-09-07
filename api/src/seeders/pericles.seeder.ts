@@ -17,8 +17,13 @@ export class PericlesSeeder extends Seeder {
       sector.name = name;
       sector.description = description;
       sector.published = true;
-      await em.persistAndFlush(sector);
-      console.log(`✅ Created sector: ${name}`);
+      try {
+        await em.persistAndFlush(sector);
+        console.log(`✅ Created sector: ${name}`);
+      } catch (error) {
+        console.log(`   ⚠️  Sector ${name} already exists, skipping...`);
+        sector = await em.findOne(Sector, { name });
+      }
     }
     return sector;
   }
@@ -42,8 +47,13 @@ export class PericlesSeeder extends Seeder {
       company.fund = fund;
       company.sector = sector;
       company.personalities.add(personality);
-      await em.persistAndFlush(company);
-      console.log(`✅ Created company: ${name}`);
+      try {
+        await em.persistAndFlush(company);
+        console.log(`✅ Created company: ${name}`);
+      } catch (error) {
+        console.log(`   ⚠️  Company ${name} already exists, skipping...`);
+        company = await em.findOne(Company, { name });
+      }
     }
     return company;
   }
@@ -80,8 +90,6 @@ export class PericlesSeeder extends Seeder {
     // Create or find Pierre-Édouard Stérin personality
     let sterinPersonality = await em.findOne(Personality, {
       name: 'Pierre-Édouard Stérin',
-      description:
-        'Pierre-Édouard Stérin souhaite, à travers le projet Périclès, utiliser sa fortune pour orchestrer une stratégie politique globale — médiatique, éducative, juridique et électorale — afin de porter durablement la droite conservatrice et l’extrême droite au pouvoir en France. Cela comprend la formation de candidats, la production de contenus idéologiques, le soutien aux médias alignés, le financement de structures, et la préparation d’un vivier de cadres prêts à prendre des responsabilités pratiques lors des futurs scrutins.',
     });
     if (!sterinPersonality) {
       sterinPersonality = new Personality();
@@ -89,28 +97,40 @@ export class PericlesSeeder extends Seeder {
       sterinPersonality.description =
         'Milliardaire français, fondateur et architecte du projet Périclès, visant à promouvoir des valeurs conservatrices et influencer la politique française';
       sterinPersonality.published = true;
-      await em.persistAndFlush(sterinPersonality);
-      console.log('✅ Created Pierre-Édouard Stérin personality');
+      try {
+        await em.persistAndFlush(sterinPersonality);
+        console.log('✅ Created Pierre-Édouard Stérin personality');
+      } catch (error) {
+        console.log('   ⚠️  Pierre-Édouard Stérin personality already exists, skipping...');
+        sterinPersonality = await em.findOne(Personality, {
+          name: 'Pierre-Édouard Stérin',
+        });
+      }
     }
 
     // Create links between entities
     console.log('🔗 Creating links between entities...');
 
-    // Link Otium Capital to Stérin personality
-    otiumFund.personalities.add(sterinPersonality);
-    console.log('   ✅ Linked Otium Capital to Stérin personality');
+    // Link entities safely
+    try {
+      // Link Otium Capital to Stérin personality
+      otiumFund.personalities.add(sterinPersonality);
+      console.log('   ✅ Linked Otium Capital to Stérin personality');
 
-    // Link Stérin personality to Otium Capital
-    sterinPersonality.funds.add(otiumFund);
-    console.log('   ✅ Linked Stérin personality to Otium Capital');
+      // Link Stérin personality to Otium Capital
+      sterinPersonality.funds.add(otiumFund);
+      console.log('   ✅ Linked Stérin personality to Otium Capital');
 
-    // Link Otium Capital to political sector (as it's also in the political/investment sphere)
-    otiumFund.sectors.add(politicalSector);
-    console.log('   ✅ Linked Otium Capital to political sector');
+      // Link Otium Capital to political sector
+      otiumFund.sectors.add(politicalSector);
+      console.log('   ✅ Linked Otium Capital to political sector');
 
-    // Link political sector to Otium Capital
-    politicalSector.funds.add(otiumFund);
-    console.log('   ✅ Linked political sector to Otium Capital');
+      // Link political sector to Otium Capital
+      politicalSector.funds.add(otiumFund);
+      console.log('   ✅ Linked political sector to Otium Capital');
+    } catch (error) {
+      console.log('   ⚠️  Some links already exist, continuing...');
+    }
 
     // Create Périclès company
     let periclesCompany = await em.findOne(Company, { name: 'Périclès' });
@@ -131,9 +151,13 @@ export class PericlesSeeder extends Seeder {
     }
 
     // Link Périclès company to Stérin personality
-    periclesCompany.personalities.add(sterinPersonality);
-    await em.persistAndFlush(periclesCompany);
-    console.log('✅ Linked Périclès company to Stérin personality');
+    try {
+      periclesCompany.personalities.add(sterinPersonality);
+      await em.persistAndFlush(periclesCompany);
+      console.log('✅ Linked Périclès company to Stérin personality');
+    } catch (error) {
+      console.log('   ⚠️  Périclès already linked to personality, continuing...');
+    }
 
     // Create additional sectors
     console.log('🏭 Creating additional sectors...');

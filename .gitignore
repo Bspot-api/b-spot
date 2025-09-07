@@ -8,6 +8,13 @@ node_modules/
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
+
+# Deployment secrets
+create-junction-tables.sql
+
+# Production configurations with secrets  
+docker-compose.prod.yml
 
 # Build outputs
 dist/
