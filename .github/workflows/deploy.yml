@@ -1,0 +1,74 @@
+name: 🚀 Deploy to Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  deploy:
+    name: 🏗️ Build & Deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔑 Login to Scaleway Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: rg.fr-par.scw.cloud
+          username: nologin
+          password: ${{ secrets.SCALEWAY_SECRET_KEY }}
+
+      - name: 🏗️ Build and push API image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./api/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            rg.fr-par.scw.cloud/${{ secrets.SCALEWAY_REGISTRY }}/b-spot-api:latest
+            rg.fr-par.scw.cloud/${{ secrets.SCALEWAY_REGISTRY }}/b-spot-api:${{ github.sha }}
+
+      - name: 🎨 Build and push Frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./frontend/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            rg.fr-par.scw.cloud/${{ secrets.SCALEWAY_REGISTRY }}/b-spot-frontend:latest
+            rg.fr-par.scw.cloud/${{ secrets.SCALEWAY_REGISTRY }}/b-spot-frontend:${{ github.sha }}
+
+      - name: 🚀 Deploy to Scaleway Container Functions
+        run: |
+          # Install Scaleway CLI
+          curl -o scw https://github.com/scaleway/scaleway-cli/releases/latest/download/scaleway-cli_$(uname -s | tr '[:upper:]' '[:lower:]')_amd64
+          chmod +x scw && sudo mv scw /usr/local/bin/
+          
+          # Configure Scaleway CLI
+          export SCW_ACCESS_KEY="${{ secrets.SCALEWAY_ACCESS_KEY }}"
+          export SCW_SECRET_KEY="${{ secrets.SCALEWAY_SECRET_KEY }}"
+          export SCW_DEFAULT_ORGANIZATION_ID="${{ secrets.SCALEWAY_ORGANIZATION_ID }}"
+          export SCW_DEFAULT_PROJECT_ID="${{ secrets.SCALEWAY_PROJECT_ID }}"
+          
+          # Update and deploy API container
+          scw container container update ${{ secrets.SCALEWAY_API_CONTAINER_ID }} \
+            registry-image=rg.fr-par.scw.cloud/${{ secrets.SCALEWAY_REGISTRY }}/b-spot-api:latest
+          scw container container deploy ${{ secrets.SCALEWAY_API_CONTAINER_ID }}
+          
+          # Update Frontend container if needed
+          # scw container container update ${{ secrets.SCALEWAY_FRONTEND_CONTAINER_ID }} \
+          #   registry-image=rg.fr-par.scw.cloud/${{ secrets.SCALEWAY_REGISTRY }}/b-spot-frontend:latest
+          # scw container container deploy ${{ secrets.SCALEWAY_FRONTEND_CONTAINER_ID }}
+
+      - name: ✅ Deployment Status
+        run: |
+          echo "🎉 Deployment completed successfully!"
+          echo "📊 API Container: https://bspotcontainersvbxer8ii-b-spot-api.functions.fnc.fr-par.scw.cloud"

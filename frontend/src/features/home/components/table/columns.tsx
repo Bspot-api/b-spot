@@ -1,7 +1,7 @@
 import type { Company } from "@/api/hooks"
 import { Button } from "@/components/shadcn/button"
 import type { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, ExternalLink } from "lucide-react"
+import { ArrowUpDown } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 export const useCompanyColumns = (): ColumnDef<Company>[] => {
@@ -26,15 +26,7 @@ export const useCompanyColumns = (): ColumnDef<Company>[] => {
         const company = row.original
         return (
           <div className="font-medium">
-            <a
-              href={company.source}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
-            >
-              {company.name}
-              <ExternalLink className="ml-1 h-3 w-3 inline" />
-            </a>
+            {company.name}
           </div>
         )
       },
@@ -153,15 +145,7 @@ export function getCompanyColumns(): ColumnDef<Company>[] {
         const company = row.original
         return (
           <div className="font-medium">
-            <a
-              href={company.source}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
-            >
-              {company.name}
-              <ExternalLink className="ml-1 h-3 w-3 inline" />
-            </a>
+            {company.name}
           </div>
         )
       },
