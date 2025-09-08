@@ -4,10 +4,12 @@ import {
   Index,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
+import { Brand } from '../brand/brand.entity';
 import { Fund } from '../fund/fund.entity';
 import { Personality } from '../personality/personality.entity';
 import { Sector } from '../sector/sector.entity';
@@ -56,4 +58,8 @@ export class Company {
     owner: true,
   })
   personalities = new Collection<Personality>(this);
+
+  @ApiProperty({ description: 'Brands owned by this company', type: () => [Brand] })
+  @OneToMany(() => Brand, (brand) => brand.company)
+  brands = new Collection<Brand>(this);
 }

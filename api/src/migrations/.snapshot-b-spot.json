@@ -16,6 +16,201 @@
           "default": "gen_random_uuid()",
           "mappedType": "uuid"
         },
+        "source_type": {
+          "name": "source_type",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "enumItems": [
+            "fund",
+            "company",
+            "brand",
+            "personality",
+            "sector"
+          ],
+          "mappedType": "enum"
+        },
+        "source_id": {
+          "name": "source_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
+        },
+        "target_type": {
+          "name": "target_type",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "enumItems": [
+            "fund",
+            "company",
+            "brand",
+            "personality",
+            "sector"
+          ],
+          "mappedType": "enum"
+        },
+        "target_id": {
+          "name": "target_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
+        },
+        "relation_type": {
+          "name": "relation_type",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "enumItems": [
+            "owns",
+            "controls",
+            "manages",
+            "founded",
+            "invests_in",
+            "operates_in",
+            "competes_with",
+            "partners_with",
+            "acquired",
+            "spun_off"
+          ],
+          "mappedType": "enum"
+        },
+        "strength": {
+          "name": "strength",
+          "type": "numeric(3,2)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "precision": 3,
+          "scale": 2,
+          "mappedType": "decimal"
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 0,
+          "mappedType": "date"
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 0,
+          "mappedType": "date"
+        },
+        "notes": {
+          "name": "notes",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "mappedType": "datetime"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "entity_relations",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "entity_relations_relation_type_index",
+          "columnNames": [
+            "relation_type"
+          ],
+          "composite": false,
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "entity_relations_target_type_target_id_index",
+          "columnNames": [
+            "target_type",
+            "target_id"
+          ],
+          "composite": true,
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "entity_relations_source_type_source_id_index",
+          "columnNames": [
+            "source_type",
+            "source_id"
+          ],
+          "composite": true,
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "entity_relations_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "gen_random_uuid()",
+          "mappedType": "uuid"
+        },
         "name": {
           "name": "name",
           "type": "varchar(255)",
@@ -611,6 +806,241 @@
             "personality_id"
           ],
           "localTableName": "public.companies_personalities",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.personalities",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "gen_random_uuid()",
+          "mappedType": "uuid"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "source": {
+          "name": "source",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "published": {
+          "name": "published",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "false",
+          "mappedType": "boolean"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "mappedType": "datetime"
+        },
+        "company_id": {
+          "name": "company_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "uuid"
+        },
+        "fund_id": {
+          "name": "fund_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "uuid"
+        },
+        "sector_id": {
+          "name": "sector_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "uuid"
+        }
+      },
+      "name": "brands",
+      "schema": "public",
+      "indexes": [
+        {
+          "columnNames": [
+            "name"
+          ],
+          "composite": false,
+          "keyName": "brands_name_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "name"
+          ],
+          "composite": false,
+          "keyName": "brands_name_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "keyName": "brands_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "brands_company_id_foreign": {
+          "constraintName": "brands_company_id_foreign",
+          "columnNames": [
+            "company_id"
+          ],
+          "localTableName": "public.brands",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.companies",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "brands_fund_id_foreign": {
+          "constraintName": "brands_fund_id_foreign",
+          "columnNames": [
+            "fund_id"
+          ],
+          "localTableName": "public.brands",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.funds",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "brands_sector_id_foreign": {
+          "constraintName": "brands_sector_id_foreign",
+          "columnNames": [
+            "sector_id"
+          ],
+          "localTableName": "public.brands",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.sectors",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "brand_id": {
+          "name": "brand_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
+        },
+        "personality_id": {
+          "name": "personality_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
+        }
+      },
+      "name": "brands_personalities",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "brands_personalities_pkey",
+          "columnNames": [
+            "brand_id",
+            "personality_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "brands_personalities_brand_id_foreign": {
+          "constraintName": "brands_personalities_brand_id_foreign",
+          "columnNames": [
+            "brand_id"
+          ],
+          "localTableName": "public.brands_personalities",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.brands",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        },
+        "brands_personalities_personality_id_foreign": {
+          "constraintName": "brands_personalities_personality_id_foreign",
+          "columnNames": [
+            "personality_id"
+          ],
+          "localTableName": "public.brands_personalities",
           "referencedColumnNames": [
             "id"
           ],

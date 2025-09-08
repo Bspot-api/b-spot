@@ -7,6 +7,7 @@ import {
   Property,
 } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
+import { Brand } from '../brand/brand.entity';
 import { Company } from '../company/company.entity';
 import { Fund } from '../fund/fund.entity';
 
@@ -38,4 +39,7 @@ export class Personality {
 
   @ManyToMany(() => Fund, (fund) => fund.personalities)
   funds = new Collection<Fund>(this);
+
+  @ManyToMany(() => Brand, (brand) => brand.personalities)
+  brands = new Collection<Brand>(this);
 }
