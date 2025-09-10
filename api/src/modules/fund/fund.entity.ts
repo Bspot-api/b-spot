@@ -36,18 +36,19 @@ export class Fund {
   @Property({ fieldName: 'createdAt' })
   createdAt: Date = new Date();
 
-  @OneToMany(() => Company, (company) => company.fund)
-  companies = new Collection<Company>(this);
+  // Relations now handled via EntityRelation system
+  // @OneToMany(() => Company, (company) => company.fund)
+  // companies = new Collection<Company>(this);
 
-  @ManyToMany(() => Personality, (personality) => personality.funds, {
-    owner: true,
-  })
-  personalities = new Collection<Personality>(this);
+  // @ManyToMany(() => Personality, (personality) => personality.funds, {
+  //   owner: true,
+  // })
+  // personalities = new Collection<Personality>(this);
 
-  @ManyToMany(() => Sector, (sector) => sector.funds, {
-    owner: true,
-  })
-  sectors = new Collection<Sector>(this);
+  // @ManyToMany(() => Sector, (sector) => sector.funds, {
+  //   owner: true,
+  // })
+  // sectors = new Collection<Sector>(this);
 
   @ApiProperty({ description: 'Brands controlled by this fund', type: () => [Brand] })
   @OneToMany(() => Brand, (brand) => brand.fund)

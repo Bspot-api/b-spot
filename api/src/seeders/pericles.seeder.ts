@@ -1,11 +1,17 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 import { Company } from '../modules/company/company.entity';
+import {
+  EntityType,
+  RelationType,
+} from '../modules/entity-relation/entity-relation.entity';
+import { EntityRelationService } from '../modules/entity-relation/entity-relation.service';
 import { Fund } from '../modules/fund/fund.entity';
 import { Personality } from '../modules/personality/personality.entity';
 import { Sector } from '../modules/sector/sector.entity';
 
 export class PericlesSeeder extends Seeder {
+  private entityRelationService: EntityRelationService;
   private async createOrFindSector(
     em: EntityManager,
     name: string,
@@ -33,9 +39,6 @@ export class PericlesSeeder extends Seeder {
     name: string,
     description: string,
     source: string,
-    fund: Fund,
-    sector: Sector,
-    personality: Personality,
   ): Promise<Company> {
     let company = await em.findOne(Company, { name });
     if (!company) {
@@ -44,9 +47,6 @@ export class PericlesSeeder extends Seeder {
       company.description = description;
       company.source = source;
       company.published = true;
-      company.fund = fund;
-      company.sector = sector;
-      company.personalities.add(personality);
       try {
         await em.persistAndFlush(company);
         console.log(`✅ Created company: ${name}`);
@@ -59,7 +59,12 @@ export class PericlesSeeder extends Seeder {
   }
 
   async run(em: EntityManager): Promise<void> {
-    console.log('🌱 Starting Périclès seeding...');
+    console.log('🌱 Starting Pericles seeding...');
+
+    this.entityRelationService = new EntityRelationService(
+      em.getRepository('EntityRelation') as any,
+      em,
+    );
 
     // Create or find the sector for political/think tank activities
     let politicalSector = await em.findOne(Sector, {
@@ -81,7 +86,7 @@ export class PericlesSeeder extends Seeder {
       otiumFund = new Fund();
       otiumFund.name = 'Otium Capital';
       otiumFund.description =
-        "Holding d'investissements privée créée en 2009 par Pierre-Édouard Stérin, spécialisée dans l'industrie, loisirs, immobilier, santé, consumer et Tech. 1,7 Md€ d'actifs, 255 M€ déployés en 2024.";
+        "Holding d'investissements privée creee en 2009 par Pierre-Edouard Sterin, spécialisée dans l'industrie, loisirs, immobilier, santé, consumer et Tech. 1,7 Md€ d'actifs, 255 M€ déployés en 2024.";
       otiumFund.published = true;
       await em.persistAndFlush(otiumFund);
       console.log('✅ Created Otium Capital fund');
@@ -95,7 +100,7 @@ export class PericlesSeeder extends Seeder {
       sterinPersonality = new Personality();
       sterinPersonality.name = 'Pierre-Édouard Stérin';
       sterinPersonality.description =
-        'Milliardaire français, fondateur et architecte du projet Périclès, visant à promouvoir des valeurs conservatrices et influencer la politique française';
+        'Milliardaire francais, fondateur et architecte du projet Pericles, visant à promouvoir des valeurs conservatrices et influencer la politique francaise';
       sterinPersonality.published = true;
       try {
         await em.persistAndFlush(sterinPersonality);
@@ -110,56 +115,101 @@ export class PericlesSeeder extends Seeder {
       }
     }
 
-    // Create links between entities
+    // Create links between entities using EntityRelation system
     console.log('🔗 Creating links between entities...');
 
-    // Link entities safely
+    // Create typed relations
     try {
-      // Link Otium Capital to Stérin personality
-      otiumFund.personalities.add(sterinPersonality);
-      console.log('   ✅ Linked Otium Capital to Stérin personality');
+      // Pierre-Edouard Sterin founded Otium Capital
+      await this.entityRelationService.createRelation(
+        EntityType.PERSONALITY,
+        sterinPersonality.id,
+        EntityType.FUND,
+        otiumFund.id,
+        RelationType.FOUNDED,
+        {
+          startDate: new Date('2009-01-01'),
+          notes: 'Pierre-Edouard Sterin founded Otium Capital in 2009',
+        },
+      );
+      console.log('   ✅ Linked Sterin personality FOUNDED Otium Capital');
 
-      // Link Stérin personality to Otium Capital
-      sterinPersonality.funds.add(otiumFund);
-      console.log('   ✅ Linked Stérin personality to Otium Capital');
-
-      // Link Otium Capital to political sector
-      otiumFund.sectors.add(politicalSector);
-      console.log('   ✅ Linked Otium Capital to political sector');
-
-      // Link political sector to Otium Capital
-      politicalSector.funds.add(otiumFund);
-      console.log('   ✅ Linked political sector to Otium Capital');
+      // Otium Capital operates in political sector
+      await this.entityRelationService.createRelation(
+        EntityType.FUND,
+        otiumFund.id,
+        EntityType.SECTOR,
+        politicalSector.id,
+        RelationType.OPERATES_IN,
+        {
+          notes: 'Otium Capital has investments in political/think tank sector',
+        },
+      );
+      console.log('   ✅ Linked Otium Capital OPERATES_IN political sector');
     } catch (error) {
-      console.log('   ⚠️  Some links already exist, continuing...');
+      console.log('   ⚠️  Some relations already exist, continuing...');
     }
 
-    // Create Périclès company
-    let periclesCompany = await em.findOne(Company, { name: 'Périclès' });
+    // Create Pericles company
+    let periclesCompany = await em.findOne(Company, { name: 'Pericles' });
     if (!periclesCompany) {
       periclesCompany = new Company();
-      periclesCompany.name = 'Périclès';
+      periclesCompany.name = 'Pericles';
       periclesCompany.description =
-        'Le projet Périclès (créé en 2023) est une initiative politique et métapolitique conçue pour promouvoir les valeurs identitaires, traditionalistes et conservatrices, et favoriser une alliance durable entre l’extrême droite et la droite libérale conservatrice. Il vise à infiltrer le débat public via les médias, les réseaux sociaux, la production audiovisuelle, les sondages, les influenceurs — afin de maîtriser la fenêtre d’Overton et « décrédibiliser les idées adverses ». Budget de 150 millions d’euros sur 10 ans, dont déjà une partie engagée';
+        "Le projet Pericles (cree en 2023) est une initiative politique et metapolitique concue pour promouvoir les valeurs identitaires, traditionalistes et conservatrices, et favoriser une alliance durable entre l'extreme droite et la droite liberale conservatrice. Il vise a infiltrer le debat public via les medias, les reseaux sociaux, la production audiovisuelle, les sondages, les influenceurs - afin de maitriser la fenetre d'Overton et decredibiliser les idees adverses. Budget de 150 millions d'euros sur 10 ans, dont deja une partie engagee";
       periclesCompany.source =
         'https://fr.wikipedia.org/wiki/Projet_P%C3%A9ricl%C3%A8s';
       periclesCompany.published = true;
-      periclesCompany.fund = otiumFund;
-      periclesCompany.sector = politicalSector;
       await em.persistAndFlush(periclesCompany);
-      console.log('✅ Created Périclès company');
-      console.log(`   📊 Linked to fund: ${otiumFund.name}`);
-      console.log(`   🏭 Linked to sector: ${politicalSector.name}`);
+      console.log('✅ Created Pericles company');
     }
 
-    // Link Périclès company to Stérin personality
+    // Create Pericles relations using EntityRelation system
     try {
-      periclesCompany.personalities.add(sterinPersonality);
-      await em.persistAndFlush(periclesCompany);
-      console.log('✅ Linked Périclès company to Stérin personality');
+      // Otium Capital owns Pericles
+      await this.entityRelationService.createRelation(
+        EntityType.FUND,
+        otiumFund.id,
+        EntityType.COMPANY,
+        periclesCompany.id,
+        RelationType.OWNS,
+        {
+          startDate: new Date('2023-01-01'),
+          notes: 'Otium Capital finances the Pericles project',
+        },
+      );
+      console.log('   ✅ Linked Otium Capital OWNS Pericles company');
+
+      // Pierre-Edouard Sterin controls Pericles
+      await this.entityRelationService.createRelation(
+        EntityType.PERSONALITY,
+        sterinPersonality.id,
+        EntityType.COMPANY,
+        periclesCompany.id,
+        RelationType.CONTROLS,
+        {
+          startDate: new Date('2023-01-01'),
+          notes:
+            'Pierre-Edouard Sterin is the architect of the Pericles project',
+        },
+      );
+      console.log('   ✅ Linked Sterin personality CONTROLS Pericles company');
+
+      // Pericles operates in political sector
+      await this.entityRelationService.createRelation(
+        EntityType.COMPANY,
+        periclesCompany.id,
+        EntityType.SECTOR,
+        politicalSector.id,
+        RelationType.OPERATES_IN,
+        {
+          notes: 'Pericles is a political and metapolitical initiative',
+        },
+      );
+      console.log('   ✅ Linked Pericles company OPERATES_IN political sector');
     } catch (error) {
       console.log(
-        '   ⚠️  Périclès already linked to personality, continuing...',
+        '   ⚠️  Some Pericles relations already exist, continuing...',
       );
     }
 
@@ -794,15 +844,55 @@ export class PericlesSeeder extends Seeder {
     ];
 
     for (const companyData of companies) {
-      await this.createOrFindCompany(
+      const company = await this.createOrFindCompany(
         em,
         companyData.name,
         companyData.description,
         companyData.source,
-        otiumFund,
-        companyData.sector,
-        sterinPersonality,
       );
+
+      // Create relations using EntityRelation system
+      try {
+        // Otium Capital owns the company
+        await this.entityRelationService.createRelation(
+          EntityType.FUND,
+          otiumFund.id,
+          EntityType.COMPANY,
+          company.id,
+          RelationType.OWNS,
+          {
+            notes: `Otium Capital owns ${company.name}`,
+          },
+        );
+
+        // Pierre-Edouard Sterin manages the company
+        await this.entityRelationService.createRelation(
+          EntityType.PERSONALITY,
+          sterinPersonality.id,
+          EntityType.COMPANY,
+          company.id,
+          RelationType.MANAGES,
+          {
+            notes: `Pierre-Edouard Sterin manages ${company.name} through Otium Capital`,
+          },
+        );
+
+        // Company operates in its sector
+        await this.entityRelationService.createRelation(
+          EntityType.COMPANY,
+          company.id,
+          EntityType.SECTOR,
+          companyData.sector.id,
+          RelationType.OPERATES_IN,
+          {
+            notes: `${company.name} operates in ${companyData.sector.name} sector`,
+          },
+        );
+      } catch (error) {
+        console.log(
+          `   ⚠️  Some relations for ${company.name} already exist, continuing...`,
+        );
+      }
     }
 
     // Persist all changes
@@ -819,6 +909,6 @@ export class PericlesSeeder extends Seeder {
       automotiveSector,
     ]);
 
-    console.log('✅ Périclès seeding completed with all links!');
+    console.log('✅ Pericles seeding completed with all links!');
   }
 }

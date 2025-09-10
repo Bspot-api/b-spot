@@ -1,11 +1,21 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 import { Company } from '../modules/company/company.entity';
+import {
+  EntityType,
+  RelationType,
+} from '../modules/entity-relation/entity-relation.entity';
+import { EntityRelationService } from '../modules/entity-relation/entity-relation.service';
 import { Fund } from '../modules/fund/fund.entity';
+import {
+  PersonalityRelation,
+  PersonalityRelationType,
+} from '../modules/personality/personality-relation.entity';
 import { Personality } from '../modules/personality/personality.entity';
 import { Sector } from '../modules/sector/sector.entity';
 
 export class BolloreSeeder extends Seeder {
+  private entityRelationService: EntityRelationService;
   private async createOrFindSector(
     em: EntityManager,
     name: string,
@@ -33,9 +43,6 @@ export class BolloreSeeder extends Seeder {
     name: string,
     description: string,
     source: string,
-    fund: Fund,
-    sector: Sector,
-    personality: Personality,
   ): Promise<Company> {
     let company = await em.findOne(Company, { name });
     if (!company) {
@@ -44,9 +51,6 @@ export class BolloreSeeder extends Seeder {
       company.description = description;
       company.source = source;
       company.published = true;
-      company.fund = fund;
-      company.sector = sector;
-      company.personalities.add(personality);
       try {
         await em.persistAndFlush(company);
         console.log(`✅ Created company: ${name}`);
@@ -60,6 +64,11 @@ export class BolloreSeeder extends Seeder {
 
   async run(em: EntityManager): Promise<void> {
     console.log('🌱 Starting Bolloré seeding...');
+
+    this.entityRelationService = new EntityRelationService(
+      em.getRepository('EntityRelation') as any,
+      em,
+    );
 
     // Create or find the sector for media and holding activities
     let mediaSector = await em.findOne(Sector, {
@@ -181,37 +190,64 @@ export class BolloreSeeder extends Seeder {
       }
     }
 
-    // Create links between entities
+    // Create links between entities using EntityRelation system
     console.log('🔗 Creating links between entities...');
 
-    // Link entities safely
+    // Create typed relations
     try {
-      // Link Vivendi fund to Vincent Bolloré personality
-      vivendiFund.personalities.add(vincentBollorePersonality);
-      console.log('   ✅ Linked Vivendi to Vincent Bolloré personality');
-
-      // Link Vincent Bolloré personality to Vivendi fund
-      vincentBollorePersonality.funds.add(vivendiFund);
-      console.log('   ✅ Linked Vincent Bolloré personality to Vivendi');
-
-      // Link Vivendi fund to media sector
-      vivendiFund.sectors.add(mediaSector);
-      console.log('   ✅ Linked Vivendi to media sector');
-
-      // Link media sector to Vivendi fund
-      mediaSector.funds.add(vivendiFund);
-      console.log('   ✅ Linked media sector to Vivendi');
-
-      // Link Bolloré Group to Vincent Bolloré and holding sector
-      bolloreFund.personalities.add(vincentBollorePersonality);
-      vincentBollorePersonality.funds.add(bolloreFund);
-      bolloreFund.sectors.add(holdingSector);
-      holdingSector.funds.add(bolloreFund);
-      console.log(
-        '   ✅ Linked Bolloré Group to Vincent Bolloré and holding sector',
+      // Vincent Bolloré controls Vivendi
+      await this.entityRelationService.createRelation(
+        EntityType.PERSONALITY,
+        vincentBollorePersonality.id,
+        EntityType.FUND,
+        vivendiFund.id,
+        RelationType.CONTROLS,
+        {
+          notes: 'Vincent Bolloré controls Vivendi through shareholding',
+        },
       );
+      console.log('   ✅ Linked Vincent Bolloré CONTROLS Vivendi');
+
+      // Vincent Bolloré controls Bolloré Group
+      await this.entityRelationService.createRelation(
+        EntityType.PERSONALITY,
+        vincentBollorePersonality.id,
+        EntityType.FUND,
+        bolloreFund.id,
+        RelationType.CONTROLS,
+        {
+          notes: 'Vincent Bolloré controls Bolloré Group',
+        },
+      );
+      console.log('   ✅ Linked Vincent Bolloré CONTROLS Bolloré Group');
+
+      // Vivendi operates in media sector
+      await this.entityRelationService.createRelation(
+        EntityType.FUND,
+        vivendiFund.id,
+        EntityType.SECTOR,
+        mediaSector.id,
+        RelationType.OPERATES_IN,
+        {
+          notes: 'Vivendi operates in media and communication sector',
+        },
+      );
+      console.log('   ✅ Linked Vivendi OPERATES_IN media sector');
+
+      // Bolloré Group operates in holding sector
+      await this.entityRelationService.createRelation(
+        EntityType.FUND,
+        bolloreFund.id,
+        EntityType.SECTOR,
+        holdingSector.id,
+        RelationType.OPERATES_IN,
+        {
+          notes: 'Bolloré Group operates as a holding company',
+        },
+      );
+      console.log('   ✅ Linked Bolloré Group OPERATES_IN holding sector');
     } catch (error) {
-      console.log('   ⚠️  Some links already exist, continuing...');
+      console.log('   ⚠️  Some relations already exist, continuing...');
     }
 
     // Create Vivendi SE company
@@ -223,24 +259,53 @@ export class BolloreSeeder extends Seeder {
         'Conglomérat français de médias et de communication, contrôlé par le groupe Bolloré. Propriétaire de Canal+, Havas, et autres actifs médiatiques majeurs.';
       vivendiCompany.source = 'https://www.vivendi.com';
       vivendiCompany.published = true;
-      vivendiCompany.fund = bolloreFund;
-      vivendiCompany.sector = holdingSector;
       await em.persistAndFlush(vivendiCompany);
       console.log('✅ Created Vivendi SE company');
-      console.log(`   📊 Linked to fund: ${bolloreFund.name}`);
-      console.log(`   🏭 Linked to sector: ${holdingSector.name}`);
     }
 
-    // Link Vivendi SE company to Vincent Bolloré personality
+    // Create Vivendi SE company relations using EntityRelation system
     try {
-      vivendiCompany.personalities.add(vincentBollorePersonality);
-      await em.persistAndFlush(vivendiCompany);
-      console.log(
-        '✅ Linked Vivendi SE company to Vincent Bolloré personality',
+      // Bolloré Group owns Vivendi SE
+      await this.entityRelationService.createRelation(
+        EntityType.FUND,
+        bolloreFund.id,
+        EntityType.COMPANY,
+        vivendiCompany.id,
+        RelationType.OWNS,
+        {
+          notes: 'Bolloré Group owns Vivendi SE',
+        },
       );
+      console.log('   ✅ Linked Bolloré Group OWNS Vivendi SE');
+
+      // Vincent Bolloré controls Vivendi SE
+      await this.entityRelationService.createRelation(
+        EntityType.PERSONALITY,
+        vincentBollorePersonality.id,
+        EntityType.COMPANY,
+        vivendiCompany.id,
+        RelationType.CONTROLS,
+        {
+          notes: 'Vincent Bolloré controls Vivendi SE through Bolloré Group',
+        },
+      );
+      console.log('   ✅ Linked Vincent Bolloré CONTROLS Vivendi SE');
+
+      // Vivendi SE operates in media sector
+      await this.entityRelationService.createRelation(
+        EntityType.COMPANY,
+        vivendiCompany.id,
+        EntityType.SECTOR,
+        mediaSector.id,
+        RelationType.OPERATES_IN,
+        {
+          notes: 'Vivendi SE operates in media and communication sector',
+        },
+      );
+      console.log('   ✅ Linked Vivendi SE OPERATES_IN media sector');
     } catch (error) {
       console.log(
-        '   ⚠️  Vivendi SE already linked to personality, continuing...',
+        '   ⚠️  Some Vivendi SE relations already exist, continuing...',
       );
     }
 
@@ -391,16 +456,110 @@ export class BolloreSeeder extends Seeder {
     ];
 
     for (const companyData of companies) {
-      await this.createOrFindCompany(
+      const company = await this.createOrFindCompany(
         em,
         companyData.name,
         companyData.description,
         companyData.source,
-        vivendiFund,
-        companyData.sector,
-        companyData.personality,
       );
+
+      // Create relations using EntityRelation system
+      try {
+        // Vivendi owns the company
+        await this.entityRelationService.createRelation(
+          EntityType.FUND,
+          vivendiFund.id,
+          EntityType.COMPANY,
+          company.id,
+          RelationType.OWNS,
+          {
+            notes: `Vivendi owns ${company.name}`,
+          },
+        );
+
+        // Vincent Bolloré manages the company through Vivendi
+        await this.entityRelationService.createRelation(
+          EntityType.PERSONALITY,
+          companyData.personality.id,
+          EntityType.COMPANY,
+          company.id,
+          RelationType.MANAGES,
+          {
+            notes: `${companyData.personality.name} manages ${company.name} through Vivendi`,
+          },
+        );
+
+        // Company operates in its sector
+        await this.entityRelationService.createRelation(
+          EntityType.COMPANY,
+          company.id,
+          EntityType.SECTOR,
+          companyData.sector.id,
+          RelationType.OPERATES_IN,
+          {
+            notes: `${company.name} operates in ${companyData.sector.name} sector`,
+          },
+        );
+      } catch (error) {
+        console.log(
+          `   ⚠️  Some relations for ${company.name} already exist, continuing...`,
+        );
+      }
     }
+
+    // Create personality relations
+    console.log('🔗 Creating personality relations...');
+
+    // Vincent Bolloré is family of Yannick Bolloré (father-son)
+    const vincentYannickRelation = new PersonalityRelation();
+    vincentYannickRelation.sourcePersonality = vincentBollorePersonality;
+    vincentYannickRelation.targetPersonality = yannickBollorePersonality;
+    vincentYannickRelation.relationType = PersonalityRelationType.IS_FAMILY_OF;
+    vincentYannickRelation.notes =
+      'Vincent Bolloré est le père de Yannick Bolloré';
+
+    const yannickVincentRelation = new PersonalityRelation();
+    yannickVincentRelation.sourcePersonality = yannickBollorePersonality;
+    yannickVincentRelation.targetPersonality = vincentBollorePersonality;
+    yannickVincentRelation.relationType = PersonalityRelationType.IS_FAMILY_OF;
+    yannickVincentRelation.notes =
+      'Yannick Bolloré est le fils de Vincent Bolloré';
+
+    // Vincent Bolloré is colleague of Maxime Saada (boss-employee)
+    const vincentMaximeRelation = new PersonalityRelation();
+    vincentMaximeRelation.sourcePersonality = vincentBollorePersonality;
+    vincentMaximeRelation.targetPersonality = maximeSaadaPersonality;
+    vincentMaximeRelation.relationType =
+      PersonalityRelationType.IS_COLLEAGUE_OF;
+    vincentMaximeRelation.notes =
+      'Vincent Bolloré est le patron de Maxime Saada';
+
+    const maximeVincentRelation = new PersonalityRelation();
+    maximeVincentRelation.sourcePersonality = maximeSaadaPersonality;
+    maximeVincentRelation.targetPersonality = vincentBollorePersonality;
+    maximeVincentRelation.relationType =
+      PersonalityRelationType.IS_COLLEAGUE_OF;
+    maximeVincentRelation.notes =
+      "Maxime Saada est l'employé de Vincent Bolloré";
+
+    // Yannick Bolloré is colleague of Maxime Saada (colleagues at Vivendi)
+    const yannickMaximeRelation = new PersonalityRelation();
+    yannickMaximeRelation.sourcePersonality = yannickBollorePersonality;
+    yannickMaximeRelation.targetPersonality = maximeSaadaPersonality;
+    yannickMaximeRelation.relationType =
+      PersonalityRelationType.IS_COLLEAGUE_OF;
+    yannickMaximeRelation.notes =
+      'Yannick Bolloré et Maxime Saada sont collègues chez Vivendi';
+
+    const maximeYannickRelation = new PersonalityRelation();
+    maximeYannickRelation.sourcePersonality = maximeSaadaPersonality;
+    maximeYannickRelation.targetPersonality = yannickBollorePersonality;
+    maximeYannickRelation.relationType =
+      PersonalityRelationType.IS_COLLEAGUE_OF;
+    maximeYannickRelation.notes =
+      'Maxime Saada et Yannick Bolloré sont collègues chez Vivendi';
+
+    console.log('✅ Personality relations created!');
 
     // Persist all changes
     await em.persistAndFlush([
@@ -418,6 +577,13 @@ export class BolloreSeeder extends Seeder {
       publishingSector,
       gamingSector,
       streamingSector,
+      // Personality relations
+      vincentYannickRelation,
+      yannickVincentRelation,
+      vincentMaximeRelation,
+      maximeVincentRelation,
+      yannickMaximeRelation,
+      maximeYannickRelation,
     ]);
 
     console.log('✅ Bolloré seeding completed with all links!');

@@ -8,16 +8,10 @@ const config: Options<PostgreSqlDriver> = {
   user: process.env.DATABASE_USER || 'postgres',
   password: process.env.DATABASE_PASSWORD || 'password',
   dbName: process.env.DATABASE_NAME || 'b-spot',
-  entities: [
-    'src/modules/**/entities/*.entity.ts',
-    'src/modules/**/*.entity.ts', 
-    'src/utils/**/*.embeddable.ts',
-  ],
-  entitiesTs: [
-    'src/modules/**/entities/*.entity.ts',
-    'src/modules/**/*.entity.ts',
-    'src/utils/**/*.embeddable.ts',
-  ],
+  // Only include entities for CLI commands (migrations, seeders)
+  ...(process.env.NODE_ENV === 'cli' && {
+    entities: ['./src/modules/**/*.entity.ts'],
+  }),
   migrations: {
     path: './src/migrations',
     pathTs: './src/migrations',
@@ -29,6 +23,7 @@ const config: Options<PostgreSqlDriver> = {
     glob: '!(*.d).{js,ts}',
   },
   debug: process.env.NODE_ENV !== 'production',
+  dynamicImportProvider: (id) => import(id),
 };
 
 export default config;

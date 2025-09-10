@@ -1,10 +1,23 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
+import { Company } from '../company/company.entity';
+import { EntityRelationCacheService } from '../entity-relation/entity-relation-cache.service';
+import {
+  EntityType,
+  RelationType,
+} from '../entity-relation/entity-relation.entity';
+import { EntityRelationService } from '../entity-relation/entity-relation.service';
+import { PersonalityRelationService } from './personality-relation.service';
 import { Personality } from './personality.entity';
 
 @Injectable()
 export class PersonalityService {
-  constructor(private readonly em: EntityManager) {}
+  constructor(
+    private readonly em: EntityManager,
+    private readonly entityRelationService: EntityRelationService,
+    private readonly entityRelationCacheService: EntityRelationCacheService,
+    private readonly personalityRelationService: PersonalityRelationService,
+  ) {}
 
   async create(data: Partial<Personality>): Promise<Personality> {
     const personality = this.em.create(Personality, {
@@ -16,11 +29,45 @@ export class PersonalityService {
   }
 
   async findAll(): Promise<Personality[]> {
-    return this.em.find(Personality, {});
+    const personalities = await this.em.find(Personality, {});
+    return this.populateMultipleRelations(personalities);
+  }
+
+  private async populateRelations(
+    personality: Personality,
+  ): Promise<Personality> {
+    const relatedPersonalities =
+      await this.personalityRelationService.getRelatedPersonalitiesBidirectional(
+        personality.id,
+      );
+
+    // Create a plain object with the relations for proper serialization
+    const personalityWithRelations = {
+      ...personality,
+      relatedPersonalities: relatedPersonalities.map((p) => ({
+        id: p.id,
+        name: p.name,
+        description: p.description,
+        published: p.published,
+        createdAt: p.createdAt,
+      })),
+    };
+
+    return personalityWithRelations as Personality;
+  }
+
+  private async populateMultipleRelations(
+    personalities: Personality[],
+  ): Promise<Personality[]> {
+    return Promise.all(
+      personalities.map((personality) => this.populateRelations(personality)),
+    );
   }
 
   async findOne(id: string): Promise<Personality | null> {
-    return this.em.findOne(Personality, { id });
+    const personality = await this.em.findOne(Personality, { id });
+    if (!personality) return null;
+    return this.populateRelations(personality);
   }
 
   async update(
@@ -41,13 +88,23 @@ export class PersonalityService {
     return true;
   }
 
-  async getCompanies(id: string) {
-    const personality = await this.em.findOne(
-      Personality,
-      { id },
-      { populate: ['companies'] },
+  async getCompanies(id: string): Promise<Company[]> {
+    // Find companies that are managed or controlled by this personality using EntityRelation
+    const relations = await this.entityRelationService.findBySource(
+      EntityType.PERSONALITY,
+      id,
     );
-    if (!personality) return [];
-    return personality.companies.getItems();
+
+    const companyRelations = relations.filter(
+      (rel) =>
+        rel.targetType === EntityType.COMPANY &&
+        (rel.relationType === RelationType.MANAGES ||
+          rel.relationType === RelationType.CONTROLS),
+    );
+
+    if (companyRelations.length === 0) return [];
+
+    const companyIds = companyRelations.map((rel) => rel.targetId);
+    return this.em.find(Company, { id: { $in: companyIds } });
   }
 }

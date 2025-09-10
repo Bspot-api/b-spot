@@ -8,8 +8,6 @@ import {
 } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
 import { Brand } from '../brand/brand.entity';
-import { Company } from '../company/company.entity';
-import { Fund } from '../fund/fund.entity';
 
 @Entity({ tableName: 'personalities' })
 export class Personality {
@@ -34,12 +32,21 @@ export class Personality {
   @Property({ fieldName: 'createdAt' })
   createdAt: Date = new Date();
 
-  @ManyToMany(() => Company, (company) => company.personalities)
-  companies = new Collection<Company>(this);
+  // Relations now handled via EntityRelation system
+  // @ManyToMany(() => Company, (company) => company.personalities)
+  // companies = new Collection<Company>(this);
 
-  @ManyToMany(() => Fund, (fund) => fund.personalities)
-  funds = new Collection<Fund>(this);
+  // @ManyToMany(() => Fund, (fund) => fund.personalities)
+  // funds = new Collection<Fund>(this);
 
   @ManyToMany(() => Brand, (brand) => brand.personalities)
   brands = new Collection<Brand>(this);
+
+  // Computed properties via EntityRelation system
+  @ApiProperty({
+    description: 'Related personalities (computed from EntityRelation)',
+    type: () => [Personality],
+    required: false,
+  })
+  relatedPersonalities: Personality[] = [];
 }

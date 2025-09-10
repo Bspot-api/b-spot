@@ -20,6 +20,13 @@ export enum RelationType {
   PARTNERS_WITH = 'partners_with',
   ACQUIRED = 'acquired',
   SPUN_OFF = 'spun_off',
+  // Personality-to-personality relations
+  IS_FRIEND_OF = 'is_friend_of',
+  IS_FAMILY_OF = 'is_family_of',
+  IS_COLLEAGUE_OF = 'is_colleague_of',
+  IS_MENTOR_OF = 'is_mentor_of',
+  IS_PARTNER_OF = 'is_partner_of',
+  IS_RIVAL_OF = 'is_rival_of',
 }
 
 @Entity({ tableName: 'entity_relations' })

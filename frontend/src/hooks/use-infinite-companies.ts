@@ -1,13 +1,11 @@
 import type { CompanyControllerFindAllData } from "@/api/hooks";
 import { companyControllerFindAll } from "@/api/hooks";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import React from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useApiClient } from "./use-api-client";
 
-export function useCompanies(
-  page: number = 1, 
-  limit: number = 30, 
+export function useInfiniteCompanies(
   search?: string,
   sectorIds?: string[],
   fundIds?: string[],
@@ -16,13 +14,13 @@ export function useCompanies(
   // Ensure the API client is configured
   useApiClient();
 
-  return useQuery({
-    queryKey: ["companies", page, limit, search, sectorIds, fundIds, personalityIds],
-    queryFn: async () => {
+  return useInfiniteQuery({
+    queryKey: ["companies-infinite", search, sectorIds, fundIds, personalityIds],
+    queryFn: async ({ pageParam = 1 }) => {
       const options: CompanyControllerFindAllData = {
         query: { 
-          page, 
-          limit, 
+          page: pageParam, 
+          limit: 20, 
           search,
           sectorIds: sectorIds?.join(','),
           fundIds: fundIds?.join(','),
@@ -33,80 +31,82 @@ export function useCompanies(
       const response = await companyControllerFindAll(options);
       return response.data;
     },
-    // Keep previous data while loading new data to prevent blinking
+    getNextPageParam: (lastPage) => {
+      const { pagination } = lastPage;
+      if (pagination && pagination.page < pagination.totalPages) {
+        return pagination.page + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
+    // Keep previous data while loading new data
     placeholderData: (previousData) => previousData,
   });
 }
 
-// Hook for pagination state management with URL sync
-export function useCompaniesPagination(initialPage: number = 1, initialLimit: number = 30) {
+// Hook for infinite scroll state management with URL sync
+export function useInfiniteCompaniesPagination() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   
   // Get current values from URL params or use defaults with proper fallbacks
-  const currentPage = Math.max(1, parseInt(searchParams.get('page') || initialPage.toString(), 10) || initialPage);
-  const currentLimit = Math.max(1, parseInt(searchParams.get('limit') || initialLimit.toString(), 10) || initialLimit);
   const currentSearch = searchParams.get('search') || '';
   const currentSectorIds = searchParams.get('sectorIds')?.split(',').filter(Boolean) || [];
   const currentFundIds = searchParams.get('fundIds')?.split(',').filter(Boolean) || [];
   const currentPersonalityIds = searchParams.get('personalityIds')?.split(',').filter(Boolean) || [];
   
-  const [page, setPage] = React.useState(currentPage);
-  const [limit, setLimit] = React.useState(currentLimit);
   const [search, setSearch] = React.useState(currentSearch);
   const [sectorIds, setSectorIds] = React.useState<string[]>(currentSectorIds);
   const [fundIds, setFundIds] = React.useState<string[]>(currentFundIds);
   const [personalityIds, setPersonalityIds] = React.useState<string[]>(currentPersonalityIds);
   const [isInitialized, setIsInitialized] = React.useState(false);
   
-  const { data: response, isLoading, error, isFetching } = useCompanies(
-    page, 
-    limit, 
+  const { 
+    data, 
+    isLoading, 
+    error, 
+    isFetching, 
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage 
+  } = useInfiniteCompanies(
     search, 
     sectorIds.length > 0 ? sectorIds : undefined,
     fundIds.length > 0 ? fundIds : undefined,
     personalityIds.length > 0 ? personalityIds : undefined
   );
 
-  const companies = response?.data || [];
-  const pagination = response?.pagination;
+  // Flatten all pages into a single array of companies
+  const companies = React.useMemo(() => {
+    return data?.pages.flatMap(page => page.data) || [];
+  }, [data]);
 
   // Mark as initialized after first data load
   React.useEffect(() => {
-    if (response && !isInitialized) {
+    if (data && !isInitialized) {
       setIsInitialized(true);
     }
-  }, [response, isInitialized]);
+  }, [data, isInitialized]);
 
   // Update URL params when state changes
   const updateURLParams = React.useCallback((
-    newPage: number, 
-    newLimit: number, 
     newSearch: string,
     newSectorIds: string[],
     newFundIds: string[],
     newPersonalityIds: string[]
   ) => {
     const params = new URLSearchParams();
-    if (newPage > 1) params.set('page', newPage.toString());
-    if (newLimit !== initialLimit) params.set('limit', newLimit.toString());
     if (newSearch) params.set('search', newSearch);
     if (newSectorIds.length > 0) params.set('sectorIds', newSectorIds.join(','));
     if (newFundIds.length > 0) params.set('fundIds', newFundIds.join(','));
     if (newPersonalityIds.length > 0) params.set('personalityIds', newPersonalityIds.join(','));
     
     setSearchParams(params, { replace: true });
-  }, [setSearchParams, initialLimit]);
+  }, [setSearchParams]);
 
   // Sync URL params with state when URL changes
   React.useEffect(() => {
-    if (currentPage !== page) {
-      setPage(currentPage);
-    }
-    if (currentLimit !== limit) {
-      setLimit(currentLimit);
-    }
     if (currentSearch !== search) {
       setSearch(currentSearch);
     }
@@ -119,76 +119,43 @@ export function useCompaniesPagination(initialPage: number = 1, initialLimit: nu
     if (JSON.stringify(currentPersonalityIds) !== JSON.stringify(personalityIds)) {
       setPersonalityIds(currentPersonalityIds);
     }
-  }, [currentPage, currentLimit, currentSearch, currentSectorIds, currentFundIds, currentPersonalityIds, page, limit, search, sectorIds, fundIds, personalityIds]);
-
-  const goToPage = (newPage: number) => {
-    setPage(newPage);
-    updateURLParams(newPage, limit, search, sectorIds, fundIds, personalityIds);
-  };
-
-  const goToNextPage = () => {
-    const newPage = page + 1;
-    setPage(newPage);
-    updateURLParams(newPage, limit, search, sectorIds, fundIds, personalityIds);
-  };
-
-  const goToPreviousPage = () => {
-    const newPage = Math.max(1, page - 1);
-    setPage(newPage);
-    updateURLParams(newPage, limit, search, sectorIds, fundIds, personalityIds);
-  };
+  }, [currentSearch, currentSectorIds, currentFundIds, currentPersonalityIds, search, sectorIds, fundIds, personalityIds]);
 
   const updateSearch = (newSearch: string) => {
     setSearch(newSearch);
-    setPage(1); // Reset to first page when search changes
-    updateURLParams(1, limit, newSearch, sectorIds, fundIds, personalityIds);
-  };
-
-  const updateLimit = (newLimit: number) => {
-    setLimit(newLimit);
-    setPage(1); // Reset to first page when limit changes
-    updateURLParams(1, newLimit, search, sectorIds, fundIds, personalityIds);
+    updateURLParams(newSearch, sectorIds, fundIds, personalityIds);
   };
 
   const updateSectorIds = (newSectorIds: string[]) => {
     setSectorIds(newSectorIds);
-    setPage(1); // Reset to first page when filters change
-    updateURLParams(1, limit, search, newSectorIds, fundIds, personalityIds);
+    updateURLParams(search, newSectorIds, fundIds, personalityIds);
   };
 
   const updateFundIds = (newFundIds: string[]) => {
     setFundIds(newFundIds);
-    setPage(1); // Reset to first page when filters change
-    updateURLParams(1, limit, search, sectorIds, newFundIds, personalityIds);
+    updateURLParams(search, sectorIds, newFundIds, personalityIds);
   };
 
   const updatePersonalityIds = (newPersonalityIds: string[]) => {
     setPersonalityIds(newPersonalityIds);
-    setPage(1); // Reset to first page when filters change
-    updateURLParams(1, limit, search, sectorIds, fundIds, newPersonalityIds);
+    updateURLParams(search, sectorIds, fundIds, newPersonalityIds);
   };
 
   return {
     companies,
-    pagination,
     isLoading: isLoading || !isInitialized,
     isFetching,
+    isFetchingNextPage,
     error,
-    page,
-    limit,
     search,
     sectorIds,
     fundIds,
     personalityIds,
-    goToPage,
-    goToNextPage,
-    goToPreviousPage,
     updateSearch,
-    updateLimit,
     updateSectorIds,
     updateFundIds,
     updatePersonalityIds,
-    hasNextPage: pagination?.totalPages ? page < pagination.totalPages : companies.length === limit,
-    hasPreviousPage: page > 1
+    hasNextPage: hasNextPage ?? false,
+    fetchNextPage
   };
 }
