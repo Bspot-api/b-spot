@@ -11,6 +11,7 @@ import { Input } from "@/components/shadcn/input"
 import { CompanyCard } from "./company-card"
 import { CompanyCardSkeleton } from "./company-card-skeleton"
 import { FilterFunds, FilterPersonalities, FilterSectors } from "./filters"
+import { ActiveFilters } from "./active-filters"
 
 export interface CompaniesGridProps {
   companies: Company[]
@@ -99,6 +100,18 @@ export function CompaniesGrid({
           </div>
         </div>
       </div>
+
+      {/* Active Filters */}
+      <ActiveFilters
+        currentSearch={currentSearch}
+        currentSectorIds={currentSectorIds}
+        currentFundIds={currentFundIds}
+        currentPersonalityIds={currentPersonalityIds}
+        onSearchChange={onSearchChange}
+        onSectorIdsChange={onSectorIdsChange}
+        onFundIdsChange={onFundIdsChange}
+        onPersonalityIdsChange={onPersonalityIdsChange}
+      />
       
       {/* Companies Grid */}
       {isLoading ? (

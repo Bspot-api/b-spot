@@ -1,17 +1,417 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
+import { Brand } from '../modules/brand/brand.entity';
 import { Company } from '../modules/company/company.entity';
 import {
+  EntityRelation,
   EntityType,
   RelationType,
 } from '../modules/entity-relation/entity-relation.entity';
-import { EntityRelationService } from '../modules/entity-relation/entity-relation.service';
 import { Fund } from '../modules/fund/fund.entity';
+import {
+  PersonalityRelation,
+  PersonalityRelationType,
+} from '../modules/personality/personality-relation.entity';
 import { Personality } from '../modules/personality/personality.entity';
 import { Sector } from '../modules/sector/sector.entity';
 
 export class BernardArnaultSeeder extends Seeder {
-  private entityRelationService: EntityRelationService;
+  async run(em: EntityManager): Promise<void> {
+    console.log('🌱 Starting BernardArnault seeding...');
+
+    // 1. CRÉER LES SECTEURS
+    const luxurySector = await this.createOrFindSector(
+      em,
+      'Luxury & Fashion',
+      'Secteur du luxe comprenant mode, maroquinerie, joaillerie, horlogerie, vins & spiritueux. Arnault domine ce secteur via LVMH.',
+    );
+    const mediaSector = await this.createOrFindSector(
+      em,
+      'Media & Communication',
+      'Secteur des médias (presse, radio) où Arnault possède Les Echos et Le Parisien.',
+    );
+
+    // 2. CRÉER LES PERSONNALITÉS
+    const bernardArnault = await this.createOrFindPersonality(
+      em,
+      'Bernard Arnault',
+      'Milliardaire français, PDG du groupe de luxe LVMH. Principal actionnaire via sa holding familiale. Influence politique et économique considérable.',
+    );
+    const delphineArnault = await this.createOrFindPersonality(
+      em,
+      'Delphine Arnault',
+      'Fille aînée de Bernard Arnault, dirigeante de LVMH (DG de Christian Dior Couture depuis 2023, administratrice de LVMH).',
+    );
+    const antoineArnault = await this.createOrFindPersonality(
+      em,
+      'Antoine Arnault',
+      'Fils de Bernard Arnault, ancien DG de Berluti (2011-2023), PDG de Christian Dior SE (holding) depuis 2022, en charge de la communication du groupe.',
+    );
+    const alexandreArnault = await this.createOrFindPersonality(
+      em,
+      'Alexandre Arnault',
+      'Fils de Bernard Arnault, VP exécutif de Tiffany & Co. depuis 2021 (après rachat par LVMH), ex-DG de Rimowa.',
+    );
+    const fredericArnault = await this.createOrFindPersonality(
+      em,
+      'Frédéric Arnault',
+      'Fils de Bernard Arnault, PDG de TAG Heuer depuis 2020, pilote la stratégie horlogère du groupe.',
+    );
+    const jeanArnault = await this.createOrFindPersonality(
+      em,
+      'Jean Arnault',
+      'Fils cadet de Bernard Arnault, directeur du marketing horlogerie chez Louis Vuitton.',
+    );
+    const xavierNiel = await this.createOrFindPersonality(
+      em,
+      'Xavier Niel',
+      "Gendre de Bernard Arnault (époux de Delphine Arnault) et entrepreneur des télécoms (fondateur d'Iliad/Free).",
+    );
+    const francoisPinault = await this.createOrFindPersonality(
+      em,
+      'François Pinault',
+      'Homme d’affaires milliardaire, fondateur de Kering (anciennement PPR). Rival historique de Bernard Arnault dans le luxe (Gucci, etc.).',
+    );
+
+    // 3. CRÉER LES FONDS
+    const arnaultHolding = await this.createOrFindFund(
+      em,
+      'Groupe Arnault (Agache)',
+      "Holding familiale des Arnault (Agache), détient ~97% de Christian Dior SE et ~48% de LVMH. Véhicule d'investissement fondé par Bernard Arnault.",
+    );
+
+    // 4. CRÉER LES ENTREPRISES
+    const lvmh = await this.createOrFindCompany(
+      em,
+      'LVMH',
+      'LVMH Moët Hennessy Louis Vuitton, numéro un mondial du luxe avec plus de 70 marques (Louis Vuitton, Dior, Bulgari, etc.). Bernard Arnault en est PDG et actionnaire majoritaire (via sa holding).',
+      'https://www.lvmh.com',
+    );
+    const carrefour = await this.createOrFindCompany(
+      em,
+      'Carrefour',
+      'Groupe français de grande distribution. Bernard Arnault a détenu ~10% de Carrefour de 2007 à 2021 via Blue Capital (partenariat avec Colony Capital).',
+      'https://www.carrefour.com',
+    );
+    const mediaGroup = await this.createOrFindCompany(
+      em,
+      'Les Echos-Le Parisien',
+      'Groupe de presse détenu par LVMH (Les Echos, quotidien économique, acquis en 2007, et Le Parisien, quotidien régional/national, acquis en 2015).',
+      'https://lesechosleparisien.fr',
+    ); // fictitious URL for the media group
+
+    // 5. CRÉER LES MARQUES
+    const dior = await this.createOrFindBrand(
+      em,
+      'Christian Dior',
+      'Marque de mode de luxe emblématique (haute couture, prêt-à-porter, maroquinerie). Acquise par Bernard Arnault en 1984, intégrée à LVMH. Delphine Arnault en est la DG depuis 2023.',
+      lvmh,
+    );
+    const tagHeuer = await this.createOrFindBrand(
+      em,
+      'TAG Heuer',
+      'Manufacture horlogère suisse renommée pour ses montres sportives. Fait partie de LVMH (division Montres & Joaillerie). Frédéric Arnault en est PDG depuis 2020.',
+      lvmh,
+    );
+    const tiffany = await this.createOrFindBrand(
+      em,
+      'Tiffany & Co.',
+      'Joaillier de luxe américain (fondé en 1837), célèbre pour ses diamants et son Blue Box. Racheté par LVMH en 2021 pour 15,8 Mds$. Alexandre Arnault y occupe un poste de direction.',
+      lvmh,
+    );
+    const berluti = await this.createOrFindBrand(
+      em,
+      'Berluti',
+      'Marque de luxe masculine (chaussures, maroquinerie, prêt-à-porter) fondée en 1895 et acquise par LVMH. Antoine Arnault a été DG de Berluti (2011-2023).',
+      lvmh,
+    );
+
+    // 6. CRÉER LES RELATIONS BUSINESS (EntityRelation)
+
+    // Bernard Arnault possède sa holding familiale (Groupe Arnault/Agache).
+    await this.createEntityRelation(em, {
+      sourceType: EntityType.PERSONALITY,
+      sourceId: bernardArnault.id,
+      targetType: EntityType.FUND,
+      targetId: arnaultHolding.id,
+      relationType: RelationType.OWNS,
+      strength: 1.0,
+      startDate: new Date('1989-01-01'),
+      notes:
+        'Fondateur et propriétaire du holding familial (Agache/Groupe Arnault).',
+    });
+
+    // La holding familiale contrôle LVMH (via Christian Dior SE, ~48% du capital).
+    await this.createEntityRelation(em, {
+      sourceType: EntityType.FUND,
+      sourceId: arnaultHolding.id,
+      targetType: EntityType.COMPANY,
+      targetId: lvmh.id,
+      relationType: RelationType.CONTROLS,
+      strength: 0.48,
+      notes:
+        'Contrôle majoritaire de LVMH via 41% Dior + parts directes (~48% capital, >60% droits de vote).',
+    });
+
+    // La holding (Groupe Arnault) a investi dans Carrefour (en a détenu ~10%).
+    await this.createEntityRelation(em, {
+      sourceType: EntityType.FUND,
+      sourceId: arnaultHolding.id,
+      targetType: EntityType.COMPANY,
+      targetId: carrefour.id,
+      relationType: RelationType.INVESTS_IN,
+      strength: 0.1,
+      startDate: new Date('2007-03-01'),
+      endDate: new Date('2021-09-01'),
+      notes:
+        'Participation (~9.8%) dans Carrefour via Blue Capital (avec Colony Capital).',
+    });
+
+    // LVMH possède le groupe Les Echos-Le Parisien (médias).
+    await this.createEntityRelation(em, {
+      sourceType: EntityType.COMPANY,
+      sourceId: lvmh.id,
+      targetType: EntityType.COMPANY,
+      targetId: mediaGroup.id,
+      relationType: RelationType.OWNS,
+      strength: 1.0,
+      startDate: new Date('2015-10-30'),
+      notes:
+        'LVMH propriétaire à 100% des journaux Les Echos (depuis 2007) et Le Parisien (depuis 2015).',
+    });
+
+    // LVMH opère dans le secteur Luxury & Fashion.
+    await this.createEntityRelation(em, {
+      sourceType: EntityType.COMPANY,
+      sourceId: lvmh.id,
+      targetType: EntityType.SECTOR,
+      targetId: luxurySector.id,
+      relationType: RelationType.OPERATES_IN,
+      strength: 1.0,
+      notes: 'LVMH est actif dans le luxe (mode, joaillerie, vins, etc.).',
+    });
+
+    // Les Echos-Le Parisien opère dans le secteur Media & Communication.
+    await this.createEntityRelation(em, {
+      sourceType: EntityType.COMPANY,
+      sourceId: mediaGroup.id,
+      targetType: EntityType.SECTOR,
+      targetId: mediaSector.id,
+      relationType: RelationType.OPERATES_IN,
+      strength: 1.0,
+      notes: 'Activité de presse écrite et médias.',
+    });
+
+    // Delphine Arnault dirige Christian Dior (marque Couture) depuis 2023.
+    await this.createEntityRelation(em, {
+      sourceType: EntityType.PERSONALITY,
+      sourceId: delphineArnault.id,
+      targetType: EntityType.BRAND,
+      targetId: dior.id,
+      relationType: RelationType.MANAGES,
+      strength: 1.0,
+      startDate: new Date('2023-01-11'),
+      notes: 'CEO de Christian Dior Couture.',
+    });
+
+    // Antoine Arnault a dirigé Berluti (2011-2023).
+    await this.createEntityRelation(em, {
+      sourceType: EntityType.PERSONALITY,
+      sourceId: antoineArnault.id,
+      targetType: EntityType.BRAND,
+      targetId: berluti.id,
+      relationType: RelationType.MANAGES,
+      strength: 1.0,
+      startDate: new Date('2011-01-01'),
+      endDate: new Date('2023-01-01'),
+      notes: 'Directeur Général de Berluti (2011 à 2023).',
+    });
+
+    // Alexandre Arnault occupe un poste de direction chez Tiffany & Co.
+    await this.createEntityRelation(em, {
+      sourceType: EntityType.PERSONALITY,
+      sourceId: alexandreArnault.id,
+      targetType: EntityType.BRAND,
+      targetId: tiffany.id,
+      relationType: RelationType.MANAGES,
+      strength: 0.8,
+      startDate: new Date('2021-01-01'),
+      notes:
+        'Vice-président exécutif Produits & Communication chez Tiffany & Co.',
+    });
+
+    // Frédéric Arnault dirige TAG Heuer depuis 2020.
+    await this.createEntityRelation(em, {
+      sourceType: EntityType.PERSONALITY,
+      sourceId: fredericArnault.id,
+      targetType: EntityType.BRAND,
+      targetId: tagHeuer.id,
+      relationType: RelationType.MANAGES,
+      strength: 1.0,
+      startDate: new Date('2020-07-01'),
+      notes: 'CEO de TAG Heuer.',
+    });
+
+    // LVMH a acquis Tiffany & Co. en 2021.
+    await this.createEntityRelation(em, {
+      sourceType: EntityType.COMPANY,
+      sourceId: lvmh.id,
+      targetType: EntityType.BRAND,
+      targetId: tiffany.id,
+      relationType: RelationType.ACQUIRED,
+      strength: 1.0,
+      startDate: new Date('2021-01-07'),
+      notes: 'Acquisition de Tiffany & Co. pour 15,8 milliards $ en 2021.',
+    });
+
+    // Ajouter les relations personnalités → companies pour l'affichage
+    
+    // Bernard Arnault contrôle LVMH
+    await this.createEntityRelation(em, {
+      sourceType: EntityType.PERSONALITY,
+      sourceId: bernardArnault.id,
+      targetType: EntityType.COMPANY,
+      targetId: lvmh.id,
+      relationType: RelationType.CONTROLS,
+      strength: 1.0,
+      notes: 'Président-directeur général et actionnaire majoritaire de LVMH.',
+    });
+
+    // Delphine Arnault liée à LVMH (administratrice + DG Dior)
+    await this.createEntityRelation(em, {
+      sourceType: EntityType.PERSONALITY,
+      sourceId: delphineArnault.id,
+      targetType: EntityType.COMPANY,
+      targetId: lvmh.id,
+      relationType: RelationType.MANAGES,
+      strength: 0.8,
+      notes: 'Administratrice de LVMH et DG de Christian Dior Couture.',
+    });
+
+    // Antoine Arnault lié à LVMH
+    await this.createEntityRelation(em, {
+      sourceType: EntityType.PERSONALITY,
+      sourceId: antoineArnault.id,
+      targetType: EntityType.COMPANY,
+      targetId: lvmh.id,
+      relationType: RelationType.MANAGES,
+      strength: 0.7,
+      notes: 'Responsable communication du groupe LVMH.',
+    });
+
+    // Alexandre Arnault lié à LVMH (via Tiffany)
+    await this.createEntityRelation(em, {
+      sourceType: EntityType.PERSONALITY,
+      sourceId: alexandreArnault.id,
+      targetType: EntityType.COMPANY,
+      targetId: lvmh.id,
+      relationType: RelationType.MANAGES,
+      strength: 0.6,
+      notes: 'VP exécutif chez Tiffany & Co. (filiale LVMH).',
+    });
+
+    // Frédéric Arnault lié à LVMH (via TAG Heuer)
+    await this.createEntityRelation(em, {
+      sourceType: EntityType.PERSONALITY,
+      sourceId: fredericArnault.id,
+      targetType: EntityType.COMPANY,
+      targetId: lvmh.id,
+      relationType: RelationType.MANAGES,
+      strength: 0.6,
+      notes: 'CEO de TAG Heuer (marque LVMH).',
+    });
+
+    // Jean Arnault lié à LVMH
+    await this.createEntityRelation(em, {
+      sourceType: EntityType.PERSONALITY,
+      sourceId: jeanArnault.id,
+      targetType: EntityType.COMPANY,
+      targetId: lvmh.id,
+      relationType: RelationType.MANAGES,
+      strength: 0.5,
+      notes: 'Directeur marketing horlogerie chez Louis Vuitton.',
+    });
+
+    // Bernard Arnault lié aux Echos-Le Parisien (propriétaire via LVMH)
+    await this.createEntityRelation(em, {
+      sourceType: EntityType.PERSONALITY,
+      sourceId: bernardArnault.id,
+      targetType: EntityType.COMPANY,
+      targetId: mediaGroup.id,
+      relationType: RelationType.OWNS,
+      strength: 1.0,
+      notes: 'Propriétaire des journaux Les Echos et Le Parisien via LVMH.',
+    });
+
+    // Bernard Arnault lié à Carrefour (investissement via sa holding)
+    await this.createEntityRelation(em, {
+      sourceType: EntityType.PERSONALITY,
+      sourceId: bernardArnault.id,
+      targetType: EntityType.COMPANY,
+      targetId: carrefour.id,
+      relationType: RelationType.INVESTS_IN,
+      strength: 0.1,
+      startDate: new Date('2007-03-01'),
+      endDate: new Date('2021-09-01'),
+      notes: 'Participation (~9.8%) dans Carrefour via sa holding Blue Capital.',
+    });
+
+    // 7. CRÉER LES RELATIONS INTERPERSONNELLES (PersonalityRelation)
+
+    // Bernard Arnault et ses enfants (liens familiaux)
+    await this.createPersonalityRelation(em, {
+      sourcePersonality: bernardArnault,
+      targetPersonality: delphineArnault,
+      relationType: PersonalityRelationType.IS_FAMILY_OF,
+      notes: 'Père et fille (Delphine est la fille aînée de Bernard Arnault).',
+    });
+    await this.createPersonalityRelation(em, {
+      sourcePersonality: bernardArnault,
+      targetPersonality: antoineArnault,
+      relationType: PersonalityRelationType.IS_FAMILY_OF,
+      notes: 'Père et fils (Antoine Arnault).',
+    });
+    await this.createPersonalityRelation(em, {
+      sourcePersonality: bernardArnault,
+      targetPersonality: alexandreArnault,
+      relationType: PersonalityRelationType.IS_FAMILY_OF,
+      notes: 'Père et fils (Alexandre Arnault).',
+    });
+    await this.createPersonalityRelation(em, {
+      sourcePersonality: bernardArnault,
+      targetPersonality: fredericArnault,
+      relationType: PersonalityRelationType.IS_FAMILY_OF,
+      notes: 'Père et fils (Frédéric Arnault).',
+    });
+    await this.createPersonalityRelation(em, {
+      sourcePersonality: bernardArnault,
+      targetPersonality: jeanArnault,
+      relationType: PersonalityRelationType.IS_FAMILY_OF,
+      notes: 'Père et fils (Jean Arnault).',
+    });
+
+    // Lien familial par alliance : Bernard Arnault est le beau-père de Xavier Niel.
+    await this.createPersonalityRelation(em, {
+      sourcePersonality: bernardArnault,
+      targetPersonality: xavierNiel,
+      relationType: PersonalityRelationType.IS_FAMILY_OF,
+      notes:
+        'Beau-père et gendre (Xavier Niel a épousé Delphine Arnault en 2010).',
+    });
+
+    // Rivalité entre Bernard Arnault et François Pinault.
+    await this.createPersonalityRelation(em, {
+      sourcePersonality: bernardArnault,
+      targetPersonality: francoisPinault,
+      relationType: PersonalityRelationType.IS_RIVAL_OF,
+      notes:
+        'Rival de longue date dans le secteur du luxe (LVMH vs Kering, bataille Gucci).',
+    });
+
+    console.log('✅ BernardArnault seeding completed with all relations!');
+  }
+
+  // Helper methods to create or find entities...
   private async createOrFindSector(
     em: EntityManager,
     name: string,
@@ -23,15 +423,44 @@ export class BernardArnaultSeeder extends Seeder {
       sector.name = name;
       sector.description = description;
       sector.published = true;
-      try {
-        await em.persistAndFlush(sector);
-        console.log(`✅ Created sector: ${name}`);
-      } catch (error) {
-        console.log(`   ⚠️  Sector ${name} already exists, skipping...`);
-        sector = await em.findOne(Sector, { name });
-      }
+      await em.persistAndFlush(sector);
+      console.log(`✅ Created sector: ${name}`);
     }
     return sector;
+  }
+
+  private async createOrFindPersonality(
+    em: EntityManager,
+    name: string,
+    description: string,
+  ): Promise<Personality> {
+    let person = await em.findOne(Personality, { name });
+    if (!person) {
+      person = new Personality();
+      person.name = name;
+      person.description = description;
+      person.published = true;
+      await em.persistAndFlush(person);
+      console.log(`✅ Created personality: ${name}`);
+    }
+    return person;
+  }
+
+  private async createOrFindFund(
+    em: EntityManager,
+    name: string,
+    description: string,
+  ): Promise<Fund> {
+    let fund = await em.findOne(Fund, { name });
+    if (!fund) {
+      fund = new Fund();
+      fund.name = name;
+      fund.description = description;
+      fund.published = true;
+      await em.persistAndFlush(fund);
+      console.log(`✅ Created fund: ${name}`);
+    }
+    return fund;
   }
 
   private async createOrFindCompany(
@@ -47,367 +476,68 @@ export class BernardArnaultSeeder extends Seeder {
       company.description = description;
       company.source = source;
       company.published = true;
-      try {
-        await em.persistAndFlush(company);
-        console.log(`✅ Created company: ${name}`);
-      } catch (error) {
-        console.log(`   ⚠️  Company ${name} already exists, skipping...`);
-        company = await em.findOne(Company, { name });
-      }
+      await em.persistAndFlush(company);
+      console.log(`✅ Created company: ${name}`);
     }
     return company;
   }
 
-  async run(em: EntityManager): Promise<void> {
-    console.log('🌱 Starting Bernard Arnault seeding...');
-
-    this.entityRelationService = new EntityRelationService(
-      em.getRepository('EntityRelation') as any,
-      em,
-    );
-
-    // Créer les secteurs principaux
-    const holdingSector = await this.createOrFindSector(
-      em,
-      'Holdings & Investissement',
-      "Secteur des holdings familiaux et sociétés d'investissement",
-    );
-    const modeSector = await this.createOrFindSector(
-      em,
-      'Mode & Luxe',
-      'Secteur des produits de luxe, mode, haute couture, joaillerie et cosmétique',
-    );
-    const mediaSector = await this.createOrFindSector(
-      em,
-      'Presse & Médias',
-      'Secteur des médias, presse écrite, radio et communication',
-    );
-    const distributionSector = await this.createOrFindSector(
-      em,
-      'Distribution & Commerce',
-      'Secteur de la grande distribution et du commerce de détail',
-    );
-
-    // Créer le principal fonds/holding familial
-    let agacheFund = await em.findOne(Fund, { name: 'Agache' });
-    if (!agacheFund) {
-      agacheFund = new Fund();
-      agacheFund.name = 'Agache';
-      agacheFund.description =
-        'Holding familial des Arnault. Détient ~97% de Christian Dior SE, qui possède ~41% du capital de LVMH. Contrôlé par Bernard Arnault via Pilinvest. Actif principalement dans le luxe (LVMH).';
-      agacheFund.published = true;
-      await em.persistAndFlush(agacheFund);
-      console.log('✅ Created Agache fund');
+  private async createOrFindBrand(
+    em: EntityManager,
+    name: string,
+    description: string,
+    company: Company,
+  ): Promise<Brand> {
+    let brand = await em.findOne(Brand, { name });
+    if (!brand) {
+      brand = new Brand();
+      brand.name = name;
+      brand.description = description;
+      brand.company = company;
+      brand.published = true;
+      await em.persistAndFlush(brand);
+      console.log(`✅ Created brand: ${name}`);
     }
+    return brand;
+  }
 
-    // Créer les personnalités (Bernard Arnault et enfants)
-    let bernardArnault = await em.findOne(Personality, {
-      name: 'Bernard Arnault',
+  private async createEntityRelation(
+    em: EntityManager,
+    data: Partial<EntityRelation>,
+  ): Promise<void> {
+    const existing = await em.findOne(EntityRelation, {
+      sourceType: data.sourceType,
+      sourceId: data.sourceId,
+      targetType: data.targetType,
+      targetId: data.targetId,
+      relationType: data.relationType,
     });
-    if (!bernardArnault) {
-      bernardArnault = new Personality();
-      bernardArnault.name = 'Bernard Arnault';
-      bernardArnault.description =
-        'Milliardaire français, PDG du groupe LVMH depuis 1989, actionnaire majoritaire via le holding familial Agache. Surnommé le "tycoon du luxe", il a bâti un empire de plus de 70 marques (Louis Vuitton, Dior, Tiffany...).';
-      bernardArnault.published = true;
-      await em.persistAndFlush(bernardArnault);
-      console.log('✅ Created Bernard Arnault personality');
-    } else {
+    if (!existing) {
+      const relation = new EntityRelation();
+      Object.assign(relation, data);
+      await em.persistAndFlush(relation);
       console.log(
-        '   ⚠️  Bernard Arnault personality already exists, using existing...',
+        `🔗 Created relation: ${data.relationType} between ${data.sourceId} and ${data.targetId}`,
       );
     }
+  }
 
-    let delphineArnault = await em.findOne(Personality, {
-      name: 'Delphine Arnault',
+  private async createPersonalityRelation(
+    em: EntityManager,
+    data: Partial<PersonalityRelation>,
+  ): Promise<void> {
+    const existing = await em.findOne(PersonalityRelation, {
+      sourcePersonality: data.sourcePersonality,
+      targetPersonality: data.targetPersonality,
+      relationType: data.relationType,
     });
-    if (!delphineArnault) {
-      delphineArnault = new Personality();
-      delphineArnault.name = 'Delphine Arnault';
-      delphineArnault.description =
-        'Fille aînée de Bernard Arnault, dirigeante dans le luxe. CEO de Christian Dior Couture depuis 2023, après 12 ans chez Louis Vuitton (ex-DG adjointe produits). Administratrice de LVMH, elle incarne la relève familiale dans la mode.';
-      delphineArnault.published = true;
-      try {
-        await em.persistAndFlush(delphineArnault);
-        console.log('✅ Created Delphine Arnault personality');
-      } catch (error) {
-        console.log(
-          '   ⚠️  Delphine Arnault personality already exists, skipping...',
-        );
-        delphineArnault = await em.findOne(Personality, {
-          name: 'Delphine Arnault',
-        });
-      }
-    }
-
-    let antoineArnault = await em.findOne(Personality, {
-      name: 'Antoine Arnault',
-    });
-    if (!antoineArnault) {
-      antoineArnault = new Personality();
-      antoineArnault.name = 'Antoine Arnault';
-      antoineArnault.description =
-        'Fils de Bernard Arnault, en charge de la communication & image du groupe LVMH. CEO de Christian Dior SE (holding de la famille) depuis fin 2022. Ex-CEO de Berluti, il reste président de cette maison et préside Loro Piana. Administrateur de LVMH.';
-      antoineArnault.published = true;
-      try {
-        await em.persistAndFlush(antoineArnault);
-        console.log('✅ Created Antoine Arnault personality');
-      } catch (error) {
-        console.log(
-          '   ⚠️  Antoine Arnault personality already exists, skipping...',
-        );
-        antoineArnault = await em.findOne(Personality, {
-          name: 'Antoine Arnault',
-        });
-      }
-    }
-
-    let alexandreArnault = await em.findOne(Personality, {
-      name: 'Alexandre Arnault',
-    });
-    if (!alexandreArnault) {
-      alexandreArnault = new Personality();
-      alexandreArnault.name = 'Alexandre Arnault';
-      alexandreArnault.description =
-        "Fils de Bernard Arnault. Vice-Président Exécutif de Tiffany & Co. (produits et communication) depuis 2021, après avoir dirigé Rimowa (2016-2020). Membre du conseil d'administration de LVMH, il représente la nouvelle génération du groupe.";
-      alexandreArnault.published = true;
-      try {
-        await em.persistAndFlush(alexandreArnault);
-        console.log('✅ Created Alexandre Arnault personality');
-      } catch (error) {
-        console.log(
-          '   ⚠️  Alexandre Arnault personality already exists, skipping...',
-        );
-        alexandreArnault = await em.findOne(Personality, {
-          name: 'Alexandre Arnault',
-        });
-      }
-    }
-
-    let fredericArnault = await em.findOne(Personality, {
-      name: 'Frédéric Arnault',
-    });
-    if (!fredericArnault) {
-      fredericArnault = new Personality();
-      fredericArnault.name = 'Frédéric Arnault';
-      fredericArnault.description =
-        "Fils de Bernard Arnault. CEO de TAG Heuer (2020-2023) puis CEO de la division Montres de LVMH en 2024. Managing Director du holding familial Financière Agache, il incarne l'innovation technologique du groupe (montres connectées, partenariats F1).";
-      fredericArnault.published = true;
-      try {
-        await em.persistAndFlush(fredericArnault);
-        console.log('✅ Created Frédéric Arnault personality');
-      } catch (error) {
-        console.log(
-          '   ⚠️  Frédéric Arnault personality already exists, skipping...',
-        );
-        fredericArnault = await em.findOne(Personality, {
-          name: 'Frédéric Arnault',
-        });
-      }
-    }
-
-    let jeanArnault = await em.findOne(Personality, { name: 'Jean Arnault' });
-    if (!jeanArnault) {
-      jeanArnault = new Personality();
-      jeanArnault.name = 'Jean Arnault';
-      jeanArnault.description =
-        "Plus jeune fils de Bernard Arnault. Depuis 2021, directeur Marketing & Développement de l'activité Horlogerie chez Louis Vuitton. Diplômé en mathématiques financières (MIT) et en ingénierie (Imperial College), il apporte une vision nouvelle à la division horlogerie du groupe.";
-      jeanArnault.published = true;
-      try {
-        await em.persistAndFlush(jeanArnault);
-        console.log('✅ Created Jean Arnault personality');
-      } catch (error) {
-        console.log(
-          '   ⚠️  Jean Arnault personality already exists, skipping...',
-        );
-        jeanArnault = await em.findOne(Personality, { name: 'Jean Arnault' });
-      }
-    }
-
-    // Create links between entities using EntityRelation system
-    console.log('🔗 Creating links between entities...');
-    try {
-      // Bernard Arnault controls Agache fund
-      await this.entityRelationService.createRelation(
-        EntityType.PERSONALITY,
-        bernardArnault.id,
-        EntityType.FUND,
-        agacheFund.id,
-        RelationType.CONTROLS,
-        {
-          notes: 'Bernard Arnault controls Agache, his family holding company',
-        },
+    if (!existing) {
+      const relation = new PersonalityRelation();
+      Object.assign(relation, data);
+      await em.persistAndFlush(relation);
+      console.log(
+        `👥 Created personality relation: ${data.relationType} between ${data.sourcePersonality.name} and ${data.targetPersonality.name}`,
       );
-      console.log('   ✅ Linked Bernard Arnault CONTROLS Agache');
-
-      // Agache operates in different sectors
-      const sectors = [
-        { sector: holdingSector, name: 'holding' },
-        { sector: modeSector, name: 'luxury fashion' },
-        { sector: mediaSector, name: 'media' },
-        { sector: distributionSector, name: 'retail distribution' },
-      ];
-
-      for (const { sector, name } of sectors) {
-        await this.entityRelationService.createRelation(
-          EntityType.FUND,
-          agacheFund.id,
-          EntityType.SECTOR,
-          sector.id,
-          RelationType.OPERATES_IN,
-          {
-            notes: `Agache operates in ${name} sector through its portfolio`,
-          },
-        );
-        console.log(`   ✅ Linked Agache OPERATES_IN ${name} sector`);
-      }
-    } catch (error) {
-      console.log('   ⚠️  Some relations already exist, continuing...');
     }
-
-    // Créer les entreprises principales associées
-    console.log('🏢 Creating companies...');
-    const companies = [
-      {
-        name: 'Christian Dior SE',
-        description:
-          "Holding coté contrôlé par la famille Arnault (~97% d'Agache). Détient ~41% du capital de LVMH et 100% de Dior Couture. Antoine Arnault en est le directeur général depuis 2022.",
-        source: 'https://www.dior-finance.com/fr',
-        sector: holdingSector,
-        personality: antoineArnault,
-      },
-      {
-        name: 'LVMH Moët Hennessy Louis Vuitton',
-        description:
-          'Leader mondial des produits de luxe (mode, maroquinerie, joaillerie, parfums, vins & spiritueux). Bernard Arnault en est le PDG et actionnaire majoritaire via Dior SE. Regroupe plus de 75 marques dont Louis Vuitton, Dior, Tiffany, etc.',
-        source: 'https://www.lvmh.com',
-        sector: modeSector,
-        personality: bernardArnault,
-      },
-      {
-        name: 'Christian Dior Couture',
-        description:
-          'Maison de couture de prestige (fondée en 1946). Intégralement détenue par LVMH depuis 2017. Référence du luxe parisien (mode féminine, haute couture). Delphine Arnault en assure la direction générale depuis 2023.',
-        source: 'https://www.dior.com',
-        sector: modeSector,
-        personality: delphineArnault,
-      },
-      {
-        name: 'Louis Vuitton',
-        description:
-          'Première marque de luxe au monde (mode & maroquinerie), fleuron historique de LVMH. Célèbre pour ses malles et monogramme LV. Jean Arnault y dirige le marketing Horlogerie, apportant un souffle nouveau sur les montres Louis Vuitton.',
-        source: 'https://www.louisvuitton.com',
-        sector: modeSector,
-        personality: jeanArnault,
-      },
-      {
-        name: 'Tiffany & Co.',
-        description:
-          'Maison américaine de joaillerie haut de gamme (New York, 1837), rachetée par LVMH en 2021 pour $16 milliards. Réputée pour ses diamants et sa célèbre Blue Box. Alexandre Arnault y occupe un poste de vice-président exécutif depuis l’acquisition.',
-        source: 'https://www.tiffany.com',
-        sector: modeSector,
-        personality: alexandreArnault,
-      },
-      {
-        name: 'TAG Heuer',
-        description:
-          'Manufacture horlogère suisse (fondée 1860), intégrée à LVMH en 1999. Innovatrice dans les montres sportives et connectées. Frédéric Arnault en a été le CEO de 2020 à 2023, modernisant la marque avant de prendre la tête de la division Montres du groupe.',
-        source: 'https://www.tagheuer.com',
-        sector: modeSector,
-        personality: fredericArnault,
-      },
-      {
-        name: 'Les Échos',
-        description:
-          'Quotidien économique français de référence, fondé en 1908. Racheté par LVMH en 2007, il fait partie de son pôle médias. Diffuse les actualités économiques et financières, avec une influence notable dans les cercles d’affaires.',
-        source: 'https://www.lesechos.fr',
-        sector: mediaSector,
-        personality: bernardArnault,
-      },
-      {
-        name: 'Le Parisien',
-        description:
-          'Quotidien généraliste français (et son édition nationale *Aujourd’hui en France*). Acquis par LVMH en 2015, il est l’un des principaux journaux d’Île-de-France. Cette diversification de LVMH dans la presse vise à pérenniser ce titre populaire.',
-        source: 'https://www.leparisien.fr',
-        sector: mediaSector,
-        personality: bernardArnault,
-      },
-      {
-        name: 'Carrefour (participation Agache)',
-        description:
-          'Chaîne française de grande distribution (hypermarchés). Agache (Arnault) a détenu ~9.8% du capital de Carrefour de 2007 à 2021 via Blue Capital, avant de céder sa participation (5.7% restants vendus pour 724 M€ en 2021).',
-        source: 'https://www.carrefour.com',
-        sector: distributionSector,
-        personality: bernardArnault,
-      },
-    ];
-
-    for (const companyData of companies) {
-      const company = await this.createOrFindCompany(
-        em,
-        companyData.name,
-        companyData.description,
-        companyData.source,
-      );
-
-      // Create relations using EntityRelation system
-      try {
-        // Agache owns the company
-        await this.entityRelationService.createRelation(
-          EntityType.FUND,
-          agacheFund.id,
-          EntityType.COMPANY,
-          company.id,
-          RelationType.OWNS,
-          {
-            notes: `Agache owns ${company.name}`,
-          },
-        );
-
-        // Bernard Arnault manages the company through Agache
-        await this.entityRelationService.createRelation(
-          EntityType.PERSONALITY,
-          companyData.personality.id,
-          EntityType.COMPANY,
-          company.id,
-          RelationType.MANAGES,
-          {
-            notes: `${companyData.personality.name} manages ${company.name} through Agache`,
-          },
-        );
-
-        // Company operates in its sector
-        await this.entityRelationService.createRelation(
-          EntityType.COMPANY,
-          company.id,
-          EntityType.SECTOR,
-          companyData.sector.id,
-          RelationType.OPERATES_IN,
-          {
-            notes: `${company.name} operates in ${companyData.sector.name} sector`,
-          },
-        );
-      } catch (error) {
-        console.log(
-          `   ⚠️  Some relations for ${company.name} already exist, continuing...`,
-        );
-      }
-    }
-
-    // Persister tous les changements
-    const entitiesToPersist = [
-      agacheFund,
-      bernardArnault,
-      holdingSector,
-      modeSector,
-      mediaSector,
-      distributionSector,
-    ].filter((entity) => entity !== null && entity !== undefined);
-
-    if (entitiesToPersist.length > 0) {
-      await em.persistAndFlush(entitiesToPersist);
-    }
-
-    console.log('✅ Bernard Arnault seeding completed with all links!');
   }
 }

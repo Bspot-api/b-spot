@@ -1,9 +1,9 @@
 import {
-    Collection,
-    Entity,
-    OneToMany,
-    PrimaryKey,
-    Property,
+  Collection,
+  Entity,
+  OneToMany,
+  PrimaryKey,
+  Property,
 } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
 import { Brand } from '../brand/brand.entity';
@@ -37,29 +37,32 @@ export class Company {
   @Property({ fieldName: 'createdAt' })
   createdAt: Date = new Date();
 
-  @ApiProperty({ description: 'Brands owned by this company', type: () => [Brand] })
+  @ApiProperty({
+    description: 'Brands owned by this company',
+    type: () => [Brand],
+  })
   @OneToMany(() => Brand, (brand) => brand.company)
   brands = new Collection<Brand>(this);
 
   // Computed properties via EntityRelation system
-  @ApiProperty({ 
-    description: 'Investment funds (computed from EntityRelation)', 
-    type: () => [Fund], 
-    required: false 
+  @ApiProperty({
+    description: 'Investment funds (computed from EntityRelation)',
+    type: () => [Fund],
+    required: false,
   })
   funds: Fund[] = [];
 
-  @ApiProperty({ 
-    description: 'Business sectors (computed from EntityRelation)', 
-    type: () => [Sector], 
-    required: false 
+  @ApiProperty({
+    description: 'Business sectors (computed from EntityRelation)',
+    type: () => [Sector],
+    required: false,
   })
   sectors: Sector[] = [];
 
-  @ApiProperty({ 
-    description: 'Involved personalities (computed from EntityRelation)', 
-    type: () => [Personality], 
-    required: false 
+  @ApiProperty({
+    description: 'Involved personalities (computed from EntityRelation)',
+    type: () => [Personality],
+    required: false,
   })
   personalities: Personality[] = [];
 }

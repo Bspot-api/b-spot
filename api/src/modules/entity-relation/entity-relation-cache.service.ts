@@ -124,12 +124,7 @@ export class EntityRelationCacheService {
   }
 
   async getPersonalitiesByCompany(companyId: string): Promise<Personality[]> {
-    const cacheKey = this.getCacheKey(
-      EntityType.COMPANY,
-      companyId,
-      EntityType.PERSONALITY,
-      RelationType.MANAGES,
-    );
+    const cacheKey = `company:${companyId}:personalities:all`;
 
     let personalities = this.getCacheEntry(cacheKey);
     if (personalities !== null) return personalities;
@@ -144,7 +139,10 @@ export class EntityRelationCacheService {
       (rel) =>
         rel.sourceType === EntityType.PERSONALITY &&
         (rel.relationType === RelationType.MANAGES ||
-          rel.relationType === RelationType.CONTROLS),
+          rel.relationType === RelationType.CONTROLS ||
+          rel.relationType === RelationType.OWNS ||
+          rel.relationType === RelationType.INVESTS_IN ||
+          rel.relationType === RelationType.FOUNDED),
     );
 
     if (personalityRelations.length > 0) {

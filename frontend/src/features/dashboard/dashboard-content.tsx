@@ -1,7 +1,7 @@
 import { Button } from '@/components/shadcn/button';
 import { useAuth } from '@/contexts/auth-context';
-import { CompaniesDataTable } from '@/features/home/components/companies-data-table';
-import { useCompaniesPagination } from '@/hooks/use-companies';
+import { CompaniesGrid } from '@/features/home/components/companies-grid';
+import { useInfiniteCompaniesPagination } from '@/hooks/use-infinite-companies';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -62,7 +62,7 @@ export function DashboardContent() {
           )}
           
           {!isLoading && !error && companies && companies.length > 0 && pagination && (
-            <CompaniesDataTable
+            <CompaniesGrid
               companies={companies}
               currentPage={page}
               totalPages={pagination.totalPages || 1}
