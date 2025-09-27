@@ -2,7 +2,7 @@
 FROM node:18-alpine AS base
 
 # Install pnpm
-RUN npm install -g pnpm
+RUN npm install -g pnpm@9
 
 # Set working directory
 WORKDIR /app
@@ -13,8 +13,9 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 # Copy frontend package.json
 COPY frontend/package.json ./frontend/
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
+# Install dependencies with cache mount
+RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile
 
 # Copy frontend source code
 COPY frontend/ ./frontend/

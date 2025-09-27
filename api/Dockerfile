@@ -2,7 +2,7 @@
 FROM node:18-alpine AS base
 
 # Install pnpm
-RUN npm install -g pnpm
+RUN npm install -g pnpm@9
 
 # Set working directory
 WORKDIR /app
@@ -13,8 +13,9 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 # Copy API package.json
 COPY api/package.json ./api/
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
+# Install dependencies with cache mount
+RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile
 
 # Copy API source code
 COPY api/ ./api/
@@ -27,7 +28,7 @@ RUN pnpm build
 FROM node:18-alpine AS production
 
 # Install pnpm and curl for healthcheck
-RUN npm install -g pnpm && apk add --no-cache curl
+RUN npm install -g pnpm@9 && apk add --no-cache curl
 
 WORKDIR /app
 
@@ -35,8 +36,9 @@ WORKDIR /app
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY api/package.json ./api/
 
-# Install production dependencies only
-RUN pnpm install --frozen-lockfile --prod
+# Install production dependencies only with cache mount
+RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile --prod
 
 # Copy built application
 COPY --from=base /app/api/dist ./api/dist
