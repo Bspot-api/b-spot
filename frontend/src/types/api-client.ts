@@ -7,7 +7,7 @@ export interface ApiClient {
 }
 
 // Base API client configuration
-export const createApiClient = (baseURL: string = 'http://localhost:3001'): AxiosInstance => {
+export const createApiClient = (baseURL: string = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'): AxiosInstance => {
   return axios.create({
     baseURL,
     headers: {

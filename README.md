@@ -200,6 +200,43 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Data Protection**: Follow best practices for data handling and storage
 - **Regular Updates**: Keep dependencies updated for security
 
+## 🚀 Production Deployment
+
+### GitHub Actions CI/CD
+
+Automatic deployment on merge to `main` with GitHub Actions.
+
+#### 🔑 Secrets Configuration
+
+In **Settings** → **Secrets and Variables** → **Actions**, add:
+
+| Secret | Description | Where to find it |
+|--------|-------------|------------------|
+| `SCALEWAY_ACCESS_KEY` | Scaleway access key | Scaleway Console → API Keys |
+| `SCALEWAY_SECRET_KEY` | Scaleway secret key | Scaleway Console → API Keys |
+| `SCALEWAY_ORGANIZATION_ID` | Organization ID | `scw account project list` |
+| `SCALEWAY_PROJECT_ID` | Project ID | `scw account project list` |
+| `SCALEWAY_REGISTRY` | Registry name | `b-spot-registry` |
+| `SCALEWAY_API_CONTAINER_ID` | API container ID | `scw container container list` |
+
+#### 🔄 Automatic Process
+
+1. **Push to `main`** → GitHub Actions triggers
+2. **Build** → Docker images AMD64 for Scaleway  
+3. **Push** → Images to Container Registry
+4. **Deploy** → Automatic production update
+
+#### 🛠️ Manual Deployment
+
+```bash
+# Via GitHub Actions
+Actions → "Deploy to Production" → Run workflow
+
+# Via local CLI  
+./scripts/build-and-push.sh
+scw container container deploy CONTAINER_ID
+```
+
 ## 📞 Support & Community
 
 - **Issues**: Report bugs and request features in [GitHub Issues](https://github.com/Bspot-api/b-spot/issues)

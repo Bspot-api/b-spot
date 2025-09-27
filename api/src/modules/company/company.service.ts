@@ -1,6 +1,7 @@
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityManager, EntityRepository } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
+import { EntityRelationCacheService } from '../entity-relation/entity-relation-cache.service';
 import { CreateCompanyDto } from './company.dto';
 import { Company } from './company.entity';
 
@@ -27,18 +28,40 @@ export class CompanyService {
     @InjectRepository(Company)
     private readonly companyRepository: EntityRepository<Company>,
     private readonly em: EntityManager,
+    private readonly entityRelationCacheService: EntityRelationCacheService,
   ) {}
 
   async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
     const company = this.companyRepository.create(createCompanyDto);
     await this.em.persistAndFlush(company);
+    return this.populateRelations(company);
+  }
+
+  private async populateRelations(company: Company): Promise<Company> {
+    const [funds, sectors, personalities] = await Promise.all([
+      this.entityRelationCacheService.getFundsByCompany(company.id),
+      this.entityRelationCacheService.getSectorsByCompany(company.id),
+      this.entityRelationCacheService.getPersonalitiesByCompany(company.id),
+    ]);
+
+    company.funds = funds;
+    company.sectors = sectors;
+    company.personalities = personalities;
+
     return company;
   }
 
+  private async populateMultipleRelations(
+    companies: Company[],
+  ): Promise<Company[]> {
+    return Promise.all(
+      companies.map((company) => this.populateRelations(company)),
+    );
+  }
+
   async findAll(): Promise<Company[]> {
-    return this.companyRepository.findAll({
-      populate: ['fund', 'sector', 'personalities'],
-    });
+    const companies = await this.companyRepository.findAll();
+    return this.populateMultipleRelations(companies);
   }
 
   async findAllPaginated(
@@ -47,69 +70,73 @@ export class CompanyService {
     filters: CompanySearchFilters = {},
   ): Promise<PaginatedCompaniesResponse> {
     const offset = (page - 1) * limit;
-    const whereConditions: any = {};
+    let whereConditions: any = {};
 
-    // Build complex filter conditions
-    const filterConditions = [];
-
-    if (filters.fundIds && filters.fundIds.length > 0) {
-      // Use $or to find companies that belong to ANY of the specified funds
-      filterConditions.push({
-        $or: filters.fundIds.map((fundId) => ({ fund: fundId })),
-      });
-    }
-
-    if (filters.sectorIds && filters.sectorIds.length > 0) {
-      // Use $or to find companies that belong to ANY of the specified sectors
-      filterConditions.push({
-        $or: filters.sectorIds.map((sectorId) => ({ sector: sectorId })),
-      });
-    }
-
-    if (filters.personalityIds && filters.personalityIds.length > 0) {
-      // Use $or to find companies that have ANY of the specified personalities
-      filterConditions.push({
-        $or: filters.personalityIds.map((personalityId) => ({
-          personalities: { $in: [personalityId] },
-        })),
-      });
-    }
-
-    // Combine all filter conditions with $and
-    if (filterConditions.length > 0) {
-      if (filterConditions.length === 1) {
-        Object.assign(whereConditions, filterConditions[0]);
-      } else {
-        whereConditions.$and = filterConditions;
-      }
-    }
-
-    let total: number;
-    let companies: Company[];
-
+    // Search by name
     if (filters.search) {
-      const searchResult = await this.searchCompanies(
-        filters.search,
-        whereConditions,
-        limit,
-        offset,
-      );
-      companies = searchResult.companies;
-      total = searchResult.total;
-    } else {
-      total = await this.companyRepository.count(whereConditions);
-      companies = await this.companyRepository.find(whereConditions, {
-        populate: ['fund', 'sector', 'personalities'],
-        limit,
-        offset,
-        orderBy: { name: 'ASC' },
-      });
+      whereConditions = {
+        name: { $ilike: `%${filters.search}%` },
+      };
     }
 
+    // Get all companies first (with basic filters)
+    const allCompanies = await this.companyRepository.find(whereConditions, {
+      orderBy: { name: 'ASC' },
+    });
+
+    // Populate relations for all companies
+    const populatedCompanies =
+      await this.populateMultipleRelations(allCompanies);
+
+    // Apply complex filters using populated data
+    let filteredCompanies = populatedCompanies;
+
+    // Filter by fund IDs
+    if (filters.fundIds && filters.fundIds.length > 0) {
+      filteredCompanies = filteredCompanies.filter(
+        (company) =>
+          company.funds &&
+          company.funds.some((fund) => filters.fundIds!.includes(fund.id)),
+      );
+    }
+
+    // Filter by sector IDs
+    if (filters.sectorIds && filters.sectorIds.length > 0) {
+      filteredCompanies = filteredCompanies.filter(
+        (company) =>
+          company.sectors &&
+          company.sectors.some((sector) =>
+            filters.sectorIds!.includes(sector.id),
+          ),
+      );
+    }
+
+    // Filter by personality IDs
+    if (filters.personalityIds && filters.personalityIds.length > 0) {
+      filteredCompanies = filteredCompanies.filter(
+        (company) =>
+          company.personalities &&
+          company.personalities.some((personality) =>
+            filters.personalityIds!.includes(personality.id),
+          ),
+      );
+    }
+
+    // Apply pagination to filtered results
+    const total = filteredCompanies.length;
+    const paginatedCompanies = filteredCompanies.slice(offset, offset + limit);
     const totalPages = Math.ceil(total / limit);
 
+    // Convert to plain objects with computed properties
+    const companiesWithRelations = paginatedCompanies.map((company) => ({
+      ...company,
+      funds: company.funds,
+      sectors: company.sectors,
+      personalities: company.personalities,
+    }));
+
     return {
-      data: companies,
+      data: companiesWithRelations,
       pagination: {
         page,
         limit,
@@ -119,65 +146,31 @@ export class CompanyService {
     };
   }
 
-  private async searchCompanies(
-    searchTerm: string,
-    whereConditions: any,
-    limit: number,
-    offset: number,
-  ): Promise<{ companies: Company[]; total: number }> {
-    const searchPattern = `%${searchTerm}%`;
-
-    // First, get the total count for search results
-    const total = await this.companyRepository.count({
-      $or: [
-        { name: { $ilike: searchPattern } },
-        { fund: { name: { $ilike: searchPattern } } },
-        { sector: { name: { $ilike: searchPattern } } },
-        { personalities: { name: { $ilike: searchPattern } } },
-      ],
-      ...whereConditions,
-    });
-
-    // Then get the paginated search results
-    const companies = await this.companyRepository.find(
-      {
-        $or: [
-          { name: { $ilike: searchPattern } },
-          { fund: { name: { $ilike: searchPattern } } },
-          { sector: { name: { $ilike: searchPattern } } },
-          { personalities: { name: { $ilike: searchPattern } } },
-        ],
-        ...whereConditions,
-      },
-      {
-        populate: ['fund', 'sector', 'personalities'],
-        limit,
-        offset,
-        orderBy: { name: 'ASC' },
-      },
-    );
-
-    return { companies, total };
-  }
-
   async findOne(id: string): Promise<Company> {
-    return this.companyRepository.findOneOrFail(id, {
-      populate: ['fund', 'sector', 'personalities'],
-    });
+    const company = await this.companyRepository.findOneOrFail(id);
+    return this.populateRelations(company);
   }
 
   async update(
     id: string,
     updateCompanyDto: Partial<CreateCompanyDto>,
   ): Promise<Company> {
-    const company = await this.findOne(id);
+    const company = await this.companyRepository.findOneOrFail(id);
     this.companyRepository.assign(company, updateCompanyDto);
     await this.em.flush();
-    return company;
+
+    // Invalidate cache for this company
+    this.entityRelationCacheService.invalidateCompanyCache(id);
+
+    return this.populateRelations(company);
   }
 
   async remove(id: string): Promise<void> {
-    const company = await this.findOne(id);
+    const company = await this.companyRepository.findOneOrFail(id);
+
+    // Invalidate cache for this company
+    this.entityRelationCacheService.invalidateCompanyCache(id);
+
     await this.em.removeAndFlush(company);
   }
 }

@@ -1,10 +1,19 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { Sector } from './sector.entity';
+import { EntityRelationService } from '../entity-relation/entity-relation.service';
+import {
+  EntityType,
+  RelationType,
+} from '../entity-relation/entity-relation.entity';
+import { Company } from '../company/company.entity';
 
 @Injectable()
 export class SectorService {
-  constructor(private readonly em: EntityManager) {}
+  constructor(
+    private readonly em: EntityManager,
+    private readonly entityRelationService: EntityRelationService,
+  ) {}
 
   async create(data: Partial<Sector>): Promise<Sector> {
     const sector = this.em.create(Sector, { ...data, published: false });
@@ -35,13 +44,22 @@ export class SectorService {
     return true;
   }
 
-  async getCompanies(id: string) {
-    const sector = await this.em.findOne(
-      Sector,
-      { id },
-      { populate: ['companies'] },
+  async getCompanies(id: string): Promise<Company[]> {
+    // Find companies that operate in this sector using EntityRelation
+    const relations = await this.entityRelationService.findByTarget(
+      EntityType.SECTOR,
+      id,
     );
-    if (!sector) return [];
-    return sector.companies.getItems();
+
+    const companyRelations = relations.filter(
+      (rel) =>
+        rel.sourceType === EntityType.COMPANY &&
+        rel.relationType === RelationType.OPERATES_IN,
+    );
+
+    if (companyRelations.length === 0) return [];
+
+    const companyIds = companyRelations.map((rel) => rel.sourceId);
+    return this.em.find(Company, { id: { $in: companyIds } });
   }
 }

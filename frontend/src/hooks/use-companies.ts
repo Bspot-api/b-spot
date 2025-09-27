@@ -48,13 +48,16 @@ export function useCompaniesPagination(initialPage: number = 1, initialLimit: nu
   const currentPage = Math.max(1, parseInt(searchParams.get('page') || initialPage.toString(), 10) || initialPage);
   const currentLimit = Math.max(1, parseInt(searchParams.get('limit') || initialLimit.toString(), 10) || initialLimit);
   const currentSearch = searchParams.get('search') || '';
+  const currentSectorIds = searchParams.get('sectorIds')?.split(',').filter(Boolean) || [];
+  const currentFundIds = searchParams.get('fundIds')?.split(',').filter(Boolean) || [];
+  const currentPersonalityIds = searchParams.get('personalityIds')?.split(',').filter(Boolean) || [];
   
   const [page, setPage] = React.useState(currentPage);
   const [limit, setLimit] = React.useState(currentLimit);
   const [search, setSearch] = React.useState(currentSearch);
-  const [sectorIds, setSectorIds] = React.useState<string[]>([]);
-  const [fundIds, setFundIds] = React.useState<string[]>([]);
-  const [personalityIds, setPersonalityIds] = React.useState<string[]>([]);
+  const [sectorIds, setSectorIds] = React.useState<string[]>(currentSectorIds);
+  const [fundIds, setFundIds] = React.useState<string[]>(currentFundIds);
+  const [personalityIds, setPersonalityIds] = React.useState<string[]>(currentPersonalityIds);
   const [isInitialized, setIsInitialized] = React.useState(false);
   
   const { data: response, isLoading, error, isFetching } = useCompanies(
@@ -107,7 +110,16 @@ export function useCompaniesPagination(initialPage: number = 1, initialLimit: nu
     if (currentSearch !== search) {
       setSearch(currentSearch);
     }
-  }, [currentPage, currentLimit, currentSearch, page, limit, search]);
+    if (JSON.stringify(currentSectorIds) !== JSON.stringify(sectorIds)) {
+      setSectorIds(currentSectorIds);
+    }
+    if (JSON.stringify(currentFundIds) !== JSON.stringify(fundIds)) {
+      setFundIds(currentFundIds);
+    }
+    if (JSON.stringify(currentPersonalityIds) !== JSON.stringify(personalityIds)) {
+      setPersonalityIds(currentPersonalityIds);
+    }
+  }, [currentPage, currentLimit, currentSearch, currentSectorIds, currentFundIds, currentPersonalityIds, page, limit, search, sectorIds, fundIds, personalityIds]);
 
   const goToPage = (newPage: number) => {
     setPage(newPage);

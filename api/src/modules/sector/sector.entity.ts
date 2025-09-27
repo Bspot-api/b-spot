@@ -2,14 +2,12 @@ import {
   Collection,
   Entity,
   Index,
-  ManyToMany,
   OneToMany,
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
-import { Company } from '../company/company.entity';
-import { Fund } from '../fund/fund.entity';
+import { Brand } from '../brand/brand.entity';
 
 @Entity({ tableName: 'sectors' })
 export class Sector {
@@ -34,9 +32,17 @@ export class Sector {
   @Property({ fieldName: 'createdAt' })
   createdAt: Date = new Date();
 
-  @OneToMany(() => Company, (company) => company.sector)
-  companies = new Collection<Company>(this);
+  // Relations now handled via EntityRelation system
+  // @OneToMany(() => Company, (company) => company.sector)
+  // companies = new Collection<Company>(this);
 
-  @ManyToMany(() => Fund, (fund) => fund.sectors)
-  funds = new Collection<Fund>(this);
+  // @ManyToMany(() => Fund, (fund) => fund.sectors)
+  // funds = new Collection<Fund>(this);
+
+  @ApiProperty({
+    description: 'Brands operating in this sector',
+    type: () => [Brand],
+  })
+  @OneToMany(() => Brand, (brand) => brand.sector)
+  brands = new Collection<Brand>(this);
 }

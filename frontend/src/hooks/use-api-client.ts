@@ -6,11 +6,12 @@ export function useApiClient() {
 
   useEffect(() => {
     if (!configSet.current) {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
       client.setConfig({
-        baseUrl: 'http://localhost:3001'
+        baseUrl: baseUrl
       });
       configSet.current = true;
-      console.log('API client configured with baseUrl:', 'http://localhost:3001');
+      console.log('API client configured with baseUrl:', baseUrl);
     }
   }, []);
 
