@@ -13,11 +13,21 @@ if ! pnpm exec mikro-orm database:create --if-not-exists > /dev/null 2>&1; then
   echo "Warning: Could not ensure database exists"
 fi
 
-# Fresh database setup for deployment
-echo "Setting up fresh database (dropping and recreating)..."
-pnpm exec mikro-orm schema:fresh --run --seed
+# Run database migrations
+echo "Running database migrations..."
+pnpm exec mikro-orm migration:up
 
-echo "✅ Fresh database with seed data ready!"
+# Check if we need to seed by looking for the Company table
+echo "Checking if database needs seeding..."
+if ! psql "${DATABASE_URL:-postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}}" -c "SELECT 1 FROM company LIMIT 1;" >/dev/null 2>&1; then
+  echo "Database appears empty or Company table missing, running seeds..."
+  pnpm exec mikro-orm seeder:run
+  echo "✅ Database seeded successfully!"
+else
+  echo "✅ Database already contains data, skipping seeding"
+fi
+
+echo "✅ Database ready!"
 
 # Start the application
 echo "Starting the application..."

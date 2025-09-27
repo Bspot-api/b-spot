@@ -27,8 +27,8 @@ RUN pnpm build
 # Production stage
 FROM node:18-alpine AS production
 
-# Install pnpm and curl for healthcheck
-RUN npm install -g pnpm@9.15.0 && apk add --no-cache curl
+# Install pnpm, curl for healthcheck, and postgresql-client for migrations
+RUN npm install -g pnpm@9.15.0 && apk add --no-cache curl postgresql-client
 
 WORKDIR /app
 
