@@ -2,7 +2,7 @@
 FROM node:18-alpine AS base
 
 # Install pnpm
-RUN npm install -g pnpm@9
+RUN npm install -g pnpm@9.15.0
 
 # Set working directory
 WORKDIR /app
@@ -28,7 +28,7 @@ RUN pnpm build
 FROM node:18-alpine AS production
 
 # Install pnpm and curl for healthcheck
-RUN npm install -g pnpm@9 && apk add --no-cache curl
+RUN npm install -g pnpm@9.15.0 && apk add --no-cache curl
 
 WORKDIR /app
 
