@@ -9,7 +9,9 @@ import { EntityRelation } from './entity-relation.entity';
 import { EntityRelationService } from './entity-relation.service';
 
 @Module({
-  imports: [MikroOrmModule.forFeature([EntityRelation, Fund, Sector, Personality])],
+  imports: [
+    MikroOrmModule.forFeature([EntityRelation, Fund, Sector, Personality]),
+  ],
   controllers: [EntityRelationController],
   providers: [EntityRelationService, EntityRelationCacheService],
   exports: [EntityRelationService, EntityRelationCacheService],

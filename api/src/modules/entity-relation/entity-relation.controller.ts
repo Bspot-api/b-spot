@@ -1,6 +1,10 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags, ApiQuery } from '@nestjs/swagger';
-import { EntityRelation, EntityType, RelationType } from './entity-relation.entity';
+import {
+  EntityRelation,
+  EntityType,
+  RelationType,
+} from './entity-relation.entity';
 import { EntityRelationService } from './entity-relation.service';
 
 @ApiTags('entity-relations')

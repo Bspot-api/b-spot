@@ -265,7 +265,7 @@ export class BernardArnaultSeeder extends Seeder {
     });
 
     // Ajouter les relations personnalités → companies pour l'affichage
-    
+
     // Bernard Arnault contrôle LVMH
     await this.createEntityRelation(em, {
       sourceType: EntityType.PERSONALITY,
@@ -353,7 +353,8 @@ export class BernardArnaultSeeder extends Seeder {
       strength: 0.1,
       startDate: new Date('2007-03-01'),
       endDate: new Date('2021-09-01'),
-      notes: 'Participation (~9.8%) dans Carrefour via sa holding Blue Capital.',
+      notes:
+        'Participation (~9.8%) dans Carrefour via sa holding Blue Capital.',
     });
 
     // 7. CRÉER LES RELATIONS INTERPERSONNELLES (PersonalityRelation)

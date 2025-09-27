@@ -1,6 +1,9 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { PersonalityRelation, PersonalityRelationType } from './personality-relation.entity';
+import {
+  PersonalityRelation,
+  PersonalityRelationType,
+} from './personality-relation.entity';
 import { Personality } from './personality.entity';
 
 @Injectable()
@@ -56,8 +59,11 @@ export class PersonalityRelationService {
     personalityId: string,
     relationType?: PersonalityRelationType,
   ): Promise<Personality[]> {
-    const relations = await this.findBySourcePersonality(personalityId, relationType);
-    return relations.map(rel => rel.targetPersonality);
+    const relations = await this.findBySourcePersonality(
+      personalityId,
+      relationType,
+    );
+    return relations.map((rel) => rel.targetPersonality);
   }
 
   async getRelatedPersonalitiesBidirectional(
@@ -70,14 +76,14 @@ export class PersonalityRelationService {
     ]);
 
     const relatedPersonalities = new Map<string, Personality>();
-    
+
     // Add outgoing relations
-    outgoing.forEach(rel => {
+    outgoing.forEach((rel) => {
       relatedPersonalities.set(rel.targetPersonality.id, rel.targetPersonality);
     });
-    
+
     // Add incoming relations
-    incoming.forEach(rel => {
+    incoming.forEach((rel) => {
       relatedPersonalities.set(rel.sourcePersonality.id, rel.sourcePersonality);
     });
 
@@ -87,7 +93,7 @@ export class PersonalityRelationService {
   async remove(id: string): Promise<boolean> {
     const relation = await this.em.findOne(PersonalityRelation, { id });
     if (!relation) return false;
-    
+
     await this.em.removeAndFlush(relation);
     return true;
   }
@@ -104,7 +110,7 @@ export class PersonalityRelationService {
     });
 
     if (!relation) return false;
-    
+
     await this.em.removeAndFlush(relation);
     return true;
   }

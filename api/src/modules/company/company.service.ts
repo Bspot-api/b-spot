@@ -51,8 +51,12 @@ export class CompanyService {
     return company;
   }
 
-  private async populateMultipleRelations(companies: Company[]): Promise<Company[]> {
-    return Promise.all(companies.map(company => this.populateRelations(company)));
+  private async populateMultipleRelations(
+    companies: Company[],
+  ): Promise<Company[]> {
+    return Promise.all(
+      companies.map((company) => this.populateRelations(company)),
+    );
   }
 
   async findAll(): Promise<Company[]> {
@@ -71,41 +75,50 @@ export class CompanyService {
     // Search by name
     if (filters.search) {
       whereConditions = {
-        name: { $ilike: `%${filters.search}%` }
+        name: { $ilike: `%${filters.search}%` },
       };
     }
 
     // Get all companies first (with basic filters)
-    let allCompanies = await this.companyRepository.find(whereConditions, {
+    const allCompanies = await this.companyRepository.find(whereConditions, {
       orderBy: { name: 'ASC' },
     });
 
     // Populate relations for all companies
-    const populatedCompanies = await this.populateMultipleRelations(allCompanies);
+    const populatedCompanies =
+      await this.populateMultipleRelations(allCompanies);
 
     // Apply complex filters using populated data
     let filteredCompanies = populatedCompanies;
 
     // Filter by fund IDs
     if (filters.fundIds && filters.fundIds.length > 0) {
-      filteredCompanies = filteredCompanies.filter(company => 
-        company.funds && company.funds.some(fund => filters.fundIds!.includes(fund.id))
+      filteredCompanies = filteredCompanies.filter(
+        (company) =>
+          company.funds &&
+          company.funds.some((fund) => filters.fundIds!.includes(fund.id)),
       );
     }
 
     // Filter by sector IDs
     if (filters.sectorIds && filters.sectorIds.length > 0) {
-      filteredCompanies = filteredCompanies.filter(company => 
-        company.sectors && company.sectors.some(sector => filters.sectorIds!.includes(sector.id))
+      filteredCompanies = filteredCompanies.filter(
+        (company) =>
+          company.sectors &&
+          company.sectors.some((sector) =>
+            filters.sectorIds!.includes(sector.id),
+          ),
       );
     }
 
     // Filter by personality IDs
     if (filters.personalityIds && filters.personalityIds.length > 0) {
-      filteredCompanies = filteredCompanies.filter(company => 
-        company.personalities && company.personalities.some(personality => 
-          filters.personalityIds!.includes(personality.id)
-        )
+      filteredCompanies = filteredCompanies.filter(
+        (company) =>
+          company.personalities &&
+          company.personalities.some((personality) =>
+            filters.personalityIds!.includes(personality.id),
+          ),
       );
     }
 
@@ -115,7 +128,7 @@ export class CompanyService {
     const totalPages = Math.ceil(total / limit);
 
     // Convert to plain objects with computed properties
-    const companiesWithRelations = paginatedCompanies.map(company => ({
+    const companiesWithRelations = paginatedCompanies.map((company) => ({
       ...company,
       funds: company.funds,
       sectors: company.sectors,
@@ -145,19 +158,19 @@ export class CompanyService {
     const company = await this.companyRepository.findOneOrFail(id);
     this.companyRepository.assign(company, updateCompanyDto);
     await this.em.flush();
-    
+
     // Invalidate cache for this company
     this.entityRelationCacheService.invalidateCompanyCache(id);
-    
+
     return this.populateRelations(company);
   }
 
   async remove(id: string): Promise<void> {
     const company = await this.companyRepository.findOneOrFail(id);
-    
+
     // Invalidate cache for this company
     this.entityRelationCacheService.invalidateCompanyCache(id);
-    
+
     await this.em.removeAndFlush(company);
   }
 }

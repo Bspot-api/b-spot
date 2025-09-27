@@ -6,10 +6,7 @@ import { SectorService } from './sector.service';
 import { EntityRelationModule } from '../entity-relation/entity-relation.module';
 
 @Module({
-  imports: [
-    MikroOrmModule.forFeature([Sector]),
-    EntityRelationModule,
-  ],
+  imports: [MikroOrmModule.forFeature([Sector]), EntityRelationModule],
   providers: [SectorService],
   controllers: [SectorController],
 })

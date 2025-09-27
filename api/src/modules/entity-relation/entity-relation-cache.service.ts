@@ -63,7 +63,8 @@ export class EntityRelationCacheService {
 
     const fundRelations = relations.filter(
       (rel) =>
-        rel.sourceType === EntityType.FUND && rel.relationType === RelationType.OWNS,
+        rel.sourceType === EntityType.FUND &&
+        rel.relationType === RelationType.OWNS,
     );
 
     if (fundRelations.length > 0) {
@@ -147,7 +148,9 @@ export class EntityRelationCacheService {
 
     if (personalityRelations.length > 0) {
       const personalityIds = personalityRelations.map((rel) => rel.sourceId);
-      personalities = await this.em.find(Personality, { id: { $in: personalityIds } });
+      personalities = await this.em.find(Personality, {
+        id: { $in: personalityIds },
+      });
     } else {
       personalities = [];
     }
@@ -193,8 +196,8 @@ export class EntityRelationCacheService {
 
     if (personalityRelations.length > 0) {
       const personalityIds = personalityRelations.map((rel) => rel.targetId);
-      relatedPersonalities = await this.em.find(Personality, { 
-        id: { $in: personalityIds } 
+      relatedPersonalities = await this.em.find(Personality, {
+        id: { $in: personalityIds },
       });
     } else {
       relatedPersonalities = [];

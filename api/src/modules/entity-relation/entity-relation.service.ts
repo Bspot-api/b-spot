@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
-import { EntityRelation, EntityType, RelationType } from './entity-relation.entity';
+import {
+  EntityRelation,
+  EntityType,
+  RelationType,
+} from './entity-relation.entity';
 
 @Injectable()
 export class EntityRelationService {
@@ -26,7 +30,10 @@ export class EntityRelationService {
     return relation;
   }
 
-  async update(id: string, relationData: Partial<EntityRelation>): Promise<EntityRelation> {
+  async update(
+    id: string,
+    relationData: Partial<EntityRelation>,
+  ): Promise<EntityRelation> {
     const relation = await this.findOne(id);
     if (!relation) {
       throw new Error('Entity relation not found');
@@ -46,15 +53,23 @@ export class EntityRelationService {
     await this.em.removeAndFlush(relation);
   }
 
-  async findBySource(sourceType: EntityType, sourceId: string): Promise<EntityRelation[]> {
+  async findBySource(
+    sourceType: EntityType,
+    sourceId: string,
+  ): Promise<EntityRelation[]> {
     return this.entityRelationRepository.find({ sourceType, sourceId });
   }
 
-  async findByTarget(targetType: EntityType, targetId: string): Promise<EntityRelation[]> {
+  async findByTarget(
+    targetType: EntityType,
+    targetId: string,
+  ): Promise<EntityRelation[]> {
     return this.entityRelationRepository.find({ targetType, targetId });
   }
 
-  async findByRelationType(relationType: RelationType): Promise<EntityRelation[]> {
+  async findByRelationType(
+    relationType: RelationType,
+  ): Promise<EntityRelation[]> {
     return this.entityRelationRepository.find({ relationType });
   }
 

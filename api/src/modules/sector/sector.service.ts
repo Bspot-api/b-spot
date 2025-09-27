@@ -2,7 +2,10 @@ import { EntityManager } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { Sector } from './sector.entity';
 import { EntityRelationService } from '../entity-relation/entity-relation.service';
-import { EntityType, RelationType } from '../entity-relation/entity-relation.entity';
+import {
+  EntityType,
+  RelationType,
+} from '../entity-relation/entity-relation.entity';
 import { Company } from '../company/company.entity';
 
 @Injectable()

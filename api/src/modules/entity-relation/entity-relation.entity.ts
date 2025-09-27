@@ -62,7 +62,10 @@ export class EntityRelation {
   @Property({ type: 'decimal', precision: 3, scale: 2, nullable: true })
   strength?: number;
 
-  @ApiProperty({ description: 'Start date of the relationship', required: false })
+  @ApiProperty({
+    description: 'Start date of the relationship',
+    required: false,
+  })
   @Property({ type: 'date', nullable: true })
   startDate?: Date;
 
