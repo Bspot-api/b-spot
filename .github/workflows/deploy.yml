@@ -60,15 +60,26 @@ jobs:
           
           # Update and deploy API container
           scw container container update ${{ secrets.SCALEWAY_API_CONTAINER_ID }} \
-            registry-image=rg.fr-par.scw.cloud/${{ secrets.SCALEWAY_REGISTRY }}/b-spot-api:latest
+            registry-image=rg.fr-par.scw.cloud/${{ secrets.SCALEWAY_REGISTRY }}/b-spot-api:latest \
+            environment-variables.NODE_ENV=production \
+            environment-variables.DATABASE_HOST=51.159.10.199 \
+            environment-variables.DATABASE_PORT=18359 \
+            environment-variables.DATABASE_USER=bspot \
+            environment-variables.DATABASE_NAME=rdb \
+            environment-variables.DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+            environment-variables.JWT_EXPIRES_IN=7d \
+            environment-variables.BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }} \
+            environment-variables.BETTER_AUTH_URL=https://bspotcontainersvbxer8ii-b-spot-api.functions.fnc.fr-par.scw.cloud \
+            environment-variables.CORS_ORIGINS="https://www.b-spot.org,https://b-spot.org"
           scw container container deploy ${{ secrets.SCALEWAY_API_CONTAINER_ID }}
           
-          # Update Frontend container if needed
-          # scw container container update ${{ secrets.SCALEWAY_FRONTEND_CONTAINER_ID }} \
-          #   registry-image=rg.fr-par.scw.cloud/${{ secrets.SCALEWAY_REGISTRY }}/b-spot-frontend:latest
-          # scw container container deploy ${{ secrets.SCALEWAY_FRONTEND_CONTAINER_ID }}
+          # Update and deploy Frontend container
+          scw container container update ${{ secrets.SCALEWAY_FRONTEND_CONTAINER_ID }} \
+            registry-image=rg.fr-par.scw.cloud/${{ secrets.SCALEWAY_REGISTRY }}/b-spot-frontend:latest
+          scw container container deploy ${{ secrets.SCALEWAY_FRONTEND_CONTAINER_ID }}
 
       - name: ✅ Deployment Status
         run: |
           echo "🎉 Deployment completed successfully!"
           echo "📊 API Container: https://bspotcontainersvbxer8ii-b-spot-api.functions.fnc.fr-par.scw.cloud"
+          echo "🎨 Frontend Container: https://bspotcontainersvbxer8ii-b-spot-frontend.functions.fnc.fr-par.scw.cloud"

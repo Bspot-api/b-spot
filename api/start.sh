@@ -13,17 +13,11 @@ if ! pnpm exec mikro-orm database:create --if-not-exists > /dev/null 2>&1; then
   echo "Warning: Could not ensure database exists"
 fi
 
-# Run migrations first (this will create schema if needed)
-echo "Running database migrations..."
-pnpm exec mikro-orm migration:up --config ./mikro-orm.config.prod.js || echo "⚠️ Some migrations already applied, continuing..."
+# Fresh database setup for deployment
+echo "Setting up fresh database (dropping and recreating)..."
+pnpm exec mikro-orm schema:fresh --run --seed
 
-# Validate schema after migrations
-echo "Validating database schema..."
-pnpm exec mikro-orm schema:validate --no-cache --config ./mikro-orm.config.prod.js || echo "Schema validation warning (continuing anyway)"
-
-# Run seeding if needed
-echo "Running database seeding..."
-pnpm exec mikro-orm seeder:run --config ./mikro-orm.config.prod.js || echo "Seeding failed or already completed"
+echo "✅ Fresh database with seed data ready!"
 
 # Start the application
 echo "Starting the application..."
