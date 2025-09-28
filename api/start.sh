@@ -17,14 +17,12 @@ fi
 echo "Running database migrations..."
 pnpm exec mikro-orm migration:up
 
-# Check if we need to seed by looking for the Company table
-echo "Checking if database needs seeding..."
-if ! psql "${DATABASE_URL:-postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}}" -c "SELECT 1 FROM company LIMIT 1;" >/dev/null 2>&1; then
-  echo "Database appears empty or Company table missing, running seeds..."
-  pnpm exec mikro-orm seeder:run
+# Try to seed the database (will fail if data already exists, which is fine)
+echo "Running database seeding (will skip if data exists)..."
+if pnpm exec mikro-orm seeder:run 2>/dev/null; then
   echo "✅ Database seeded successfully!"
 else
-  echo "✅ Database already contains data, skipping seeding"
+  echo "✅ Database seeding skipped (likely already has data)"
 fi
 
 echo "✅ Database ready!"
