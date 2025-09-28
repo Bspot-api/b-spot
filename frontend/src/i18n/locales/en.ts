@@ -1,0 +1,169 @@
+export default {
+  "pages": {
+    "helloWorld": {
+      "title": "Hello world",
+      "adminLink": "Admin",
+      "aboutLink": "About"
+    },
+    "about": {
+      "title": "About B-Spot",
+      "subtitle": "When your Business gets Spotted!",
+      "mission": {
+        "title": "Mission",
+        "description": "B-Spot aims to make transparent the links between companies and investors, by facilitating access to public information on capital structures."
+      },
+      "whatWeDo": {
+        "title": "What B-Spot does",
+        "description": "B-Spot provides a searchable database of companies, investment funds and involved personalities, based on verified public information."
+      },
+      "howItWorks": {
+        "title": "How it works",
+        "description": "Consult our database to identify links between companies and investors."
+      },
+      "underConstruction": {
+        "title": "🚧 Under Construction",
+        "description": "B-Spot is actively under development. Here are the features coming soon:",
+        "features": {
+          "title": "Upcoming Features",
+          "suggestions": "Suggest missing information",
+          "reporting": "Report false information",
+          "aiUpdates": "Automatic database updates using AI"
+        },
+        "mobile": {
+          "title": "Mobile App",
+          "scanner": "Article scanner to identify companies",
+          "accounts": "User account creation",
+          "preferences": "Manage preferences and personalized alerts"
+        }
+      }
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "welcomeMessage": "Welcome to your dashboard. This page is only accessible to connected users.",
+      "myAccount": "My account",
+      "logout": "Logout"
+    },
+    "account": {
+      "title": "My account",
+      "myAccount": "My account",
+      "logout": "Logout",
+      "accountInfo": {
+        "title": "Account Information",
+        "description": "Manage your personal information and password",
+        "email": "Email",
+        "name": "Name"
+      },
+      "changePassword": {
+        "title": "Change password",
+        "currentPassword": "Current password",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm new password",
+        "submit": "Change password",
+        "loading": "Modifying...",
+        "success": "Password changed successfully!",
+        "errors": {
+          "passwordsMismatch": "New passwords do not match",
+          "passwordTooShort": "New password must be at least 6 characters long",
+          "changeError": "Error changing password",
+          "generalError": "An error occurred"
+        }
+      }
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Login to your account",
+      "description": "Enter your email below to login to your account",
+      "email": "Email",
+      "password": "Password",
+      "forgotPassword": "Forgot your password?",
+      "submit": "Login",
+      "loading": "Signing in...",
+      "error": "An error occurred"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "close": "Close"
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "account": "My account",
+    "login": "Login"
+  },
+  "brand": {
+    "name": "B-Spot"
+  },
+  "companies": {
+    "title": "Companies List",
+    "loading": "Loading companies...",
+    "loadingParams": "Loading parameters...",
+    "error": "Error loading companies",
+    "searchPlaceholder": "Search for a company...",
+    "noResults": "No companies found",
+    "noResultsForSearch": "No companies found for \"{search}\"",
+    "pagination": {
+      "page": "Page {page} of {totalPages}",
+      "total": "({total} companies total)",
+      "show": "Show:",
+      "perPage": "per page"
+    }
+  },
+  "table": {
+    "columns": {
+      "companyName": "Company Name",
+      "description": "Description",
+      "fund": "Investment Fund",
+      "personalities": "Involved Personalities",
+      "sector": "Sector"
+    },
+    "filters": {
+      "funds": "Funds",
+      "personalities": "Personalities",
+      "sectors": "Sectors"
+    },
+    "values": {
+      "notSpecified": "Not specified",
+      "noPersonalities": "No personalities",
+      "noDescription": "No description",
+      "noDetails": "No details available"
+    },
+    "pagination": {
+      "rowsPerPage": "Rows per page",
+      "page": "Page",
+      "of": "of",
+      "rowsSelected": "row(s) selected",
+      "goToFirstPage": "Go to first page",
+      "goToPreviousPage": "Go to previous page",
+      "goToNextPage": "Go to next page",
+      "goToLastPage": "Go to last page",
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
+  "filters": {
+    "noResults": "No results found",
+    "clearFilters": "Clear filters",
+    "selected": "selected"
+  },
+  "dashboard": {
+    "companies": "Companies"
+  },
+  "loading": {
+    "general": "Loading...",
+    "loading": "Loading..."
+  },
+  "languages": {
+    "english": "English",
+    "french": "Français"
+  },
+  "command": {
+    "palette": {
+      "title": "Command Palette",
+      "description": "Search for a command to run..."
+    }
+  }
+}
