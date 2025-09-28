@@ -17,13 +17,7 @@ fi
 echo "Running database migrations..."
 NODE_ENV=cli pnpm exec mikro-orm migration:up
 
-# Try to seed the database (will fail if data already exists, which is fine)
-echo "Running database seeding (will skip if data exists)..."
-if NODE_ENV=cli pnpm exec mikro-orm seeder:run 2>/dev/null; then
-  echo "✅ Database seeded successfully!"
-else
-  echo "✅ Database seeding skipped (likely already has data)"
-fi
+# Seeds are now managed manually, not at startup
 
 echo "✅ Database ready!"
 
