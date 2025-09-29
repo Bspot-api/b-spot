@@ -20,6 +20,10 @@ RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
 # Copy frontend source code
 COPY frontend/ ./frontend/
 
+# Build args for environment variables
+ARG VITE_API_BASE_URL=http://localhost:3001
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+
 # Build the frontend
 WORKDIR /app/frontend
 RUN pnpm build --mode production

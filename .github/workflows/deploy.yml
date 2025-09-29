@@ -54,6 +54,8 @@ jobs:
           file: ./frontend/Dockerfile
           platforms: linux/amd64
           push: true
+          build-args: |
+            VITE_API_BASE_URL=https://api.b-spot.org
           tags: |
             rg.fr-par.scw.cloud/${{ secrets.SCALEWAY_REGISTRY }}/b-spot-frontend:latest
             rg.fr-par.scw.cloud/${{ secrets.SCALEWAY_REGISTRY }}/b-spot-frontend:${{ github.sha }}
