@@ -5,6 +5,7 @@ import {
   ManyToOne,
   PrimaryKey,
   Property,
+  Unique,
 } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
 import { Personality } from './personality.entity';
@@ -22,6 +23,9 @@ export enum PersonalityRelationType {
 @Index({ properties: ['sourcePersonality', 'targetPersonality'] })
 @Index({ properties: ['relationType'] })
 @Index({ properties: ['sourcePersonality', 'relationType'] })
+@Unique({
+  properties: ['sourcePersonality', 'targetPersonality', 'relationType'],
+})
 export class PersonalityRelation {
   @ApiProperty({ description: 'Relation unique identifier' })
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })

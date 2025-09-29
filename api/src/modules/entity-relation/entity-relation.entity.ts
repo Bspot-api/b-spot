@@ -1,4 +1,11 @@
-import { Entity, Enum, Index, PrimaryKey, Property } from '@mikro-orm/core';
+import {
+  Entity,
+  Enum,
+  Index,
+  PrimaryKey,
+  Property,
+  Unique,
+} from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum EntityType {
@@ -33,6 +40,15 @@ export enum RelationType {
 @Index({ properties: ['sourceType', 'sourceId'] })
 @Index({ properties: ['targetType', 'targetId'] })
 @Index({ properties: ['relationType'] })
+@Unique({
+  properties: [
+    'sourceType',
+    'sourceId',
+    'targetType',
+    'targetId',
+    'relationType',
+  ],
+})
 export class EntityRelation {
   @ApiProperty({ description: 'Relation unique identifier' })
   @PrimaryKey({ type: 'uuid', defaultRaw: 'gen_random_uuid()' })

@@ -18,7 +18,7 @@ export class Company {
   id!: string;
 
   @ApiProperty({ description: 'Company name' })
-  @Property()
+  @Property({ unique: true })
   name!: string;
 
   @ApiProperty({ description: 'Company description' })

@@ -70,6 +70,16 @@
       "schema": "public",
       "indexes": [
         {
+          "columnNames": [
+            "name"
+          ],
+          "composite": false,
+          "keyName": "companies_name_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
           "keyName": "companies_pkey",
           "columnNames": [
             "id"
@@ -269,6 +279,20 @@
           "constraint": false,
           "primary": false,
           "unique": false
+        },
+        {
+          "keyName": "entity_relations_source_type_source_id_target_typ_321f2_unique",
+          "columnNames": [
+            "source_type",
+            "source_id",
+            "target_type",
+            "target_id",
+            "relation_type"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": false,
+          "unique": true
         },
         {
           "keyName": "entity_relations_pkey",
@@ -571,6 +595,18 @@
           "constraint": false,
           "primary": false,
           "unique": false
+        },
+        {
+          "keyName": "personality_relations_source_personality_id_targe_59e66_unique",
+          "columnNames": [
+            "source_personality_id",
+            "target_personality_id",
+            "relation_type"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": false,
+          "unique": true
         },
         {
           "keyName": "personality_relations_pkey",
