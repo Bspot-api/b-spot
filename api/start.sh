@@ -7,8 +7,9 @@ echo "Starting B-Spot API..."
 export NODE_ENV=production
 echo "NODE_ENV set to: $NODE_ENV"
 
-# Skip all database operations for now to isolate startup issues
-echo "⚠️  Skipping database operations for troubleshooting"
+# Run database migrations with corrected entity paths
+echo "Running database migrations..."
+NODE_ENV=cli pnpm exec mikro-orm migration:up
 
 # Start the application
 echo "Starting the application..."

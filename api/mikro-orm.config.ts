@@ -8,12 +8,12 @@ const config: Options<PostgreSqlDriver> = {
   user: process.env.DATABASE_USER || 'postgres',
   password: process.env.DATABASE_PASSWORD || 'password',
   dbName: process.env.DATABASE_NAME || 'b-spot',
-  // Only include entities for CLI commands (migrations, seeders)
+  // Include entities for CLI commands (migrations, seeders)
   ...(process.env.NODE_ENV === 'cli' && {
-    entities: ['./src/modules/**/*.entity.ts'],
+    entities: ['./dist/src/modules/**/*.entity.js'],  // Use compiled JS files
   }),
   migrations: {
-    path: './src/migrations',
+    path: './dist/src/migrations',  // Use compiled migrations
     pathTs: './src/migrations',
     glob: '!(*.d).{js,ts}',
   },
