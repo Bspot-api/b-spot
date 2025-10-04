@@ -309,7 +309,7 @@ INSERT INTO companies (name, description, source, published, "createdAt") VALUES
 ('Hachette Livre', 'Premier éditeur français, filiale de Lagardère contrôlée par Vivendi-Bolloré. Leader européen de l''édition.', 'https://www.hachette.com', true, NOW()),
 -- Holdings intermédiaires Bolloré (investigation ChatGPT)
 ('Compagnie de Cornouaille', 'Holding intermédiaire du groupe Bolloré (détention de Vivendi, UMG...), fusionnée dans Bolloré SE en 2024. Ancienne structure de contrôle capitalistique.', 'https://www.bollore.com', true, NOW()),
-('Financière V', 'Holding familiale privée créée par Vincent Bolloré dans les années 1980, échelon du contrôle capitalistique du groupe Bolloré entre Bolloré Participations et Sofibol.', NULL, true, NOW())
+('Financière V', 'Holding familiale privée créée par Vincent Bolloré dans les années 1980, échelon du contrôle capitalistique du groupe Bolloré entre Bolloré Participations et Sofibol.', 'https://www.zonebourse.com/cours/action/BOLLORE-4717/', true, NOW())
 ON CONFLICT (name) DO UPDATE SET
   description = EXCLUDED.description,
   source = EXCLUDED.source,

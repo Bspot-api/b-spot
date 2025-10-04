@@ -69,12 +69,12 @@ ON CONFLICT (source_type, source_id, target_type, target_id, relation_type) DO N
 
 -- Otium Capital → plateformes (relation "plateforme_roll-up")
 INSERT INTO entity_relations (source_type, source_id, target_type, target_id, relation_type, notes, "createdAt", "updatedAt") VALUES
-('company', (SELECT id FROM companies WHERE name ILIKE 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Comet Software'), 'plateforme_roll-up', 'Plateforme business software portée par Otium Partners (livre blanc 12/2024).', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name ILIKE 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Otelium'), 'plateforme_roll-up', 'Plateforme hôtelière (roll-up).', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name ILIKE 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Alfeor'), 'plateforme_roll-up', 'Plateforme nucléaire (roll-up).', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name ILIKE 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Enosium Life Science'), 'plateforme_roll-up', 'Plateforme services scientifiques santé (roll-up).', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name ILIKE 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Novavet'), 'plateforme_roll-up', 'Plateforme santé animale (roll-up).', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name ILIKE 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Hadrena'), 'plateforme_roll-up', 'Plateforme loisirs locaux (FEC).', NOW(), NOW())
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Comet Software'), 'plateforme_roll-up', 'Plateforme business software portée par Otium Partners (livre blanc 12/2024).', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Otelium'), 'plateforme_roll-up', 'Plateforme hôtelière (roll-up).', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Alfeor'), 'plateforme_roll-up', 'Plateforme nucléaire (roll-up).', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Enosium Life Science'), 'plateforme_roll-up', 'Plateforme services scientifiques santé (roll-up).', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Novavet'), 'plateforme_roll-up', 'Plateforme santé animale (roll-up).', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Hadrena'), 'plateforme_roll-up', 'Plateforme loisirs locaux (FEC).', NOW(), NOW())
 
 ON CONFLICT (source_type, source_id, target_type, target_id, relation_type) DO NOTHING;
 
@@ -84,7 +84,7 @@ ON CONFLICT (source_type, source_id, target_type, target_id, relation_type) DO N
 
 -- Otium Capital → Otium Studio (relation "studio")
 INSERT INTO entity_relations (source_type, source_id, target_type, target_id, relation_type, notes, "createdAt", "updatedAt") VALUES
-('company', (SELECT id FROM companies WHERE name ILIKE 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Otium Studio'), 'studio', 'Startup studio intégré (budget >180 M€ jusqu''en 2030).', NOW(), NOW())
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Otium Studio'), 'studio', 'Startup studio intégré (budget >180 M€ jusqu''en 2030).', NOW(), NOW())
 
 ON CONFLICT (source_type, source_id, target_type, target_id, relation_type) DO NOTHING;
 
@@ -100,17 +100,17 @@ ON CONFLICT (source_type, source_id, target_type, target_id, relation_type) DO N
 
 -- Otium Capital → participations (relation "invested_in")
 INSERT INTO entity_relations (source_type, source_id, target_type, target_id, relation_type, notes, "createdAt", "updatedAt") VALUES
-('company', (SELECT id FROM companies WHERE name ILIKE 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'VSORA'), 'invested_in', 'Lead 46 M$ en 04/2025.', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name ILIKE 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Orcan Energy'), 'invested_in', 'Entrée au capital annoncée le 31/01/2023.', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name ILIKE 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Amenitiz'), 'invested_in', 'Lead seed 2019 ; participation Série A 2022.', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name ILIKE 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Stage11'), 'invested_in', 'Seed 5 M€ menée par Otium (10/2021).', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name ILIKE 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Rzilient'), 'invested_in', 'Participation tour early (2021–2023).', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name ILIKE 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Metomic'), 'invested_in', 'Participation via Resonance (véhicule tech d''Otium).', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name ILIKE 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Prello'), 'invested_in', 'Seed 13 M€ menée par Otium (02/2022).', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name ILIKE 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Aria'), 'invested_in', 'Série A 12/2023 aux côtés d''Adevinta Ventures.', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name ILIKE 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'PayFit'), 'invested_in', 'Tour 2016 (co-mené avec Xavier Niel / NJJ) ; suivi 2019 via Frst.', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name ILIKE 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Shippeo'), 'invested_in', 'Seed 2016 ; Série A 2017 avec Partech.', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name ILIKE 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Otium Leisure'), 'invested_in', 'Financement 140 M€ (09/2024) pour construire un leader FEC.', NOW(), NOW())
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'VSORA'), 'invested_in', 'Lead 46 M$ en 04/2025.', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Orcan Energy'), 'invested_in', 'Entrée au capital annoncée le 31/01/2023.', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Amenitiz'), 'invested_in', 'Lead seed 2019 ; participation Série A 2022.', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Stage11'), 'invested_in', 'Seed 5 M€ menée par Otium (10/2021).', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Rzilient'), 'invested_in', 'Participation tour early (2021–2023).', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Metomic'), 'invested_in', 'Participation via Resonance (véhicule tech d''Otium).', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Prello'), 'invested_in', 'Seed 13 M€ menée par Otium (02/2022).', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Aria'), 'invested_in', 'Série A 12/2023 aux côtés d''Adevinta Ventures.', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'PayFit'), 'invested_in', 'Tour 2016 (co-mené avec Xavier Niel / NJJ) ; suivi 2019 via Frst.', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Shippeo'), 'invested_in', 'Seed 2016 ; Série A 2017 avec Partech.', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Otium Leisure'), 'invested_in', 'Financement 140 M€ (09/2024) pour construire un leader FEC.', NOW(), NOW())
 
 ON CONFLICT (source_type, source_id, target_type, target_id, relation_type) DO NOTHING;
 

@@ -37,13 +37,12 @@
         },
         "source": {
           "name": "source",
-          "type": "varchar(255)",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 255,
-          "mappedType": "string"
+          "mappedType": "text"
         },
         "published": {
           "name": "published",
@@ -181,6 +180,7 @@
             "plateforme_roll-up",
             "studio",
             "incubée_par",
+            "supports",
             "is_friend_of",
             "is_family_of",
             "is_colleague_of",

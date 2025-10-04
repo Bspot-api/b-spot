@@ -34,6 +34,7 @@ export enum RelationType {
   PLATEFORME_ROLL_UP = 'plateforme_roll-up',
   STUDIO = 'studio',
   INCUBEE_PAR = 'incubée_par',
+  SUPPORTS = 'supports',
   // Personality-to-personality relations
   IS_FRIEND_OF = 'is_friend_of',
   IS_FAMILY_OF = 'is_family_of',

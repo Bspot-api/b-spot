@@ -17,6 +17,7 @@ export enum PersonalityRelationType {
   IS_MENTOR_OF = 'is_mentor_of',
   IS_PARTNER_OF = 'is_partner_of',
   IS_RIVAL_OF = 'is_rival_of',
+  IS_CONNECTED_TO = 'is_connected_to',
 }
 
 @Entity({ tableName: 'personality_relations' })

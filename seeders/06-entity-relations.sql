@@ -7,49 +7,49 @@ INSERT INTO entity_relations (source_type, source_id, target_type, target_id, re
 ('personality', (SELECT id FROM personalities WHERE name = 'Pierre-Édouard Stérin'), 'fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'founded', '2009-01-01', 'Pierre-Edouard Sterin founded Otium Capital in 2009', NOW(), NOW()),
 
 -- Otium Capital operates in political sector
-('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'sector', (SELECT id FROM sectors WHERE name = 'Politique et Think Tank'), 'operates_in', NULL, 'Otium Capital has investments in political/think tank sector', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'sector', (SELECT id FROM sectors WHERE name = 'Politique et Think Tank'), 'operates_in', 'Otium Capital has investments in political/think tank sector', NOW(), NOW()),
 
 -- Otium Capital owns Pericles
-('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Périclès (association)'), 'soutien_financier', 'Otium Capital/Stérin financent le projet Périclès (150M€ / 10 ans).', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Périclès (association)'), 'supports', 'Otium Capital/Stérin financent le projet Périclès (150M€ / 10 ans).', NOW(), NOW()),
 
 -- Pierre-Edouard Stérin controls Périclès
-('personality', (SELECT id FROM personalities WHERE name = 'Pierre-Édouard Stérin'), 'company', (SELECT id FROM companies WHERE name = 'Périclès (association)'), 'initiateur', 'Commanditaire/porteur du projet Périclès ; financement annoncé 150 M€ / 10 ans.', NOW(), NOW()),
+('personality', (SELECT id FROM personalities WHERE name = 'Pierre-Édouard Stérin'), 'company', (SELECT id FROM companies WHERE name = 'Périclès (association)'), 'founded', 'Commanditaire/porteur du projet Périclès ; financement annoncé 150 M€ / 10 ans.', NOW(), NOW()),
 
 -- François Durvye relations avec Otium et Périclès
-('personality', (SELECT id FROM personalities WHERE name = 'François Durvye'), 'company', (SELECT id FROM companies WHERE name = 'Otium Capital'), 'dirige', 'Directeur général (CEO).', NOW(), NOW()),
-('personality', (SELECT id FROM personalities WHERE name = 'François Durvye'), 'company', (SELECT id FROM companies WHERE name = 'Périclès (association)'), 'animateur', 'Rôle opérationnel/soutien au dispositif (portraits & enquêtes).', NOW(), NOW()),
+('personality', (SELECT id FROM personalities WHERE name = 'François Durvye'), 'fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'manages', 'Directeur général (CEO).', NOW(), NOW()),
+('personality', (SELECT id FROM personalities WHERE name = 'François Durvye'), 'company', (SELECT id FROM companies WHERE name = 'Périclès (association)'), 'manages', 'Rôle opérationnel/soutien au dispositif (portraits & enquêtes).', NOW(), NOW()),
 
 -- Périclès soutient Souveraine Tech
-('company', (SELECT id FROM companies WHERE name = 'Périclès (association)'), 'company', (SELECT id FROM companies WHERE name = 'Souveraine Tech'), 'soutien_financier', 'Lauréat/financé via écosystème "Maison du Bien commun" lié à Stérin.', NOW(), NOW()),
+('company', (SELECT id FROM companies WHERE name = 'Périclès (association)'), 'company', (SELECT id FROM companies WHERE name = 'Souveraine Tech'), 'supports', 'Lauréat/financé via écosystème "Maison du Bien commun" lié à Stérin.', NOW(), NOW()),
 
 -- Relations d''investissement détaillées
 -- Xavier Niel co-investit avec Otium sur PayFit
-('personality', (SELECT id FROM personalities WHERE name = 'Xavier Niel'), 'company', (SELECT id FROM companies WHERE name = 'Payfit'), 'co-investisseur', 'Co-lead 5 M€ (2016) ; participation au tour B (2017).', NOW(), NOW()),
+('personality', (SELECT id FROM personalities WHERE name = 'Xavier Niel'), 'company', (SELECT id FROM companies WHERE name = 'Payfit'), 'invests_in', 'Co-lead 5 M€ (2016) ; participation au tour B (2017).', NOW(), NOW()),
 
 -- Co-investisseurs Shippeo
-('company', (SELECT id FROM companies WHERE name = 'Partech'), 'company', (SELECT id FROM companies WHERE name = 'Shippeo'), 'co-investisseur', 'Co-lead Série A 10 M€ (11/2017) avec Otium Venture.', NOW(), NOW()),
+('company', (SELECT id FROM companies WHERE name = 'Partech'), 'company', (SELECT id FROM companies WHERE name = 'Shippeo'), 'invests_in', 'Co-lead Série A 10 M€ (11/2017) avec Otium Venture.', NOW(), NOW()),
 
 -- Co-investisseurs Owkin
-('company', (SELECT id FROM companies WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'investisseur', 'Lead Série A (11 M$, 01/2018).', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name = 'Cathay Innovation'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'co-investisseur', 'Participation à la Série A 2018.', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name = 'GV (ex-Google Ventures)'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'investisseur', 'Extension Série A (05/2018) avec GV.', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'invests_in', 'Lead Série A (11 M$, 01/2018).', NOW(), NOW()),
+('company', (SELECT id FROM companies WHERE name = 'Cathay Innovation'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'invests_in', 'Participation à la Série A 2018.', NOW(), NOW()),
+('company', (SELECT id FROM companies WHERE name = 'GV (ex-Google Ventures)'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'invests_in', 'Extension Série A (05/2018) avec GV.', NOW(), NOW()),
 
 -- LightOn relation investisseur Otium
-('company', (SELECT id FROM companies WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'LightOn'), 'investisseur', 'Otium listé parmi les investisseurs (deeptech/photonic, puis GenAI).', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'LightOn'), 'invests_in', 'Otium listé parmi les investisseurs (deeptech/photonic, puis GenAI).', NOW(), NOW()),
 
 -- Périclès operates in political sector
 ('company', (SELECT id FROM companies WHERE name = 'Périclès (association)'), 'sector', (SELECT id FROM sectors WHERE name = 'Politique et Think Tank'), 'operates_in', 'Initiative métapolitique annoncée à 150M€ sur 10 ans.', NOW(), NOW()),
 
 -- Relations d''acquisition ajoutées du Lot 2
 -- Katoo acquise par Choco
-('company', (SELECT id FROM companies WHERE name = 'Katoo'), 'company', (SELECT id FROM companies WHERE name = 'Choco'), 'acquise_par', 'Katoo est désormais intégrée à Choco (2021–2022).', NOW(), NOW()),
+('company', (SELECT id FROM companies WHERE name = 'Katoo'), 'company', (SELECT id FROM companies WHERE name = 'Choco'), 'acquired', 'Katoo est désormais intégrée à Choco (2021–2022).', NOW(), NOW()),
 
 -- Tekyn acquise par Lectra
-('company', (SELECT id FROM companies WHERE name = 'Tekyn'), 'company', (SELECT id FROM companies WHERE name = 'Lectra'), 'acquise_par', 'Lectra a pris le contrôle (compléments 2022–2023).', NOW(), NOW()),
+('company', (SELECT id FROM companies WHERE name = 'Tekyn'), 'company', (SELECT id FROM companies WHERE name = 'Lectra'), 'acquired', 'Lectra a pris le contrôle (compléments 2022–2023).', NOW(), NOW()),
 
 -- Relations ajoutées du Lot 2.2
 -- Otium Capital investit dans Orcan Energy
-('company', (SELECT id FROM companies WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Orcan Energy'), 'investisseur', 'Entrée au capital annoncée le 31/01/2023.', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'company', (SELECT id FROM companies WHERE name = 'Orcan Energy'), 'invests_in', 'Entrée au capital annoncée le 31/01/2023.', NOW(), NOW()),
 
 -- OXP opère dans le secteur Technologie & Digital
 ('company', (SELECT id FROM companies WHERE name = 'OXP'), 'sector', (SELECT id FROM sectors WHERE name = 'Technologie & Digital'), 'operates_in', 'Extension SketchUp (UP) pour designers/architectes.', NOW(), NOW())
@@ -344,13 +344,13 @@ INSERT INTO entity_relations (source_type, source_id, target_type, target_id, re
 ('company', (SELECT id FROM companies WHERE name = 'Christian Dior SE'), 'company', (SELECT id FROM companies WHERE name = 'LVMH'), 'détention_capital', '41,87% du capital LVMH au 31/12/2024 ; ~57% des droits de vote (famille Arnault totalisant ~64% en 2024-2025).', NOW(), NOW()),
 
 -- Bernard Arnault fonde Fondation Louis Vuitton
-('personality', (SELECT id FROM personalities WHERE name = 'Bernard Arnault'), 'company', (SELECT id FROM companies WHERE name = 'Fondation Louis Vuitton'), 'fondateur', 'Commanditaire et président ; outil d''influence culturelle et soft power.', NOW(), NOW()),
+('personality', (SELECT id FROM personalities WHERE name = 'Bernard Arnault'), 'company', (SELECT id FROM companies WHERE name = 'Fondation Louis Vuitton'), 'founded', 'Commanditaire et président ; outil d''influence culturelle et soft power.', NOW(), NOW()),
 
 -- Aglaé Ventures investit dans Back Market, Spotify, Slack, Airbnb
-('company', (SELECT id FROM companies WHERE name = 'Aglaé Ventures'), 'company', (SELECT id FROM companies WHERE name = 'Back Market'), 'investisseur', 'Portefeuille Aglaé (site officiel).', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name = 'Aglaé Ventures'), 'company', (SELECT id FROM companies WHERE name = 'Spotify'), 'investisseur', 'Portefeuille Aglaé (site officiel).', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name = 'Aglaé Ventures'), 'company', (SELECT id FROM companies WHERE name = 'Slack'), 'investisseur', 'Portefeuille Aglaé (site officiel).', NOW(), NOW()),
-('company', (SELECT id FROM companies WHERE name = 'Aglaé Ventures'), 'company', (SELECT id FROM companies WHERE name = 'Airbnb'), 'investisseur', 'Portefeuille Aglaé (site officiel).', NOW(), NOW())
+('company', (SELECT id FROM companies WHERE name = 'Aglaé Ventures'), 'company', (SELECT id FROM companies WHERE name = 'Back Market'), 'invests_in', 'Portefeuille Aglaé (site officiel).', NOW(), NOW()),
+('company', (SELECT id FROM companies WHERE name = 'Aglaé Ventures'), 'company', (SELECT id FROM companies WHERE name = 'Spotify'), 'invests_in', 'Portefeuille Aglaé (site officiel).', NOW(), NOW()),
+('company', (SELECT id FROM companies WHERE name = 'Aglaé Ventures'), 'company', (SELECT id FROM companies WHERE name = 'Slack'), 'invests_in', 'Portefeuille Aglaé (site officiel).', NOW(), NOW()),
+('company', (SELECT id FROM companies WHERE name = 'Aglaé Ventures'), 'company', (SELECT id FROM companies WHERE name = 'Airbnb'), 'invests_in', 'Portefeuille Aglaé (site officiel).', NOW(), NOW())
 
 ON CONFLICT (source_type, source_id, target_type, target_id, relation_type) DO NOTHING;
 

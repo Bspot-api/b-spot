@@ -26,7 +26,7 @@ export class Company {
   description!: string;
 
   @ApiProperty({ description: 'Source link (URL)' })
-  @Property()
+  @Property({ type: 'text' })
   source!: string;
 
   @ApiProperty({ description: 'Published status', default: false })
