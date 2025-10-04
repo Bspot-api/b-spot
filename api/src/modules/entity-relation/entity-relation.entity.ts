@@ -22,11 +22,18 @@ export enum RelationType {
   MANAGES = 'manages',
   FOUNDED = 'founded',
   INVESTS_IN = 'invests_in',
+  INVESTED_IN = 'invested_in',
   OPERATES_IN = 'operates_in',
+  BELONGS_TO = 'belongs_to',
   COMPETES_WITH = 'competes_with',
   PARTNERS_WITH = 'partners_with',
   ACQUIRED = 'acquired',
   SPUN_OFF = 'spun_off',
+  FINANCEMENT = 'financement',
+  DETENTION_CAPITAL = 'détention_capital',
+  PLATEFORME_ROLL_UP = 'plateforme_roll-up',
+  STUDIO = 'studio',
+  INCUBEE_PAR = 'incubée_par',
   // Personality-to-personality relations
   IS_FRIEND_OF = 'is_friend_of',
   IS_FAMILY_OF = 'is_family_of',
@@ -34,6 +41,7 @@ export enum RelationType {
   IS_MENTOR_OF = 'is_mentor_of',
   IS_PARTNER_OF = 'is_partner_of',
   IS_RIVAL_OF = 'is_rival_of',
+  IS_CONNECTED_TO = 'is_connected_to',
 }
 
 @Entity({ tableName: 'entity_relations' })
