@@ -162,6 +162,8 @@ INSERT INTO companies (name, description, source, published, "createdAt") VALUES
 ('Périclès (association)', 'Association créée en 07/2023 soutenue par Pierre-Édouard Stérin. Projet métapolitique annoncé à 150 M€ sur 10 ans pour "générer, conseiller et financer des initiatives" (site), décrit par Le Monde comme visant l''union des droites.', 'https://periclesfrance.org/ ; https://www.lemonde.fr/en/france/article/2024/07/21/a-french-billionaire-s-plan-to-enable-victory-for-the-far-right_6692554_7.html', true, NOW()),
 -- Projets écosystème Périclès
 ('Souveraine Tech', 'Média en ligne sur la souveraineté techno/numérique, soutenu via Périclès/"Maison du Bien commun".', 'https://www.lemonde.fr/pixels/article/2025/03/03/pericles-souveraine-tech-le-media-soutenu-par-le-projet-du-milliardaire-conservateur_6575420_4408996.html', true, NOW()),
+-- Bolloré companies
+('Blue Solutions', 'Filiale du Groupe Bolloré spécialisée dans les batteries lithium-métal-polymère (LMP) pour véhicules électriques et stockage d''énergie. Marie Bolloré en est la CEO depuis 2017.', 'https://www.blue-solutions.com/', true, NOW()),
 -- Co-investisseurs identifiés
 ('Partech', 'Société de capital-risque internationale.', 'https://www.shippeo.com/press-releases/shippeo-raises-10-million-euro-series-a-2', true, NOW()),
 ('Cathay Innovation', 'Fonds VC (groupe Cathay Capital).', 'https://www.cathaycapital.com/owkin-closes-11-million-series-a-financing-round/', true, NOW()),

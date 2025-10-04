@@ -36,30 +36,30 @@ ON CONFLICT (source_personality_id, target_personality_id, relation_type) DO NOT
 -- =====================================================
 
 -- Owkin investment relations with co-investors
-INSERT INTO entity_relations (source_type, source_id, target_type, target_id, relation_type, start_date, notes, "createdAt", "updatedAt") VALUES
+INSERT INTO entity_relations (source_type, source_id, target_type, target_id, relation_type, notes, "createdAt", "updatedAt") VALUES
 -- GV invested in Owkin
-('fund', (SELECT id FROM funds WHERE name = 'GV'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'invested_in', NULL, 'Co-investisseur dans les levées de fonds Owkin (montant non précisé)', NOW(), NOW()),
+('company', (SELECT id FROM companies WHERE name = 'GV (Google Ventures)'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'invested_in', 'Co-investisseur dans les levées de fonds Owkin (montant non précisé)', NOW(), NOW()),
 
 -- Bpifrance invested in Owkin
-('fund', (SELECT id FROM funds WHERE name = 'Bpifrance'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'invested_in', NULL, 'Co-investisseur dans les levées de fonds Owkin (montant non précisé)', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Bpifrance'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'invested_in', 'Co-investisseur dans les levées de fonds Owkin (montant non précisé)', NOW(), NOW()),
 
 -- F-Prime Capital invested in Owkin
-('fund', (SELECT id FROM funds WHERE name = 'F-Prime Capital'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'invested_in', NULL, 'Co-investisseur dans les levées de fonds Owkin (montant non précisé)', NOW(), NOW()),
+('company', (SELECT id FROM companies WHERE name = 'F-Prime Capital'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'invested_in', 'Co-investisseur dans les levées de fonds Owkin (montant non précisé)', NOW(), NOW()),
 
 -- MACSF invested in Owkin
-('fund', (SELECT id FROM funds WHERE name = 'MACSF'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'invested_in', NULL, 'Co-investisseur dans les levées de fonds Owkin (montant non précisé)', NOW(), NOW()),
+('company', (SELECT id FROM companies WHERE name = 'MACSF'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'invested_in', 'Co-investisseur dans les levées de fonds Owkin (montant non précisé)', NOW(), NOW()),
 
 -- Isai invested in Owkin
-('fund', (SELECT id FROM funds WHERE name = 'Isai'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'invested_in', NULL, 'Co-investisseur dans les levées de fonds Owkin (montant non précisé)', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'Isai'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'invested_in', 'Co-investisseur dans les levées de fonds Owkin (montant non précisé)', NOW(), NOW()),
 
 -- BioDiscovery 5 LP invested in Owkin
-('fund', (SELECT id FROM funds WHERE name = 'BioDiscovery 5 LP'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'invested_in', NULL, 'Co-investisseur dans les levées de fonds Owkin (montant non précisé)', NOW(), NOW()),
+('fund', (SELECT id FROM funds WHERE name = 'BioDiscovery 5 LP'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'invested_in', 'Co-investisseur dans les levées de fonds Owkin (montant non précisé)', NOW(), NOW()),
 
 -- Bristol Myers Squibb invested in Owkin
-('company', (SELECT id FROM companies WHERE name = 'Bristol Myers Squibb'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'invested_in', NULL, 'Investisseur stratégique et partenaire pharmaceutique d''Owkin', NOW(), NOW()),
+('company', (SELECT id FROM companies WHERE name = 'Bristol Myers Squibb'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'invested_in', 'Investisseur stratégique et partenaire pharmaceutique d''Owkin', NOW(), NOW()),
 
 -- Sanofi invested in Owkin
-('company', (SELECT id FROM companies WHERE name = 'Sanofi'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'invested_in', '2023-07-01', 'Investissement de 180 millions $ pour le partenariat stratégique en IA médicale', NOW(), NOW())
+('company', (SELECT id FROM companies WHERE name = 'Sanofi'), 'company', (SELECT id FROM companies WHERE name = 'Owkin'), 'invested_in', 'Investissement de 180 millions $ pour le partenariat stratégique en IA médicale', NOW(), NOW())
 
 ON CONFLICT (source_type, source_id, target_type, target_id, relation_type) DO NOTHING;
 

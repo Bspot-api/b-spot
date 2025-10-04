@@ -2,9 +2,9 @@
 -- =====================================================
 
 -- Main relations (Pierre-Edouard Stérin, Otium Capital, Pericles)
-INSERT INTO entity_relations (source_type, source_id, target_type, target_id, relation_type, start_date, notes, "createdAt", "updatedAt") VALUES
+INSERT INTO entity_relations (source_type, source_id, target_type, target_id, relation_type, notes, "createdAt", "updatedAt") VALUES
 -- Pierre-Edouard Stérin founded Otium Capital
-('personality', (SELECT id FROM personalities WHERE name = 'Pierre-Édouard Stérin'), 'fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'founded', '2009-01-01', 'Pierre-Edouard Sterin founded Otium Capital in 2009', NOW(), NOW()),
+('personality', (SELECT id FROM personalities WHERE name = 'Pierre-Édouard Stérin'), 'fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'founded', 'Pierre-Edouard Sterin founded Otium Capital in 2009', NOW(), NOW()),
 
 -- Otium Capital operates in political sector
 ('fund', (SELECT id FROM funds WHERE name = 'Otium Capital'), 'sector', (SELECT id FROM sectors WHERE name = 'Politique et Think Tank'), 'operates_in', 'Otium Capital has investments in political/think tank sector', NOW(), NOW()),
