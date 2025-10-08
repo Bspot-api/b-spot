@@ -72,63 +72,91 @@ export class CompanyService {
     const offset = (page - 1) * limit;
     let whereConditions: any = {};
 
-    // Search by name
     if (filters.search) {
-      whereConditions = {
-        name: { $ilike: `%${filters.search}%` },
-      };
+      whereConditions.name = { $ilike: `%${filters.search}%` };
     }
 
-    // Get all companies first (with basic filters)
-    const allCompanies = await this.companyRepository.find(whereConditions, {
-      orderBy: { name: 'ASC' },
-    });
+    let allowedCompanyIds: string[] | undefined;
 
-    // Populate relations for all companies
+    if (
+      filters.fundIds?.length ||
+      filters.sectorIds?.length ||
+      filters.personalityIds?.length
+    ) {
+      const companyIdSets: string[][] = [];
+
+      if (filters.fundIds?.length) {
+        const fundCompanyIdArrays = await Promise.all(
+          filters.fundIds.map((fundId) =>
+            this.entityRelationCacheService.getCompanyIdsByFund(fundId),
+          ),
+        );
+        const fundCompanyIds = [...new Set(fundCompanyIdArrays.flat())];
+        companyIdSets.push(fundCompanyIds);
+      }
+
+      if (filters.sectorIds?.length) {
+        const sectorCompanyIdArrays = await Promise.all(
+          filters.sectorIds.map((sectorId) =>
+            this.entityRelationCacheService.getCompanyIdsBySector(sectorId),
+          ),
+        );
+        const sectorCompanyIds = [...new Set(sectorCompanyIdArrays.flat())];
+        companyIdSets.push(sectorCompanyIds);
+      }
+
+      if (filters.personalityIds?.length) {
+        const personalityCompanyIdArrays = await Promise.all(
+          filters.personalityIds.map((personalityId) =>
+            this.entityRelationCacheService.getCompanyIdsByPersonality(
+              personalityId,
+            ),
+          ),
+        );
+        const personalityCompanyIds = [
+          ...new Set(personalityCompanyIdArrays.flat()),
+        ];
+        companyIdSets.push(personalityCompanyIds);
+      }
+
+      if (companyIdSets.length === 1) {
+        allowedCompanyIds = companyIdSets[0];
+      } else if (companyIdSets.length > 1) {
+        allowedCompanyIds = companyIdSets.reduce((intersection, currentSet) =>
+          intersection.filter((id) => currentSet.includes(id)),
+        );
+      }
+
+      if (allowedCompanyIds && allowedCompanyIds.length === 0) {
+        return {
+          data: [],
+          pagination: {
+            page,
+            limit,
+            total: 0,
+            totalPages: 0,
+          },
+        };
+      }
+    }
+
+    if (allowedCompanyIds) {
+      whereConditions.id = { $in: allowedCompanyIds };
+    }
+
+    const [companies, total] = await this.companyRepository.findAndCount(
+      whereConditions,
+      {
+        limit,
+        offset,
+        orderBy: { name: 'ASC' },
+      },
+    );
+
     const populatedCompanies =
-      await this.populateMultipleRelations(allCompanies);
+      await this.populateMultipleRelations(companies);
 
-    // Apply complex filters using populated data
-    let filteredCompanies = populatedCompanies;
-
-    // Filter by fund IDs
-    if (filters.fundIds && filters.fundIds.length > 0) {
-      filteredCompanies = filteredCompanies.filter(
-        (company) =>
-          company.funds &&
-          company.funds.some((fund) => filters.fundIds!.includes(fund.id)),
-      );
-    }
-
-    // Filter by sector IDs
-    if (filters.sectorIds && filters.sectorIds.length > 0) {
-      filteredCompanies = filteredCompanies.filter(
-        (company) =>
-          company.sectors &&
-          company.sectors.some((sector) =>
-            filters.sectorIds!.includes(sector.id),
-          ),
-      );
-    }
-
-    // Filter by personality IDs
-    if (filters.personalityIds && filters.personalityIds.length > 0) {
-      filteredCompanies = filteredCompanies.filter(
-        (company) =>
-          company.personalities &&
-          company.personalities.some((personality) =>
-            filters.personalityIds!.includes(personality.id),
-          ),
-      );
-    }
-
-    // Apply pagination to filtered results
-    const total = filteredCompanies.length;
-    const paginatedCompanies = filteredCompanies.slice(offset, offset + limit);
-    const totalPages = Math.ceil(total / limit);
-
-    // Convert to plain objects with computed properties
-    const companiesWithRelations = paginatedCompanies.map((company) => ({
+    const companiesWithRelations = populatedCompanies.map((company) => ({
       ...company,
       funds: company.funds,
       sectors: company.sectors,
@@ -141,7 +169,7 @@ export class CompanyService {
         page,
         limit,
         total,
-        totalPages,
+        totalPages: Math.ceil(total / limit),
       },
     };
   }

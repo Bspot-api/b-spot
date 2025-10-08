@@ -207,6 +207,101 @@ export class EntityRelationCacheService {
     return relatedPersonalities;
   }
 
+  async getCompanyIdsByFund(fundId: string): Promise<string[]> {
+    const cacheKey = `fund:${fundId}:companyIds`;
+
+    let companyIds = this.getCacheEntry(cacheKey);
+    if (companyIds !== null) return companyIds;
+
+    const relations = await this.entityRelationService.findBySource(
+      EntityType.FUND,
+      fundId,
+    );
+
+    const companyRelations = relations.filter(
+      (rel) =>
+        rel.targetType === EntityType.COMPANY &&
+        (rel.relationType === RelationType.OWNS ||
+          rel.relationType === RelationType.INVESTS_IN ||
+          rel.relationType === RelationType.SUPPORTS ||
+          rel.relationType === RelationType.PLATEFORME_ROLL_UP ||
+          rel.relationType === RelationType.STUDIO),
+    );
+
+    companyIds = companyRelations.map((rel) => rel.targetId);
+
+    this.setCacheEntry(cacheKey, companyIds);
+    return companyIds;
+  }
+
+  async getCompanyIdsBySector(sectorId: string): Promise<string[]> {
+    const cacheKey = `sector:${sectorId}:companyIds`;
+
+    let companyIds = this.getCacheEntry(cacheKey);
+    if (companyIds !== null) return companyIds;
+
+    const relations = await this.entityRelationService.findByTarget(
+      EntityType.SECTOR,
+      sectorId,
+    );
+
+    const companyRelations = relations.filter(
+      (rel) =>
+        rel.sourceType === EntityType.COMPANY &&
+        (rel.relationType === RelationType.OPERATES_IN ||
+          rel.relationType === RelationType.BELONGS_TO),
+    );
+
+    companyIds = companyRelations.map((rel) => rel.sourceId);
+
+    this.setCacheEntry(cacheKey, companyIds);
+    return companyIds;
+  }
+
+  async getCompanyIdsByPersonality(personalityId: string): Promise<string[]> {
+    const cacheKey = `personality:${personalityId}:companyIds`;
+
+    let companyIds = this.getCacheEntry(cacheKey);
+    if (companyIds !== null) return companyIds;
+
+    const directRelations = await this.entityRelationService.findBySource(
+      EntityType.PERSONALITY,
+      personalityId,
+    );
+
+    const directCompanyIds = directRelations
+      .filter(
+        (rel) =>
+          rel.targetType === EntityType.COMPANY &&
+          (rel.relationType === RelationType.MANAGES ||
+            rel.relationType === RelationType.CONTROLS ||
+            rel.relationType === RelationType.OWNS ||
+            rel.relationType === RelationType.INVESTS_IN ||
+            rel.relationType === RelationType.FOUNDED),
+      )
+      .map((rel) => rel.targetId);
+
+    const fundRelations = directRelations.filter(
+      (rel) =>
+        rel.targetType === EntityType.FUND &&
+        (rel.relationType === RelationType.FOUNDED ||
+          rel.relationType === RelationType.MANAGES ||
+          rel.relationType === RelationType.CONTROLS ||
+          rel.relationType === RelationType.OWNS),
+    );
+
+    const indirectCompanyIds: string[] = [];
+    for (const fundRel of fundRelations) {
+      const companiesFromFund = await this.getCompanyIdsByFund(fundRel.targetId);
+      indirectCompanyIds.push(...companiesFromFund);
+    }
+
+    companyIds = [...new Set([...directCompanyIds, ...indirectCompanyIds])];
+
+    this.setCacheEntry(cacheKey, companyIds);
+    return companyIds;
+  }
+
   clearCache() {
     this.cache.clear();
   }
