@@ -3,11 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Fund } from '../fund/fund.entity';
 import { Personality } from '../personality/personality.entity';
 import { Sector } from '../sector/sector.entity';
-import {
-  EntityRelation,
-  EntityType,
-  RelationType,
-} from './entity-relation.entity';
+import { EntityType, RelationType } from './entity-relation.entity';
 import { EntityRelationService } from './entity-relation.service';
 
 export interface CompanyRelationDetail {
