@@ -164,6 +164,7 @@ INSERT INTO companies (name, description, source, published, "createdAt") VALUES
 ('Souveraine Tech', 'Média en ligne sur la souveraineté techno/numérique, soutenu via Périclès/"Maison du Bien commun".', 'https://www.lemonde.fr/pixels/article/2025/03/03/pericles-souveraine-tech-le-media-soutenu-par-le-projet-du-milliardaire-conservateur_6575420_4408996.html', true, NOW()),
 -- Bolloré companies
 ('Blue Solutions', 'Filiale du Groupe Bolloré spécialisée dans les batteries lithium-métal-polymère (LMP) pour véhicules électriques et stockage d''énergie. Marie Bolloré en est la CEO depuis 2017.', 'https://www.blue-solutions.com/', true, NOW()),
+('Compagnie de l''Odet', 'Holding familiale de la famille Bolloré, société-mère du groupe. Sébastien Bolloré en est le DG adjoint.', 'https://www.bollore.com/', true, NOW()),
 -- Co-investisseurs identifiés
 ('Partech', 'Société de capital-risque internationale.', 'https://www.shippeo.com/press-releases/shippeo-raises-10-million-euro-series-a-2', true, NOW()),
 ('Cathay Innovation', 'Fonds VC (groupe Cathay Capital).', 'https://www.cathaycapital.com/owkin-closes-11-million-series-a-financing-round/', true, NOW()),

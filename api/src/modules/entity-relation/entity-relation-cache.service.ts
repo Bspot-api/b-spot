@@ -6,6 +6,17 @@ import { Sector } from '../sector/sector.entity';
 import { EntityType, RelationType } from './entity-relation.entity';
 import { EntityRelationService } from './entity-relation.service';
 
+export interface CompanyRelationDetail {
+  companyId: string;
+  relationType: RelationType;
+  notes?: string;
+}
+
+export interface CompanyRelationDetailWithVia extends CompanyRelationDetail {
+  via?: 'direct' | 'fund';
+  viaEntityId?: string;
+}
+
 @Injectable()
 export class EntityRelationCacheService {
   private cache = new Map<string, any>();
@@ -205,6 +216,143 @@ export class EntityRelationCacheService {
 
     this.setCacheEntry(cacheKey, relatedPersonalities);
     return relatedPersonalities;
+  }
+
+  async getCompanyIdsByFund(fundId: string): Promise<string[]> {
+    const details = await this.getCompanyRelationsByFund(fundId);
+    return details.map((d) => d.companyId);
+  }
+
+  async getCompanyRelationsByFund(
+    fundId: string,
+  ): Promise<CompanyRelationDetail[]> {
+    const cacheKey = `fund:${fundId}:companyRelations`;
+
+    let details = this.getCacheEntry(cacheKey);
+    if (details !== null) return details;
+
+    const relations = await this.entityRelationService.findBySource(
+      EntityType.FUND,
+      fundId,
+    );
+
+    const companyRelations = relations.filter(
+      (rel) =>
+        rel.targetType === EntityType.COMPANY &&
+        (rel.relationType === RelationType.OWNS ||
+          rel.relationType === RelationType.INVESTS_IN ||
+          rel.relationType === RelationType.SUPPORTS ||
+          rel.relationType === RelationType.PLATEFORME_ROLL_UP ||
+          rel.relationType === RelationType.STUDIO),
+    );
+
+    details = companyRelations.map((rel) => ({
+      companyId: rel.targetId,
+      relationType: rel.relationType,
+      notes: rel.notes,
+    }));
+
+    this.setCacheEntry(cacheKey, details);
+    return details;
+  }
+
+  async getCompanyIdsBySector(sectorId: string): Promise<string[]> {
+    const details = await this.getCompanyRelationsBySector(sectorId);
+    return details.map((d) => d.companyId);
+  }
+
+  async getCompanyRelationsBySector(
+    sectorId: string,
+  ): Promise<CompanyRelationDetail[]> {
+    const cacheKey = `sector:${sectorId}:companyRelations`;
+
+    let details = this.getCacheEntry(cacheKey);
+    if (details !== null) return details;
+
+    const relations = await this.entityRelationService.findByTarget(
+      EntityType.SECTOR,
+      sectorId,
+    );
+
+    const companyRelations = relations.filter(
+      (rel) =>
+        rel.sourceType === EntityType.COMPANY &&
+        (rel.relationType === RelationType.OPERATES_IN ||
+          rel.relationType === RelationType.BELONGS_TO),
+    );
+
+    details = companyRelations.map((rel) => ({
+      companyId: rel.sourceId,
+      relationType: rel.relationType,
+      notes: rel.notes,
+    }));
+
+    this.setCacheEntry(cacheKey, details);
+    return details;
+  }
+
+  async getCompanyIdsByPersonality(personalityId: string): Promise<string[]> {
+    const details = await this.getCompanyRelationsByPersonality(personalityId);
+    return [...new Set(details.map((d) => d.companyId))];
+  }
+
+  async getCompanyRelationsByPersonality(
+    personalityId: string,
+  ): Promise<CompanyRelationDetailWithVia[]> {
+    const cacheKey = `personality:${personalityId}:companyRelations`;
+
+    let details = this.getCacheEntry(cacheKey);
+    if (details !== null) return details;
+
+    const directRelations = await this.entityRelationService.findBySource(
+      EntityType.PERSONALITY,
+      personalityId,
+    );
+
+    const directCompanyDetails: CompanyRelationDetailWithVia[] =
+      directRelations
+        .filter(
+          (rel) =>
+            rel.targetType === EntityType.COMPANY &&
+            (rel.relationType === RelationType.MANAGES ||
+              rel.relationType === RelationType.CONTROLS ||
+              rel.relationType === RelationType.OWNS ||
+              rel.relationType === RelationType.INVESTS_IN ||
+              rel.relationType === RelationType.FOUNDED),
+        )
+        .map((rel) => ({
+          companyId: rel.targetId,
+          relationType: rel.relationType,
+          notes: rel.notes,
+          via: 'direct' as const,
+        }));
+
+    const fundRelations = directRelations.filter(
+      (rel) =>
+        rel.targetType === EntityType.FUND &&
+        (rel.relationType === RelationType.FOUNDED ||
+          rel.relationType === RelationType.MANAGES ||
+          rel.relationType === RelationType.CONTROLS ||
+          rel.relationType === RelationType.OWNS),
+    );
+
+    const indirectCompanyDetails: CompanyRelationDetailWithVia[] = [];
+    for (const fundRel of fundRelations) {
+      const companiesFromFund =
+        await this.getCompanyRelationsByFund(fundRel.targetId);
+      indirectCompanyDetails.push(
+        ...companiesFromFund.map((c) => ({
+          ...c,
+          via: 'fund' as const,
+          viaEntityId: fundRel.targetId,
+        })),
+      );
+    }
+
+    details = [...directCompanyDetails, ...indirectCompanyDetails];
+
+    this.setCacheEntry(cacheKey, details);
+    return details;
   }
 
   clearCache() {

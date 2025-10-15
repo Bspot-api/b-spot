@@ -7,9 +7,20 @@ import {
 } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
 import { Brand } from '../brand/brand.entity';
+import { RelationType } from '../entity-relation/entity-relation.entity';
 import { Fund } from '../fund/fund.entity';
 import { Personality } from '../personality/personality.entity';
 import { Sector } from '../sector/sector.entity';
+
+export interface RelationMatch {
+  filterType: 'fund' | 'sector' | 'personality';
+  filterId: string;
+  filterName: string;
+  relationType: RelationType;
+  via?: 'direct' | 'fund';
+  viaEntityId?: string;
+  viaEntityName?: string;
+}
 
 @Entity({ tableName: 'companies' })
 export class Company {
@@ -65,4 +76,11 @@ export class Company {
     required: false,
   })
   personalities: Personality[] = [];
+
+  @ApiProperty({
+    description: 'Relation context when filtered (how this company matched the filters)',
+    type: 'array',
+    required: false,
+  })
+  matchedVia?: RelationMatch[];
 }
