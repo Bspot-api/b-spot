@@ -1,4 +1,4 @@
-import type { Company } from "@/api/hooks"
+import type { Company } from "@/types/relation"
 import { Button } from "@/components/shadcn/button"
 import type { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
