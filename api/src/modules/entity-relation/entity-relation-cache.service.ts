@@ -3,8 +3,23 @@ import { Injectable } from '@nestjs/common';
 import { Fund } from '../fund/fund.entity';
 import { Personality } from '../personality/personality.entity';
 import { Sector } from '../sector/sector.entity';
-import { EntityType, RelationType } from './entity-relation.entity';
+import {
+  EntityRelation,
+  EntityType,
+  RelationType,
+} from './entity-relation.entity';
 import { EntityRelationService } from './entity-relation.service';
+
+export interface CompanyRelationDetail {
+  companyId: string;
+  relationType: RelationType;
+  notes?: string;
+}
+
+export interface CompanyRelationDetailWithVia extends CompanyRelationDetail {
+  via?: 'direct' | 'fund';
+  viaEntityId?: string;
+}
 
 @Injectable()
 export class EntityRelationCacheService {
@@ -208,10 +223,17 @@ export class EntityRelationCacheService {
   }
 
   async getCompanyIdsByFund(fundId: string): Promise<string[]> {
-    const cacheKey = `fund:${fundId}:companyIds`;
+    const details = await this.getCompanyRelationsByFund(fundId);
+    return details.map((d) => d.companyId);
+  }
 
-    let companyIds = this.getCacheEntry(cacheKey);
-    if (companyIds !== null) return companyIds;
+  async getCompanyRelationsByFund(
+    fundId: string,
+  ): Promise<CompanyRelationDetail[]> {
+    const cacheKey = `fund:${fundId}:companyRelations`;
+
+    let details = this.getCacheEntry(cacheKey);
+    if (details !== null) return details;
 
     const relations = await this.entityRelationService.findBySource(
       EntityType.FUND,
@@ -228,17 +250,28 @@ export class EntityRelationCacheService {
           rel.relationType === RelationType.STUDIO),
     );
 
-    companyIds = companyRelations.map((rel) => rel.targetId);
+    details = companyRelations.map((rel) => ({
+      companyId: rel.targetId,
+      relationType: rel.relationType,
+      notes: rel.notes,
+    }));
 
-    this.setCacheEntry(cacheKey, companyIds);
-    return companyIds;
+    this.setCacheEntry(cacheKey, details);
+    return details;
   }
 
   async getCompanyIdsBySector(sectorId: string): Promise<string[]> {
-    const cacheKey = `sector:${sectorId}:companyIds`;
+    const details = await this.getCompanyRelationsBySector(sectorId);
+    return details.map((d) => d.companyId);
+  }
 
-    let companyIds = this.getCacheEntry(cacheKey);
-    if (companyIds !== null) return companyIds;
+  async getCompanyRelationsBySector(
+    sectorId: string,
+  ): Promise<CompanyRelationDetail[]> {
+    const cacheKey = `sector:${sectorId}:companyRelations`;
+
+    let details = this.getCacheEntry(cacheKey);
+    if (details !== null) return details;
 
     const relations = await this.entityRelationService.findByTarget(
       EntityType.SECTOR,
@@ -252,34 +285,51 @@ export class EntityRelationCacheService {
           rel.relationType === RelationType.BELONGS_TO),
     );
 
-    companyIds = companyRelations.map((rel) => rel.sourceId);
+    details = companyRelations.map((rel) => ({
+      companyId: rel.sourceId,
+      relationType: rel.relationType,
+      notes: rel.notes,
+    }));
 
-    this.setCacheEntry(cacheKey, companyIds);
-    return companyIds;
+    this.setCacheEntry(cacheKey, details);
+    return details;
   }
 
   async getCompanyIdsByPersonality(personalityId: string): Promise<string[]> {
-    const cacheKey = `personality:${personalityId}:companyIds`;
+    const details = await this.getCompanyRelationsByPersonality(personalityId);
+    return [...new Set(details.map((d) => d.companyId))];
+  }
 
-    let companyIds = this.getCacheEntry(cacheKey);
-    if (companyIds !== null) return companyIds;
+  async getCompanyRelationsByPersonality(
+    personalityId: string,
+  ): Promise<CompanyRelationDetailWithVia[]> {
+    const cacheKey = `personality:${personalityId}:companyRelations`;
+
+    let details = this.getCacheEntry(cacheKey);
+    if (details !== null) return details;
 
     const directRelations = await this.entityRelationService.findBySource(
       EntityType.PERSONALITY,
       personalityId,
     );
 
-    const directCompanyIds = directRelations
-      .filter(
-        (rel) =>
-          rel.targetType === EntityType.COMPANY &&
-          (rel.relationType === RelationType.MANAGES ||
-            rel.relationType === RelationType.CONTROLS ||
-            rel.relationType === RelationType.OWNS ||
-            rel.relationType === RelationType.INVESTS_IN ||
-            rel.relationType === RelationType.FOUNDED),
-      )
-      .map((rel) => rel.targetId);
+    const directCompanyDetails: CompanyRelationDetailWithVia[] =
+      directRelations
+        .filter(
+          (rel) =>
+            rel.targetType === EntityType.COMPANY &&
+            (rel.relationType === RelationType.MANAGES ||
+              rel.relationType === RelationType.CONTROLS ||
+              rel.relationType === RelationType.OWNS ||
+              rel.relationType === RelationType.INVESTS_IN ||
+              rel.relationType === RelationType.FOUNDED),
+        )
+        .map((rel) => ({
+          companyId: rel.targetId,
+          relationType: rel.relationType,
+          notes: rel.notes,
+          via: 'direct' as const,
+        }));
 
     const fundRelations = directRelations.filter(
       (rel) =>
@@ -290,16 +340,23 @@ export class EntityRelationCacheService {
           rel.relationType === RelationType.OWNS),
     );
 
-    const indirectCompanyIds: string[] = [];
+    const indirectCompanyDetails: CompanyRelationDetailWithVia[] = [];
     for (const fundRel of fundRelations) {
-      const companiesFromFund = await this.getCompanyIdsByFund(fundRel.targetId);
-      indirectCompanyIds.push(...companiesFromFund);
+      const companiesFromFund =
+        await this.getCompanyRelationsByFund(fundRel.targetId);
+      indirectCompanyDetails.push(
+        ...companiesFromFund.map((c) => ({
+          ...c,
+          via: 'fund' as const,
+          viaEntityId: fundRel.targetId,
+        })),
+      );
     }
 
-    companyIds = [...new Set([...directCompanyIds, ...indirectCompanyIds])];
+    details = [...directCompanyDetails, ...indirectCompanyDetails];
 
-    this.setCacheEntry(cacheKey, companyIds);
-    return companyIds;
+    this.setCacheEntry(cacheKey, details);
+    return details;
   }
 
   clearCache() {

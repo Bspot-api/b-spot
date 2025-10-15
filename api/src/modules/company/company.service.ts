@@ -2,8 +2,11 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityManager, EntityRepository } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
 import { EntityRelationCacheService } from '../entity-relation/entity-relation-cache.service';
+import { Fund } from '../fund/fund.entity';
+import { Personality } from '../personality/personality.entity';
+import { Sector } from '../sector/sector.entity';
 import { CreateCompanyDto } from './company.dto';
-import { Company } from './company.entity';
+import { Company, RelationMatch } from './company.entity';
 
 export interface PaginatedCompaniesResponse {
   data: Company[];
@@ -77,6 +80,7 @@ export class CompanyService {
     }
 
     let allowedCompanyIds: string[] | undefined;
+    const relationMatchesMap = new Map<string, RelationMatch[]>();
 
     if (
       filters.fundIds?.length ||
@@ -86,6 +90,29 @@ export class CompanyService {
       const companyIdSets: string[][] = [];
 
       if (filters.fundIds?.length) {
+        const funds = await this.em.find(Fund, {
+          id: { $in: filters.fundIds },
+        });
+        const fundMap = new Map(funds.map((f) => [f.id, f.name]));
+
+        for (const fundId of filters.fundIds) {
+          const relations =
+            await this.entityRelationCacheService.getCompanyRelationsByFund(
+              fundId,
+            );
+          relations.forEach((rel) => {
+            const matches = relationMatchesMap.get(rel.companyId) || [];
+            matches.push({
+              filterType: 'fund',
+              filterId: fundId,
+              filterName: fundMap.get(fundId) || fundId,
+              relationType: rel.relationType,
+              via: 'direct',
+            });
+            relationMatchesMap.set(rel.companyId, matches);
+          });
+        }
+
         const fundCompanyIdArrays = await Promise.all(
           filters.fundIds.map((fundId) =>
             this.entityRelationCacheService.getCompanyIdsByFund(fundId),
@@ -96,6 +123,29 @@ export class CompanyService {
       }
 
       if (filters.sectorIds?.length) {
+        const sectors = await this.em.find(Sector, {
+          id: { $in: filters.sectorIds },
+        });
+        const sectorMap = new Map(sectors.map((s) => [s.id, s.name]));
+
+        for (const sectorId of filters.sectorIds) {
+          const relations =
+            await this.entityRelationCacheService.getCompanyRelationsBySector(
+              sectorId,
+            );
+          relations.forEach((rel) => {
+            const matches = relationMatchesMap.get(rel.companyId) || [];
+            matches.push({
+              filterType: 'sector',
+              filterId: sectorId,
+              filterName: sectorMap.get(sectorId) || sectorId,
+              relationType: rel.relationType,
+              via: 'direct',
+            });
+            relationMatchesMap.set(rel.companyId, matches);
+          });
+        }
+
         const sectorCompanyIdArrays = await Promise.all(
           filters.sectorIds.map((sectorId) =>
             this.entityRelationCacheService.getCompanyIdsBySector(sectorId),
@@ -106,6 +156,49 @@ export class CompanyService {
       }
 
       if (filters.personalityIds?.length) {
+        const personalities = await this.em.find(Personality, {
+          id: { $in: filters.personalityIds },
+        });
+        const personalityMap = new Map(
+          personalities.map((p) => [p.id, p.name]),
+        );
+
+        for (const personalityId of filters.personalityIds) {
+          const relations =
+            await this.entityRelationCacheService.getCompanyRelationsByPersonality(
+              personalityId,
+            );
+
+          const fundIds = [
+            ...new Set(
+              relations
+                .filter((r) => r.via === 'fund' && r.viaEntityId)
+                .map((r) => r.viaEntityId!),
+            ),
+          ];
+          const fundsMap = new Map<string, string>();
+          if (fundIds.length > 0) {
+            const funds = await this.em.find(Fund, { id: { $in: fundIds } });
+            funds.forEach((f) => fundsMap.set(f.id, f.name));
+          }
+
+          relations.forEach((rel) => {
+            const matches = relationMatchesMap.get(rel.companyId) || [];
+            matches.push({
+              filterType: 'personality',
+              filterId: personalityId,
+              filterName: personalityMap.get(personalityId) || personalityId,
+              relationType: rel.relationType,
+              via: rel.via,
+              viaEntityId: rel.viaEntityId,
+              viaEntityName: rel.viaEntityId
+                ? fundsMap.get(rel.viaEntityId)
+                : undefined,
+            });
+            relationMatchesMap.set(rel.companyId, matches);
+          });
+        }
+
         const personalityCompanyIdArrays = await Promise.all(
           filters.personalityIds.map((personalityId) =>
             this.entityRelationCacheService.getCompanyIdsByPersonality(
@@ -161,6 +254,7 @@ export class CompanyService {
       funds: company.funds,
       sectors: company.sectors,
       personalities: company.personalities,
+      matchedVia: relationMatchesMap.get(company.id),
     }));
 
     return {
