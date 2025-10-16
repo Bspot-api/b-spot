@@ -151,8 +151,14 @@ export class CompanyController {
   @Get(':id')
   @ApiOperation({ summary: 'Get a company by ID' })
   @ApiResponse({ status: 200, description: 'Company found', type: Company })
-  findOne(@Param('id') id: string) {
-    return this.companyService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const company = await this.companyService.findOne(id);
+    return {
+      ...company,
+      funds: company.funds,
+      sectors: company.sectors,
+      personalities: company.personalities,
+    };
   }
 
   @Patch(':id')

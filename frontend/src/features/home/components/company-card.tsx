@@ -2,6 +2,7 @@ import type { Company } from "@/types/relation"
 import { Badge } from "@/components/shadcn/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/shadcn/card"
 import { useTranslation } from "react-i18next"
+import { Link } from "react-router-dom"
 import { RelationBadge } from "./relation-badge"
 
 interface CompanyCardProps {
@@ -12,7 +13,8 @@ export function CompanyCard({ company }: CompanyCardProps) {
   const { t } = useTranslation()
 
   return (
-    <Card className="h-full hover:shadow-lg transition-shadow duration-200">
+    <Link to={`/companies/${company.id}`} className="block h-full">
+      <Card className="h-full hover:shadow-lg transition-shadow duration-200 cursor-pointer">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg font-semibold line-clamp-1">
           {company.name}
@@ -63,6 +65,7 @@ export function CompanyCard({ company }: CompanyCardProps) {
           </div>
         )}
       </CardContent>
-    </Card>
+      </Card>
+    </Link>
   )
 }

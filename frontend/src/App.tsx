@@ -3,6 +3,7 @@ import { FaviconManager } from '@/components/ui/favicon-manager';
 import { AuthProvider } from '@/contexts/auth-context';
 import { AboutPage } from '@/pages/about';
 import { AccountPage } from '@/pages/account';
+import { CompanyDetailPage } from '@/pages/company-detail';
 import { Dashboard } from '@/pages/dashboard';
 import { HomePage } from '@/pages/home';
 import { LoginPage } from '@/pages/login';
@@ -18,22 +19,23 @@ function App() {
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/" element={<HomePage />} />
+            <Route path="/companies/:id" element={<CompanyDetailPage />} />
             <Route path="/about" element={<AboutPage />} />
-            <Route 
-              path="/dashboard" 
+            <Route
+              path="/dashboard"
               element={
                 <ProtectedRoute>
                   <Dashboard />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/account" 
+            <Route
+              path="/account"
               element={
                 <ProtectedRoute>
                   <AccountPage />
                 </ProtectedRoute>
-              } 
+              }
             />
           </Routes>
         </div>
