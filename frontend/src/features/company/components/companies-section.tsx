@@ -1,7 +1,7 @@
 import type { Company } from "@/api/hooks"
 import { CompanyCard } from "@/features/home/components/company-card"
 import { CompanyCardSkeleton } from "@/features/home/components/company-card-skeleton"
-import { Section } from "./section"
+import { Section } from "@/components/shared/sections/section"
 import { Building2 } from "lucide-react"
 
 interface CompaniesSectionProps {

@@ -3,7 +3,7 @@ import { CompanyDetail } from "@/features/company/components/company-detail"
 import { useCompany } from "@/hooks/use-company"
 import { useParams } from "react-router-dom"
 
-export function CompanyDetailPage() {
+export function CompanyPage() {
   const { id } = useParams<{ id: string }>()
   const { data: company, isLoading, error } = useCompany(id!)
 

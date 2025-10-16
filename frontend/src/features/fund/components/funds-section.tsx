@@ -1,6 +1,6 @@
 import type { Fund } from "@/api/hooks"
-import { FundCard } from "@/components/shared/fund-card"
-import { Section } from "./section"
+import { FundCard } from "./fund-card"
+import { Section } from "@/components/shared/sections/section"
 import { TrendingUp } from "lucide-react"
 
 interface FundsSectionProps {

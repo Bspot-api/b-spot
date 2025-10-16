@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom"
 import { PersonalityDetail } from "@/features/personality/components/personality-detail"
 import { usePersonality } from "@/hooks/use-personality"
 
-export function PersonalityDetailPage() {
+export function PersonalityPage() {
   const { id } = useParams<{ id: string }>()
 
   const { data: personality, isLoading, error } = usePersonality(id!)

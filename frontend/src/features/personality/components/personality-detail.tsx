@@ -1,11 +1,9 @@
 import type { Personality } from "@/api/hooks"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/shadcn/card"
-import {
-  RelatedPersonalitiesSection,
-  FundsSection,
-  SectorsSection,
-  CompaniesSection,
-} from "@/components/shared"
+import { RelatedPersonalitiesSection } from "@/features/personality/components/related-personalities-section"
+import { FundsSection } from "@/features/fund/components/funds-section"
+import { SectorsSection } from "@/features/sector/components/sectors-section"
+import { CompaniesSection } from "@/features/company/components/companies-section"
 import { usePersonalityCompanies } from "@/hooks/use-personality-companies"
 import { ArrowLeft, Building2, Calendar, Layers, TrendingUp, Users } from "lucide-react"
 import { Link } from "react-router-dom"

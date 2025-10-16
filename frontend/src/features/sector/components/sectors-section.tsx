@@ -1,6 +1,6 @@
 import type { Sector } from "@/api/hooks"
-import { SectorCard } from "@/components/shared/sector-card"
-import { Section } from "./section"
+import { SectorCard } from "./sector-card"
+import { Section } from "@/components/shared/sections/section"
 import { Layers } from "lucide-react"
 
 interface SectorsSectionProps {

@@ -3,8 +3,8 @@ import { FaviconManager } from '@/components/ui/favicon-manager';
 import { AuthProvider } from '@/contexts/auth-context';
 import { AboutPage } from '@/pages/about';
 import { AccountPage } from '@/pages/account';
-import { CompanyDetailPage } from '@/pages/company-detail';
-import { PersonalityDetailPage } from '@/pages/personality-detail';
+import { CompanyPage } from '@/features/company/pages/company-page';
+import { PersonalityPage } from '@/features/personality/pages/personality-page';
 import { Dashboard } from '@/pages/dashboard';
 import { HomePage } from '@/pages/home';
 import { LoginPage } from '@/pages/login';
@@ -20,8 +20,8 @@ function App() {
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/" element={<HomePage />} />
-            <Route path="/companies/:id" element={<CompanyDetailPage />} />
-            <Route path="/personalities/:id" element={<PersonalityDetailPage />} />
+            <Route path="/companies/:id" element={<CompanyPage />} />
+            <Route path="/personalities/:id" element={<PersonalityPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route
               path="/dashboard"

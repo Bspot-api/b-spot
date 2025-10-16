@@ -1,6 +1,6 @@
 import type { Personality } from "@/api/hooks"
-import { PersonalityCard } from "@/components/shared/personality-card"
-import { Section } from "./section"
+import { PersonalityCard } from "./personality-card"
+import { Section } from "@/components/shared/sections/section"
 import { Users } from "lucide-react"
 
 interface RelatedPersonalitiesSectionProps {
