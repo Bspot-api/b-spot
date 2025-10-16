@@ -13,7 +13,7 @@ export function SectorsSection({ sectors, title = "Business Sectors" }: SectorsS
 
   return (
     <Section icon={Layers} iconColor="text-green-600" title={title} count={sectors.length}>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="flex flex-wrap gap-2">
         {sectors.map((sector) => (
           <SectorCard key={sector.id} sector={sector} />
         ))}

@@ -800,32 +800,6 @@ export const personalityControllerGetCompaniesOptions = (options: Options<Person
     });
 };
 
-export const personalityControllerGetCompaniesInfiniteQueryKey = (options: Options<PersonalityControllerGetCompaniesData>): QueryKey<Options<PersonalityControllerGetCompaniesData>> => createQueryKey('personalityControllerGetCompanies', options, true);
-
-export const personalityControllerGetCompaniesInfiniteOptions = (options: Options<PersonalityControllerGetCompaniesData>) => {
-    return infiniteQueryOptions<unknown, DefaultError, InfiniteData<unknown>, QueryKey<Options<PersonalityControllerGetCompaniesData>>, number | Pick<QueryKey<Options<PersonalityControllerGetCompaniesData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
-    // @ts-ignore
-    {
-        queryFn: async ({ pageParam, queryKey, signal }) => {
-            // @ts-ignore
-            const page: Pick<QueryKey<Options<PersonalityControllerGetCompaniesData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
-                query: {
-                    page: pageParam
-                }
-            };
-            const params = createInfiniteParams(queryKey, page);
-            const { data } = await personalityControllerGetCompanies({
-                ...options,
-                ...params,
-                signal,
-                throwOnError: true
-            });
-            return data;
-        },
-        queryKey: personalityControllerGetCompaniesInfiniteQueryKey(options)
-    });
-};
-
 export const sectorControllerFindAllQueryKey = (options?: Options<SectorControllerFindAllData>) => createQueryKey('sectorControllerFindAll', options);
 
 export const sectorControllerFindAllOptions = (options?: Options<SectorControllerFindAllData>) => {

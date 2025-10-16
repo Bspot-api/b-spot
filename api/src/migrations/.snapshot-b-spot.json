@@ -688,6 +688,16 @@
           "length": 255,
           "mappedType": "string"
         },
+        "icon": {
+          "name": "icon",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
         "published": {
           "name": "published",
           "type": "boolean",

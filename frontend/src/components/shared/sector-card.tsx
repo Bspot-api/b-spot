@@ -1,29 +1,21 @@
 import type { Sector } from "@/api/hooks"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/shadcn/card"
-import { Layers } from "lucide-react"
+import { Link } from "react-router-dom"
+import { getIconComponent } from "@/utils/icon-mapper"
 
 interface SectorCardProps {
   sector: Sector
-  onClick?: () => void
 }
 
-export function SectorCard({ sector, onClick }: SectorCardProps) {
+export function SectorCard({ sector }: SectorCardProps) {
+  const Icon = getIconComponent(sector.icon)
+
   return (
-    <Card
-      className={`${onClick ? "cursor-pointer hover:shadow-md transition-shadow" : ""}`}
-      onClick={onClick}
+    <Link
+      to={`/sectors/${sector.id}`}
+      className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 hover:text-gray-900 rounded-full transition-colors cursor-pointer border border-gray-200"
     >
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Layers className="h-5 w-5 text-green-600" />
-          {sector.name}
-        </CardTitle>
-      </CardHeader>
-      {sector.description && (
-        <CardContent>
-          <p className="text-sm text-gray-600">{sector.description}</p>
-        </CardContent>
-      )}
-    </Card>
+      <Icon className="h-4 w-4 text-green-600" />
+      <span className="text-sm font-medium">{sector.name}</span>
+    </Link>
   )
 }

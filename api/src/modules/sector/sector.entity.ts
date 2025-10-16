@@ -24,6 +24,10 @@ export class Sector {
   @Property()
   description!: string;
 
+  @ApiProperty({ description: 'Lucide icon name', required: false })
+  @Property({ nullable: true })
+  icon?: string;
+
   @ApiProperty({ description: 'Published status', default: false })
   @Property({ default: false })
   published: boolean = false;

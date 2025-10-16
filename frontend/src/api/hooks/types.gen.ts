@@ -41,6 +41,10 @@ export type Sector = {
      */
     description: string;
     /**
+     * Lucide icon name
+     */
+    icon?: string;
+    /**
      * Published status
      */
     published: boolean;
@@ -819,25 +823,18 @@ export type PersonalityControllerGetCompaniesData = {
     path: {
         id: string;
     };
-    query?: {
-        /**
-         * Page number (default: 1)
-         */
-        page?: number;
-        /**
-         * Items per page (default: 20)
-         */
-        limit?: number;
-    };
+    query?: never;
     url: '/personalities/{id}/companies';
 };
 
 export type PersonalityControllerGetCompaniesResponses = {
     /**
-     * List companies for this personality with pagination
+     * List all companies for this personality
      */
-    200: unknown;
+    200: Array<Company>;
 };
+
+export type PersonalityControllerGetCompaniesResponse = PersonalityControllerGetCompaniesResponses[keyof PersonalityControllerGetCompaniesResponses];
 
 export type SectorControllerFindAllData = {
     body?: never;
