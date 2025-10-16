@@ -7,8 +7,9 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Company } from '../company/company.entity';
 import { Personality } from './personality.entity';
 import { PersonalityService } from './personality.service';
@@ -30,19 +31,35 @@ export class PersonalityController {
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const personality = await this.service.findOne(id);
+    const personality = await this.service.findOneWithRelations(id);
     if (!personality) throw new NotFoundException('Personality not found');
     return personality;
   }
 
   @Get(':id/companies')
   @ApiOkResponse({
-    type: Company,
-    isArray: true,
-    description: 'List all companies for this personality',
+    description: 'List companies for this personality with pagination',
   })
-  async getCompanies(@Param('id') id: string): Promise<Company[]> {
-    return this.service.getCompanies(id);
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Page number (default: 1)',
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Items per page (default: 20)',
+    type: Number,
+  })
+  async getCompanies(
+    @Param('id') id: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    const pageNum = page ? parseInt(page.toString(), 10) : 1;
+    const limitNum = limit ? parseInt(limit.toString(), 10) : 20;
+    return this.service.getCompaniesPaginated(id, pageNum, limitNum);
   }
 
   @Put(':id')

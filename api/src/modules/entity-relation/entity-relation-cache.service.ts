@@ -355,6 +355,65 @@ export class EntityRelationCacheService {
     return details;
   }
 
+  async getFundsByPersonality(personalityId: string): Promise<Fund[]> {
+    const cacheKey = `personality:${personalityId}:funds`;
+
+    let funds = this.getCacheEntry(cacheKey);
+    if (funds !== null) return funds;
+
+    const relations = await this.entityRelationService.findBySource(
+      EntityType.PERSONALITY,
+      personalityId,
+    );
+
+    const fundRelations = relations.filter(
+      (rel) =>
+        rel.targetType === EntityType.FUND &&
+        (rel.relationType === RelationType.FOUNDED ||
+          rel.relationType === RelationType.MANAGES ||
+          rel.relationType === RelationType.CONTROLS ||
+          rel.relationType === RelationType.OWNS),
+    );
+
+    if (fundRelations.length > 0) {
+      const fundIds = fundRelations.map((rel) => rel.targetId);
+      funds = await this.em.find(Fund, { id: { $in: fundIds } });
+    } else {
+      funds = [];
+    }
+
+    this.setCacheEntry(cacheKey, funds);
+    return funds;
+  }
+
+  async getSectorsByPersonality(personalityId: string): Promise<Sector[]> {
+    const cacheKey = `personality:${personalityId}:sectors`;
+
+    let sectors = this.getCacheEntry(cacheKey);
+    if (sectors !== null) return sectors;
+
+    const companyIds = await this.getCompanyIdsByPersonality(personalityId);
+    if (companyIds.length === 0) {
+      this.setCacheEntry(cacheKey, []);
+      return [];
+    }
+
+    const sectorIds = new Set<string>();
+    for (const companyId of companyIds) {
+      const companySectors = await this.getSectorsByCompany(companyId);
+      companySectors.forEach((sector) => sectorIds.add(sector.id));
+    }
+
+    if (sectorIds.size === 0) {
+      this.setCacheEntry(cacheKey, []);
+      return [];
+    }
+
+    sectors = await this.em.find(Sector, { id: { $in: Array.from(sectorIds) } });
+    this.setCacheEntry(cacheKey, sectors);
+    return sectors;
+  }
+
   clearCache() {
     this.cache.clear();
   }

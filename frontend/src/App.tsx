@@ -4,6 +4,7 @@ import { AuthProvider } from '@/contexts/auth-context';
 import { AboutPage } from '@/pages/about';
 import { AccountPage } from '@/pages/account';
 import { CompanyDetailPage } from '@/pages/company-detail';
+import { PersonalityDetailPage } from '@/pages/personality-detail';
 import { Dashboard } from '@/pages/dashboard';
 import { HomePage } from '@/pages/home';
 import { LoginPage } from '@/pages/login';
@@ -20,6 +21,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/" element={<HomePage />} />
             <Route path="/companies/:id" element={<CompanyDetailPage />} />
+            <Route path="/personalities/:id" element={<PersonalityDetailPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route
               path="/dashboard"

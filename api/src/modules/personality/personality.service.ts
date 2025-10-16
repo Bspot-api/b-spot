@@ -70,6 +70,28 @@ export class PersonalityService {
     return this.populateRelations(personality);
   }
 
+  async findOneWithRelations(id: string): Promise<any | null> {
+    const personality = await this.findOne(id);
+    if (!personality) return null;
+
+    const [funds, sectors] = await Promise.all([
+      this.entityRelationCacheService.getFundsByPersonality(id),
+      this.entityRelationCacheService.getSectorsByPersonality(id),
+    ]);
+
+    // Ensure we return a plain object with all properties including id
+    return {
+      id: personality.id,
+      name: personality.name,
+      description: personality.description,
+      published: personality.published,
+      createdAt: personality.createdAt,
+      relatedPersonalities: personality.relatedPersonalities || [],
+      funds,
+      sectors,
+    };
+  }
+
   async update(
     id: string,
     data: Partial<Personality>,
@@ -106,5 +128,38 @@ export class PersonalityService {
 
     const companyIds = companyRelations.map((rel) => rel.targetId);
     return this.em.find(Company, { id: { $in: companyIds } });
+  }
+
+  async getCompaniesPaginated(
+    id: string,
+    page: number = 1,
+    limit: number = 20,
+  ): Promise<{ data: Company[]; pagination: any }> {
+    const companyIds =
+      await this.entityRelationCacheService.getCompanyIdsByPersonality(id);
+
+    if (companyIds.length === 0) {
+      return {
+        data: [],
+        pagination: { page, limit, total: 0, totalPages: 0 },
+      };
+    }
+
+    const offset = (page - 1) * limit;
+    const [companies, total] = await this.em.findAndCount(
+      Company,
+      { id: { $in: companyIds } },
+      { limit, offset, orderBy: { name: 'ASC' } },
+    );
+
+    return {
+      data: companies,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 }
