@@ -1,8 +1,8 @@
 import type { Company } from "@/types/relation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/shadcn/card"
-import { FundCard, PersonalityCard, SectorCard } from "@/components/shared"
+import { FundsSection, SectorsSection, RelatedPersonalitiesSection } from "@/components/shared"
 import { RelationBadge } from "@/features/home/components/relation-badge"
-import { ArrowLeft, Building2, Calendar, ExternalLink, Layers, Tag, Users } from "lucide-react"
+import { ArrowLeft, Calendar, ExternalLink, Tag } from "lucide-react"
 import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 
@@ -83,50 +83,12 @@ export function CompanyDetail({ company }: CompanyDetailProps) {
           </Card>
         )}
 
-        {/* Investment Funds */}
-        {company.funds && company.funds.length > 0 && (
-          <div>
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <Building2 className="h-5 w-5" />
-              Investment Funds
-            </h2>
-            <div className="grid grid-cols-1 gap-4">
-              {company.funds.map((fund) => (
-                <FundCard key={fund.id} fund={fund} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Business Sectors */}
-        {company.sectors && company.sectors.length > 0 && (
-          <div>
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <Layers className="h-5 w-5" />
-              Business Sectors
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {company.sectors.map((sector) => (
-                <SectorCard key={sector.id} sector={sector} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Involved Personalities */}
-        {company.personalities && company.personalities.length > 0 && (
-          <div>
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Involved Personalities
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {company.personalities.map((personality) => (
-                <PersonalityCard key={personality.id} personality={personality} />
-              ))}
-            </div>
-          </div>
-        )}
+        <FundsSection funds={company.funds || []} />
+        <SectorsSection sectors={company.sectors || []} />
+        <RelatedPersonalitiesSection
+          personalities={company.personalities || []}
+          title="Involved Personalities"
+        />
       </div>
     </div>
   )

@@ -1,12 +1,13 @@
 import type { Personality } from "@/api/hooks"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/shadcn/card"
-import { FundCard, PersonalityCard, SectorCard } from "@/components/shared"
-import { CompanyCard } from "@/features/home/components/company-card"
+import {
+  RelatedPersonalitiesSection,
+  FundsSection,
+  SectorsSection,
+  CompaniesSection,
+} from "@/components/shared"
 import { usePersonalityCompanies } from "@/hooks/use-personality-companies"
-import { useInfiniteScroll } from "@/hooks/use-infinite-scroll"
-import { CompanyCardSkeleton } from "@/features/home/components/company-card-skeleton"
 import { ArrowLeft, Building2, Calendar, Layers, TrendingUp, Users } from "lucide-react"
-import { useMemo } from "react"
 import { Link } from "react-router-dom"
 
 interface PersonalityDetailProps {
@@ -18,25 +19,7 @@ interface PersonalityDetailProps {
 }
 
 export function PersonalityDetail({ personality }: PersonalityDetailProps) {
-  const {
-    data: companiesData,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading: isLoadingCompanies,
-  } = usePersonalityCompanies(personality.id)
-
-  const companies = useMemo(() => {
-    return companiesData?.pages.flatMap((page) => page.data) || []
-  }, [companiesData])
-
-  const totalCompanies = companiesData?.pages[0]?.pagination?.total || 0
-
-  const loadMoreRef = useInfiniteScroll({
-    hasNextPage: hasNextPage ?? false,
-    isFetchingNextPage,
-    fetchNextPage,
-  })
+  const { data: companies = [], isLoading } = usePersonalityCompanies(personality.id)
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -71,7 +54,7 @@ export function PersonalityDetail({ personality }: PersonalityDetailProps) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <Building2 className="h-4 w-4" />
-                <span>{totalCompanies} companies</span>
+                <span>{companies.length} companies</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <TrendingUp className="h-4 w-4" />
@@ -93,88 +76,10 @@ export function PersonalityDetail({ personality }: PersonalityDetailProps) {
           </CardContent>
         </Card>
 
-        {/* Related Personalities */}
-        {personality.relatedPersonalities && personality.relatedPersonalities.length > 0 && (
-          <div>
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Related Personalities
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {personality.relatedPersonalities.map((related: any) => (
-                <PersonalityCard key={related.id} personality={related} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Investment Funds */}
-        {personality.funds && personality.funds.length > 0 && (
-          <div>
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Investment Funds
-            </h2>
-            <div className="grid grid-cols-1 gap-4">
-              {personality.funds.map((fund: any) => (
-                <FundCard key={fund.id} fund={fund} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Business Sectors */}
-        {personality.sectors && personality.sectors.length > 0 && (
-          <div>
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <Layers className="h-5 w-5" />
-              Business Sectors
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {personality.sectors.map((sector: any) => (
-                <SectorCard key={sector.id} sector={sector} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Companies with Infinite Scroll */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <Building2 className="h-5 w-5" />
-            Companies ({totalCompanies})
-          </h2>
-
-          {isLoadingCompanies ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <CompanyCardSkeleton key={index} />
-              ))}
-            </div>
-          ) : companies.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {companies.map((company: any) => (
-                <CompanyCard key={company.id} company={company} />
-              ))}
-
-              {/* Loading more skeletons */}
-              {isFetchingNextPage && (
-                <>
-                  {Array.from({ length: 3 }).map((_, index) => (
-                    <CompanyCardSkeleton key={`loading-${index}`} />
-                  ))}
-                </>
-              )}
-
-              {/* Infinite scroll trigger */}
-              <div ref={loadMoreRef} className="col-span-full h-4" />
-            </div>
-          ) : (
-            <div className="text-center py-12 bg-gray-50 rounded-lg">
-              <p className="text-gray-500">No companies found</p>
-            </div>
-          )}
-        </div>
+        <RelatedPersonalitiesSection personalities={personality.relatedPersonalities || []} />
+        <FundsSection funds={personality.funds || []} />
+        <SectorsSection sectors={personality.sectors || []} />
+        <CompaniesSection companies={companies} isLoading={isLoading} />
       </div>
     </div>
   )

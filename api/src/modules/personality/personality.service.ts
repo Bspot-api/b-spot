@@ -111,55 +111,11 @@ export class PersonalityService {
   }
 
   async getCompanies(id: string): Promise<Company[]> {
-    // Find companies that are managed or controlled by this personality using EntityRelation
-    const relations = await this.entityRelationService.findBySource(
-      EntityType.PERSONALITY,
-      id,
-    );
-
-    const companyRelations = relations.filter(
-      (rel) =>
-        rel.targetType === EntityType.COMPANY &&
-        (rel.relationType === RelationType.MANAGES ||
-          rel.relationType === RelationType.CONTROLS),
-    );
-
-    if (companyRelations.length === 0) return [];
-
-    const companyIds = companyRelations.map((rel) => rel.targetId);
-    return this.em.find(Company, { id: { $in: companyIds } });
-  }
-
-  async getCompaniesPaginated(
-    id: string,
-    page: number = 1,
-    limit: number = 20,
-  ): Promise<{ data: Company[]; pagination: any }> {
     const companyIds =
       await this.entityRelationCacheService.getCompanyIdsByPersonality(id);
 
-    if (companyIds.length === 0) {
-      return {
-        data: [],
-        pagination: { page, limit, total: 0, totalPages: 0 },
-      };
-    }
+    if (companyIds.length === 0) return [];
 
-    const offset = (page - 1) * limit;
-    const [companies, total] = await this.em.findAndCount(
-      Company,
-      { id: { $in: companyIds } },
-      { limit, offset, orderBy: { name: 'ASC' } },
-    );
-
-    return {
-      data: companies,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
+    return this.em.find(Company, { id: { $in: companyIds } }, { orderBy: { name: 'ASC' } });
   }
 }

@@ -3,3 +3,7 @@ export { Header } from './header';
 export { FundCard } from './fund-card';
 export { PersonalityCard } from './personality-card';
 export { SectorCard } from './sector-card';
+export { RelatedPersonalitiesSection } from './sections/related-personalities-section';
+export { FundsSection } from './sections/funds-section';
+export { SectorsSection } from './sections/sectors-section';
+export { CompaniesSection } from './sections/companies-section';
