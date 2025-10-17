@@ -1,13 +1,13 @@
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import { FaviconManager } from '@/components/ui/favicon-manager';
 import { AuthProvider } from '@/contexts/auth-context';
-import { AboutPage } from '@/pages/about';
-import { AccountPage } from '@/pages/account';
+import { AboutPage } from '@/features/about/pages/about-page';
+import { AccountPage } from '@/features/auth/pages/account-page';
+import { LoginPage } from '@/features/auth/pages/login-page';
 import { CompanyPage } from '@/features/company/pages/company-page';
+import { DashboardPage } from '@/features/dashboard/pages/dashboard-page';
+import { HomePage } from '@/features/home/pages/home-page';
 import { PersonalityPage } from '@/features/personality/pages/personality-page';
-import { Dashboard } from '@/pages/dashboard';
-import { HomePage } from '@/pages/home';
-import { LoginPage } from '@/pages/login';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
 
@@ -27,7 +27,7 @@ function App() {
               path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <DashboardPage />
                 </ProtectedRoute>
               }
             />
