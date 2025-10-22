@@ -36,16 +36,17 @@ apiClient.interceptors.response.use(
   (error: AxiosError) => {
     // Handle common errors
     if (error.response?.status === 401) {
-      // Unauthorized - redirect to login
+      // Unauthorized - just log, don't redirect (routes are public by default)
+      console.warn('401 Unauthorized:', error.config?.url);
       localStorage.removeItem('auth_token');
-      window.location.href = '/login';
+      // Don't redirect automatically - let components handle it
     }
-    
+
     if (error.response?.status === 403) {
       // Forbidden - show error message
       console.error('Access forbidden');
     }
-    
+
     return Promise.reject(error);
   }
 );

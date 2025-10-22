@@ -7,8 +7,10 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AllowAnonymous, AuthGuard } from '@thallesp/nestjs-better-auth';
 import { CreateCompanyDto } from './company.dto';
 import { Company } from './company.entity';
 import { CompanySearchFilters, CompanyService } from './company.service';
@@ -29,7 +31,8 @@ export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new company' })
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Create a new company (admin only)' })
   @ApiResponse({
     status: 201,
     description: 'Company created successfully',
@@ -40,6 +43,7 @@ export class CompanyController {
   }
 
   @Get()
+  @AllowAnonymous()
   @ApiOperation({ summary: 'Get all companies with pagination and search' })
   @ApiQuery({
     name: 'page',
@@ -149,6 +153,7 @@ export class CompanyController {
   }
 
   @Get(':id')
+  @AllowAnonymous()
   @ApiOperation({ summary: 'Get a company by ID' })
   @ApiResponse({ status: 200, description: 'Company found', type: Company })
   async findOne(@Param('id') id: string) {
@@ -162,7 +167,8 @@ export class CompanyController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update a company' })
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Update a company (admin only)' })
   @ApiResponse({
     status: 200,
     description: 'Company updated successfully',
@@ -176,7 +182,8 @@ export class CompanyController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a company' })
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Delete a company (admin only)' })
   @ApiResponse({ status: 200, description: 'Company deleted successfully' })
   remove(@Param('id') id: string) {
     return this.companyService.remove(id);

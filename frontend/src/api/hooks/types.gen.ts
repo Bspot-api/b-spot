@@ -315,28 +315,6 @@ export type AppControllerGetHealthResponses = {
 
 export type AppControllerGetHealthResponse = AppControllerGetHealthResponses[keyof AppControllerGetHealthResponses];
 
-export type AuthControllerSignUpData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/auth/signup';
-};
-
-export type AuthControllerSignUpResponses = {
-    201: unknown;
-};
-
-export type AuthControllerSignInData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/auth/signin';
-};
-
-export type AuthControllerSignInResponses = {
-    201: unknown;
-};
-
 export type AuthControllerChangePasswordData = {
     body?: never;
     path?: never;
@@ -344,8 +322,39 @@ export type AuthControllerChangePasswordData = {
     url: '/auth/change-password';
 };
 
+export type AuthControllerChangePasswordErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+};
+
 export type AuthControllerChangePasswordResponses = {
-    201: unknown;
+    /**
+     * Password changed successfully
+     */
+    200: unknown;
+};
+
+export type AuthControllerGetProfileData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/auth/profile';
+};
+
+export type AuthControllerGetProfileErrors = {
+    /**
+     * Unauthorized
+     */
+    401: unknown;
+};
+
+export type AuthControllerGetProfileResponses = {
+    /**
+     * Returns current user
+     */
+    200: unknown;
 };
 
 export type BrandControllerFindAllData = {

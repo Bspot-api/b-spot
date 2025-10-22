@@ -23,6 +23,7 @@ const config: Options<PostgreSqlDriver> = {
     glob: '!(*.d).{js,ts}',
   },
   debug: process.env.NODE_ENV !== 'production',
+  allowGlobalContext: true,
   dynamicImportProvider: (id) => import(id),
 };
 

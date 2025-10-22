@@ -1,9 +1,9 @@
 import { Entity, PrimaryKey, Property, Unique } from '@mikro-orm/core';
 
-@Entity({ tableName: 'users' })
+@Entity({ tableName: 'user' })
 export class User {
-  @PrimaryKey()
-  id!: number;
+  @PrimaryKey({ type: 'text' })
+  id!: string;
 
   @Property()
   @Unique()
@@ -18,23 +18,11 @@ export class User {
   @Property({ nullable: true })
   avatar?: string;
 
+  @Property({ nullable: true })
+  image?: string;
+
   @Property({ default: false })
   emailVerified = false;
-
-  @Property({ nullable: true })
-  emailVerificationToken?: string;
-
-  @Property({ nullable: true })
-  emailVerificationTokenExpiresAt?: Date;
-
-  @Property({ nullable: true })
-  passwordResetToken?: string;
-
-  @Property({ nullable: true })
-  passwordResetTokenExpiresAt?: Date;
-
-  @Property({ default: false })
-  isActive = true;
 
   @Property()
   createdAt = new Date();

@@ -1,5 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
 import { Brand } from './brand.entity';
 import { BrandService } from './brand.service';
 
@@ -9,6 +10,7 @@ export class BrandController {
   constructor(private readonly brandService: BrandService) {}
 
   @Get()
+  @AllowAnonymous()
   @ApiOperation({ summary: 'Get all brands' })
   @ApiResponse({ status: 200, description: 'Success', type: [Brand] })
   async findAll(): Promise<Brand[]> {
@@ -16,6 +18,7 @@ export class BrandController {
   }
 
   @Get(':id')
+  @AllowAnonymous()
   @ApiOperation({ summary: 'Get brand by ID' })
   @ApiResponse({ status: 200, description: 'Success', type: Brand })
   @ApiResponse({ status: 404, description: 'Brand not found' })
@@ -24,6 +27,7 @@ export class BrandController {
   }
 
   @Get('company/:companyId')
+  @AllowAnonymous()
   @ApiOperation({ summary: 'Get brands by company ID' })
   @ApiResponse({ status: 200, description: 'Success', type: [Brand] })
   async findByCompany(@Param('companyId') companyId: string): Promise<Brand[]> {
@@ -31,6 +35,7 @@ export class BrandController {
   }
 
   @Get('fund/:fundId')
+  @AllowAnonymous()
   @ApiOperation({ summary: 'Get brands by fund ID' })
   @ApiResponse({ status: 200, description: 'Success', type: [Brand] })
   async findByFund(@Param('fundId') fundId: string): Promise<Brand[]> {
@@ -38,6 +43,7 @@ export class BrandController {
   }
 
   @Get('sector/:sectorId')
+  @AllowAnonymous()
   @ApiOperation({ summary: 'Get brands by sector ID' })
   @ApiResponse({ status: 200, description: 'Success', type: [Brand] })
   async findBySector(@Param('sectorId') sectorId: string): Promise<Brand[]> {

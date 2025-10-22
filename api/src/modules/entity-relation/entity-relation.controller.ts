@@ -1,5 +1,6 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags, ApiQuery } from '@nestjs/swagger';
+import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
 import {
   EntityRelation,
   EntityType,
@@ -13,6 +14,7 @@ export class EntityRelationController {
   constructor(private readonly entityRelationService: EntityRelationService) {}
 
   @Get()
+  @AllowAnonymous()
   @ApiOperation({ summary: 'Get all entity relations' })
   @ApiResponse({ status: 200, description: 'Success', type: [EntityRelation] })
   async findAll(): Promise<EntityRelation[]> {
@@ -20,6 +22,7 @@ export class EntityRelationController {
   }
 
   @Get(':id')
+  @AllowAnonymous()
   @ApiOperation({ summary: 'Get entity relation by ID' })
   @ApiResponse({ status: 200, description: 'Success', type: EntityRelation })
   @ApiResponse({ status: 404, description: 'Entity relation not found' })
@@ -28,6 +31,7 @@ export class EntityRelationController {
   }
 
   @Get('source/:sourceType/:sourceId')
+  @AllowAnonymous()
   @ApiOperation({ summary: 'Get relations by source entity' })
   @ApiResponse({ status: 200, description: 'Success', type: [EntityRelation] })
   async findBySource(
@@ -38,6 +42,7 @@ export class EntityRelationController {
   }
 
   @Get('target/:targetType/:targetId')
+  @AllowAnonymous()
   @ApiOperation({ summary: 'Get relations by target entity' })
   @ApiResponse({ status: 200, description: 'Success', type: [EntityRelation] })
   async findByTarget(
@@ -48,6 +53,7 @@ export class EntityRelationController {
   }
 
   @Get('type/:relationType')
+  @AllowAnonymous()
   @ApiOperation({ summary: 'Get relations by relation type' })
   @ApiResponse({ status: 200, description: 'Success', type: [EntityRelation] })
   async findByRelationType(
@@ -57,6 +63,7 @@ export class EntityRelationController {
   }
 
   @Get('pair')
+  @AllowAnonymous()
   @ApiOperation({ summary: 'Get relations between two specific entities' })
   @ApiQuery({ name: 'sourceType', enum: EntityType })
   @ApiQuery({ name: 'sourceId', type: String })

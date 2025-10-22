@@ -7,8 +7,10 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { AllowAnonymous, AuthGuard } from '@thallesp/nestjs-better-auth';
 import { Company } from '../company/company.entity';
 import { Fund } from './fund.entity';
 import { FundService } from './fund.service';
@@ -19,16 +21,19 @@ export class FundController {
   constructor(private readonly service: FundService) {}
 
   @Post()
+  @UseGuards(AuthGuard)
   async create(@Body() data: Partial<Fund>) {
     return this.service.create(data);
   }
 
   @Get()
+  @AllowAnonymous()
   async findAll() {
     return this.service.findAll();
   }
 
   @Get(':id')
+  @AllowAnonymous()
   async findOne(@Param('id') id: string) {
     const fund = await this.service.findOne(id);
     if (!fund) throw new NotFoundException('Fund not found');
@@ -36,6 +41,7 @@ export class FundController {
   }
 
   @Get(':id/companies')
+  @AllowAnonymous()
   @ApiOkResponse({
     type: Company,
     isArray: true,
@@ -46,6 +52,7 @@ export class FundController {
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard)
   async update(@Param('id') id: string, @Body() data: Partial<Fund>) {
     const fund = await this.service.update(id, data);
     if (!fund) throw new NotFoundException('Fund not found');
@@ -53,6 +60,7 @@ export class FundController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
   async remove(@Param('id') id: string) {
     const ok = await this.service.remove(id);
     if (!ok) throw new NotFoundException('Fund not found');

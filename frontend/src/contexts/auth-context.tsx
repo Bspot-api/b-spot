@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext } from 'react';
+import { signIn, signOut, useSession } from '@/lib/auth-client';
 
 interface User {
-  id: number;
+  id: string;
   email: string;
   name?: string;
 }
@@ -11,7 +12,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,58 +22,40 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Check if user is logged in on mount
-    const token = localStorage.getItem('auth_token');
-    const userData = localStorage.getItem('user');
-    
-    if (token && userData) {
-      try {
-        setUser(JSON.parse(userData));
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('user');
-      }
-    }
-    setIsLoading(false);
-  }, []);
+  const { data: session, isPending } = useSession();
 
   const login = async (email: string, password: string) => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/auth/signin`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+    const result = await signIn.email({
+      email,
+      password,
+    });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Login failed');
-      }
-
-      const data = await response.json();
-      setUser(data.user);
-      localStorage.setItem('auth_token', 'dummy-token'); // In a real app, you'd get a JWT token
-      localStorage.setItem('user', JSON.stringify(data.user));
-    } catch (error) {
-      throw error;
+    if (result.error) {
+      throw new Error(result.error.message || 'Login failed');
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user');
+  const logout = async () => {
+    await signOut();
   };
 
+  const user: User | null = session?.user
+    ? {
+        id: session.user.id,
+        email: session.user.email,
+        name: session.user.name,
+      }
+    : null;
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isLoading: isPending,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

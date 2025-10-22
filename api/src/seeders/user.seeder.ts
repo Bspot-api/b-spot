@@ -1,40 +1,55 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 import { hashPassword } from 'better-auth/crypto';
+import { randomUUID } from 'crypto';
+import { Account } from '../modules/auth/entities/account.entity';
 import { User } from '../modules/user/user.entity';
 
 export class UserSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
-    // Check if user already exists
-    const existingUser = await em.findOne(User, {
-      email: 'bspot.api@gmail.com',
-    });
+    const seedEmail = process.env.SEED_USER_EMAIL || 'admin@b-spot.local';
+    const seedPassword = process.env.SEED_USER_PASSWORD;
 
-    if (existingUser) {
-      console.log('User bspot.api@gmail.com already exists, skipping...');
+    if (!seedPassword) {
+      console.log(
+        '⚠️  SEED_USER_PASSWORD not set. Skipping user seeding for security.',
+      );
+      console.log(
+        '   Set SEED_USER_PASSWORD in your .env file to seed a user.',
+      );
       return;
     }
 
-    // Plain password for seeding
-    const plainPassword = 'pleasechangethisuglypassword';
+    const existingUser = await em.findOne(User, { email: seedEmail });
 
-    // Hash the password using better-auth
-    const hashedPassword = await hashPassword(plainPassword);
+    if (existingUser) {
+      console.log(`User ${seedEmail} already exists, skipping...`);
+      return;
+    }
 
-    // Create the user with hashed password
-    const user = new User();
-    user.email = 'bspot.api@gmail.com';
-    user.password = hashedPassword;
-    user.name = 'Bspot';
-    user.emailVerified = true;
-    user.isActive = true;
+    const hashedPassword = await hashPassword(seedPassword);
+    const userId = randomUUID();
 
-    await em.persistAndFlush(user);
+    const user = em.create(User, {
+      id: userId,
+      email: seedEmail,
+      name: process.env.SEED_USER_NAME || 'Admin',
+      emailVerified: true,
+    });
+
+    const account = em.create(Account, {
+      id: randomUUID(),
+      userId: userId,
+      accountId: userId,
+      providerId: 'credential',
+      password: hashedPassword,
+    });
+
+    await em.persistAndFlush([user, account]);
 
     console.log('✅ User seeded successfully:');
-    console.log(`   Email: bspot.api@gmail.com`);
-    console.log(`   Password: ${plainPassword}`);
-    console.log(`   Name: B-spot`);
-    console.log('   ⚠️  Remember to change the password after first login!');
+    console.log(`   Email: ${seedEmail}`);
+    console.log(`   Name: ${user.name}`);
+    console.log('   ⚠️  Password is set from SEED_USER_PASSWORD env var');
   }
 }
