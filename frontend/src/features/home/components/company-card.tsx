@@ -1,6 +1,6 @@
-import type { Company } from "@/types/relation"
 import { Badge } from "@/components/shadcn/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/shadcn/card"
+import type { Company } from "@/types/relation"
 import { useTranslation } from "react-i18next"
 import { Link } from "react-router-dom"
 import { RelationBadge } from "./relation-badge"
@@ -31,7 +31,7 @@ export function CompanyCard({ company }: CompanyCardProps) {
         {company.matchedVia && company.matchedVia.length > 0 && (
           <div className="space-y-2">
             <p className="text-sm font-medium text-gray-700">
-              Matched via
+              {t('details.matchedVia')}
             </p>
             <div className="flex flex-wrap gap-1">
               {company.matchedVia.map((match, index) => (

@@ -1,12 +1,12 @@
-import type { Company } from "@/types/relation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/shadcn/card"
 import { FundsSection } from "@/features/fund/components/funds-section"
-import { SectorsSection } from "@/features/sector/components/sectors-section"
-import { RelatedPersonalitiesSection } from "@/features/personality/components/related-personalities-section"
 import { RelationBadge } from "@/features/home/components/relation-badge"
+import { RelatedPersonalitiesSection } from "@/features/personality/components/related-personalities-section"
+import { SectorsSection } from "@/features/sector/components/sectors-section"
+import type { Company } from "@/types/relation"
 import { ArrowLeft, Calendar, ExternalLink, Tag } from "lucide-react"
-import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import { Link } from "react-router-dom"
 
 interface CompanyDetailProps {
   company: Company
@@ -22,7 +22,7 @@ export function CompanyDetail({ company }: CompanyDetailProps) {
         className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to companies
+{t('details.backToCompanies')}
       </Link>
 
       <div className="space-y-6">
@@ -60,7 +60,7 @@ export function CompanyDetail({ company }: CompanyDetailProps) {
             <div className="flex items-center gap-2 text-sm text-gray-500">
               <Calendar className="h-4 w-4" />
               <span>
-                Added on {new Date(company.createdAt).toLocaleDateString()}
+                {t('details.addedOn')} {new Date(company.createdAt).toLocaleDateString()}
               </span>
             </div>
           </CardContent>
@@ -72,7 +72,7 @@ export function CompanyDetail({ company }: CompanyDetailProps) {
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-2">
                 <Tag className="h-5 w-5" />
-                Matched Relations
+{t('details.matchedRelations')}
               </CardTitle>
             </CardHeader>
             <CardContent>

@@ -165,5 +165,30 @@ export default {
       "title": "Palette de commandes",
       "description": "Rechercher une commande à exécuter..."
     }
+  },
+  "details": {
+    "backToCompanies": "Retour aux entreprises",
+    "matchedVia": "Correspondance via",
+    "matchedRelations": "Relations correspondantes",
+    "addedOn": "Ajouté le",
+    "stats": {
+      "companies": "entreprises",
+      "funds": "fonds",
+      "sectors": "secteurs"
+    }
+  },
+  "sections": {
+    "companies": "Entreprises",
+    "investmentFunds": "Fonds d'investissement",
+    "businessSectors": "Secteurs d'activité",
+    "relatedPersonalities": "Personnalités liées",
+    "involvedPersonalities": "Personnalités impliquées"
+  },
+  "activeFilters": {
+    "title": "Filtres actifs:",
+    "clearAll": "Tout effacer"
+  },
+  "about": {
+    "sourceCode": "Code Source"
   }
 }

@@ -48,7 +48,7 @@ export function AboutContent() {
               {/* GitHub Repository Section */}
               <section className="bg-gray-50 border border-gray-200 rounded-lg p-6">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-                  Code Source
+{t('about.sourceCode')}
                 </h2>
                 <div className="flex justify-center">
                   <a 

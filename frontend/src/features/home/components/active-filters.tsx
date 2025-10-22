@@ -1,8 +1,8 @@
+import { Button } from '@/components/shadcn/button';
+import { useApiClient } from '@/hooks/use-api-client';
+import { useQuery } from '@tanstack/react-query';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/shadcn/button';
-import { useQuery } from '@tanstack/react-query';
-import { useApiClient } from '@/hooks/use-api-client';
 
 interface ActiveFiltersProps {
   currentSearch: string;
@@ -87,7 +87,7 @@ export function ActiveFilters({
   return (
     <div className="flex flex-wrap items-center gap-2 p-4 bg-gray-50 rounded-lg">
       <span className="text-sm font-medium text-gray-700">
-        Filtres actifs:
+{t('activeFilters.title')}
       </span>
 
       {/* Search filter */}
@@ -166,7 +166,7 @@ export function ActiveFilters({
         onClick={clearAllFilters}
         className="ml-2"
       >
-        Tout effacer
+{t('activeFilters.clearAll')}
       </Button>
     </div>
   );

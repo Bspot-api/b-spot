@@ -165,5 +165,30 @@ export default {
       "title": "Command Palette",
       "description": "Search for a command to run..."
     }
+  },
+  "details": {
+    "backToCompanies": "Back to companies",
+    "matchedVia": "Matched via",
+    "matchedRelations": "Matched Relations",
+    "addedOn": "Added on",
+    "stats": {
+      "companies": "companies",
+      "funds": "funds",
+      "sectors": "sectors"
+    }
+  },
+  "sections": {
+    "companies": "Companies",
+    "investmentFunds": "Investment Funds",
+    "businessSectors": "Business Sectors",
+    "relatedPersonalities": "Related Personalities",
+    "involvedPersonalities": "Involved Personalities"
+  },
+  "activeFilters": {
+    "title": "Active filters:",
+    "clearAll": "Clear all"
+  },
+  "about": {
+    "sourceCode": "Source Code"
   }
 }

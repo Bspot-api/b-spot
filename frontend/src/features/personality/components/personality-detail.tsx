@@ -1,11 +1,12 @@
 import type { Personality } from "@/api/hooks"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/shadcn/card"
-import { RelatedPersonalitiesSection } from "@/features/personality/components/related-personalities-section"
-import { FundsSection } from "@/features/fund/components/funds-section"
-import { SectorsSection } from "@/features/sector/components/sectors-section"
 import { CompaniesSection } from "@/features/company/components/companies-section"
+import { FundsSection } from "@/features/fund/components/funds-section"
+import { RelatedPersonalitiesSection } from "@/features/personality/components/related-personalities-section"
+import { SectorsSection } from "@/features/sector/components/sectors-section"
 import { usePersonalityCompanies } from "@/hooks/use-personality-companies"
 import { ArrowLeft, Building2, Calendar, Layers, TrendingUp, Users } from "lucide-react"
+import { useTranslation } from "react-i18next"
 import { Link } from "react-router-dom"
 
 interface PersonalityDetailProps {
@@ -17,6 +18,7 @@ interface PersonalityDetailProps {
 }
 
 export function PersonalityDetail({ personality }: PersonalityDetailProps) {
+  const { t } = useTranslation()
   const { data: companies = [], isLoading } = usePersonalityCompanies(personality.id)
 
   return (
@@ -26,7 +28,7 @@ export function PersonalityDetail({ personality }: PersonalityDetailProps) {
         className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to companies
+{t('details.backToCompanies')}
       </Link>
 
       <div className="space-y-6">
@@ -52,15 +54,15 @@ export function PersonalityDetail({ personality }: PersonalityDetailProps) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <Building2 className="h-4 w-4" />
-                <span>{companies.length} companies</span>
+                <span>{companies.length} {t('details.stats.companies')}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <TrendingUp className="h-4 w-4" />
-                <span>{personality.funds?.length || 0} funds</span>
+                <span>{personality.funds?.length || 0} {t('details.stats.funds')}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <Layers className="h-4 w-4" />
-                <span>{personality.sectors?.length || 0} sectors</span>
+                <span>{personality.sectors?.length || 0} {t('details.stats.sectors')}</span>
               </div>
             </div>
 
@@ -68,7 +70,7 @@ export function PersonalityDetail({ personality }: PersonalityDetailProps) {
             <div className="flex items-center gap-2 text-sm text-gray-500">
               <Calendar className="h-4 w-4" />
               <span>
-                Added on {new Date(personality.createdAt).toLocaleDateString()}
+                {t('details.addedOn')} {new Date(personality.createdAt).toLocaleDateString()}
               </span>
             </div>
           </CardContent>
