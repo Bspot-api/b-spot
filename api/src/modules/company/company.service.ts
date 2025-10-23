@@ -288,8 +288,13 @@ export class CompanyService {
     relations.forEach((rel) => {
       const matches = relationMatchesMap.get(rel.companyId) || [];
       matches.push({
-        ...(baseMatch as any),
+        filterType: baseMatch.filterType!,
+        filterId: baseMatch.filterId!,
+        filterName: baseMatch.filterName!,
         relationType: rel.relationType,
+        via: baseMatch.via,
+        viaEntityId: baseMatch.viaEntityId,
+        viaEntityName: baseMatch.viaEntityName,
       });
       relationMatchesMap.set(rel.companyId, matches);
     });

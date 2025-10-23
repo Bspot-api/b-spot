@@ -8,13 +8,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AllowAnonymous, AuthGuard, Session, UserSession } from '@thallesp/nestjs-better-auth';
+import { AuthGuard, Session, UserSession } from '@thallesp/nestjs-better-auth';
+import { ChangePasswordDto } from './auth.dto';
 import { AuthService } from './auth.service';
-
-interface ChangePasswordDto {
-  currentPassword: string;
-  newPassword: string;
-}
 
 @ApiTags('auth-admin')
 @Controller('auth')
