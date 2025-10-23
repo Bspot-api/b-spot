@@ -1,5 +1,4 @@
-import { apiClient } from '@/lib/api-client';
-import { useQuery } from '@tanstack/react-query';
+import { createEntityQuery } from './use-entity-query';
 
 export interface Sector {
   id: string;
@@ -8,13 +7,4 @@ export interface Sector {
   companyCount: number;
 }
 
-export function useSectors() {
-  return useQuery({
-    queryKey: ['sectors'],
-    queryFn: async (): Promise<Sector[]> => {
-      const response = await apiClient.get('/sectors');
-      return response.data;
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-}
+export const useSectors = createEntityQuery<Sector>('sectors');

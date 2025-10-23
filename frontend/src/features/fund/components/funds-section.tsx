@@ -1,4 +1,5 @@
 import type { Fund } from "@/api/hooks"
+import { EntityGrid } from "@/components/shared/entity-grid"
 import { Section } from "@/components/shared/sections/section"
 import { TrendingUp } from "lucide-react"
 import { useTranslation } from "react-i18next"
@@ -12,16 +13,16 @@ interface FundsSectionProps {
 export function FundsSection({ funds, title }: FundsSectionProps) {
   const { t } = useTranslation()
   const sectionTitle = title || t('sections.investmentFunds')
-  
+
   if (!funds || funds.length === 0) return null
 
   return (
     <Section icon={TrendingUp} iconColor="text-blue-600" title={sectionTitle} count={funds.length}>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <EntityGrid>
         {funds.map((fund) => (
           <FundCard key={fund.id} fund={fund} />
         ))}
-      </div>
+      </EntityGrid>
     </Section>
   )
 }

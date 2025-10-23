@@ -1,4 +1,5 @@
 import type { Company } from "@/api/hooks"
+import { EntityGrid } from "@/components/shared/entity-grid"
 import { Section } from "@/components/shared/sections/section"
 import { CompanyCard } from "@/features/home/components/company-card"
 import { CompanyCardSkeleton } from "@/features/home/components/company-card-skeleton"
@@ -18,21 +19,21 @@ export function CompaniesSection({
 }: CompaniesSectionProps) {
   const { t } = useTranslation()
   const sectionTitle = title || t('sections.companies')
-  
+
   return (
     <Section icon={Building2} iconColor="text-gray-600" title={sectionTitle} count={companies.length}>
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <EntityGrid>
           {Array.from({ length: 6 }).map((_, index) => (
             <CompanyCardSkeleton key={index} />
           ))}
-        </div>
+        </EntityGrid>
       ) : companies.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <EntityGrid>
           {companies.map((company) => (
             <CompanyCard key={company.id} company={company} />
           ))}
-        </div>
+        </EntityGrid>
       ) : (
         <div className="text-center py-12 bg-gray-50 rounded-lg">
           <p className="text-gray-500">{t('companies.noResults')}</p>
