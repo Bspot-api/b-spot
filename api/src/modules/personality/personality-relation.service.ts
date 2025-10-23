@@ -5,6 +5,7 @@ import {
   PersonalityRelationType,
 } from './personality-relation.entity';
 import { Personality } from './personality.entity';
+import { CreatePersonalityRelationDto } from './personality-relation.dto';
 
 @Injectable()
 export class PersonalityRelationService {
@@ -16,11 +17,16 @@ export class PersonalityRelationService {
     relationType: PersonalityRelationType,
     notes?: string,
   ): Promise<PersonalityRelation> {
-    const relation = this.em.create(PersonalityRelation, {
+    const relationData: CreatePersonalityRelationDto = {
       sourcePersonality: sourcePersonalityId,
       targetPersonality: targetPersonalityId,
       relationType,
       notes,
+    };
+    const relation = this.em.create(PersonalityRelation, {
+      ...relationData,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
     await this.em.persistAndFlush(relation);

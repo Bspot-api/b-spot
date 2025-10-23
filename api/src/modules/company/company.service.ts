@@ -35,7 +35,10 @@ export class CompanyService {
   ) {}
 
   async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
-    const company = this.companyRepository.create(createCompanyDto);
+    const company = new Company();
+    company.name = createCompanyDto.name;
+    company.description = createCompanyDto.description;
+    company.source = createCompanyDto.source;
     await this.em.persistAndFlush(company);
     return this.populateRelations(company);
   }

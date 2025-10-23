@@ -35,6 +35,8 @@ export class UserSeeder extends Seeder {
       email: seedEmail,
       name: process.env.SEED_USER_NAME || 'Admin',
       emailVerified: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
     const account = em.create(Account, {
@@ -43,6 +45,8 @@ export class UserSeeder extends Seeder {
       accountId: userId,
       providerId: 'credential',
       password: hashedPassword,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
     await em.persistAndFlush([user, account]);

@@ -7,6 +7,7 @@ import {
   RelationType,
 } from '../entity-relation/entity-relation.entity';
 import { Company } from '../company/company.entity';
+import { CreateFundDto, UpdateFundDto } from './fund.dto';
 
 @Injectable()
 export class FundService {
@@ -15,8 +16,12 @@ export class FundService {
     private readonly entityRelationService: EntityRelationService,
   ) {}
 
-  async create(data: Partial<Fund>): Promise<Fund> {
-    const fund = this.em.create(Fund, { ...data, published: false });
+  async create(data: CreateFundDto): Promise<Fund> {
+    const fund = this.em.create(Fund, {
+      ...data,
+      published: false,
+      createdAt: new Date(),
+    });
     await this.em.persistAndFlush(fund);
     return fund;
   }
@@ -29,7 +34,7 @@ export class FundService {
     return this.em.findOne(Fund, { id });
   }
 
-  async update(id: string, data: Partial<Fund>): Promise<Fund | null> {
+  async update(id: string, data: UpdateFundDto): Promise<Fund | null> {
     const fund = await this.findOne(id);
     if (!fund) return null;
     Object.assign(fund, { ...data, published: false });

@@ -7,6 +7,7 @@ import {
   RelationType,
 } from '../entity-relation/entity-relation.entity';
 import { Company } from '../company/company.entity';
+import { CreateSectorDto, UpdateSectorDto } from './sector.dto';
 
 @Injectable()
 export class SectorService {
@@ -15,8 +16,12 @@ export class SectorService {
     private readonly entityRelationService: EntityRelationService,
   ) {}
 
-  async create(data: Partial<Sector>): Promise<Sector> {
-    const sector = this.em.create(Sector, { ...data, published: false });
+  async create(data: CreateSectorDto): Promise<Sector> {
+    const sector = this.em.create(Sector, {
+      ...data,
+      published: false,
+      createdAt: new Date(),
+    });
     await this.em.persistAndFlush(sector);
     return sector;
   }
@@ -29,7 +34,7 @@ export class SectorService {
     return this.em.findOne(Sector, { id });
   }
 
-  async update(id: string, data: Partial<Sector>): Promise<Sector | null> {
+  async update(id: string, data: UpdateSectorDto): Promise<Sector | null> {
     const sector = await this.findOne(id);
     if (!sector) return null;
     Object.assign(sector, { ...data, published: false });

@@ -13,6 +13,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AllowAnonymous, AuthGuard } from '@thallesp/nestjs-better-auth';
 import { Company } from '../company/company.entity';
 import { Personality } from './personality.entity';
+import { CreatePersonalityDto, UpdatePersonalityDto } from './personality.dto';
 import { PersonalityService } from './personality.service';
 
 @ApiTags('personalities')
@@ -22,7 +23,7 @@ export class PersonalityController {
 
   @Post()
   @UseGuards(AuthGuard)
-  async create(@Body() data: Partial<Personality>) {
+  async create(@Body() data: CreatePersonalityDto) {
     return this.service.create(data);
   }
 
@@ -53,7 +54,7 @@ export class PersonalityController {
 
   @Put(':id')
   @UseGuards(AuthGuard)
-  async update(@Param('id') id: string, @Body() data: Partial<Personality>) {
+  async update(@Param('id') id: string, @Body() data: UpdatePersonalityDto) {
     const personality = await this.service.update(id, data);
     if (!personality) throw new NotFoundException('Personality not found');
     return personality;

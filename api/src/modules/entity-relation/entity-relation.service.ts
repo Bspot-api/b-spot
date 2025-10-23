@@ -7,6 +7,10 @@ import {
   EntityType,
   RelationType,
 } from './entity-relation.entity';
+import {
+  CreateEntityRelationDto,
+  UpdateEntityRelationDto,
+} from './entity-relation.dto';
 
 @Injectable()
 export class EntityRelationService {
@@ -24,15 +28,19 @@ export class EntityRelationService {
     return this.entityRelationRepository.findOne({ id });
   }
 
-  async create(relationData: Partial<EntityRelation>): Promise<EntityRelation> {
-    const relation = this.entityRelationRepository.create(relationData);
+  async create(relationData: CreateEntityRelationDto): Promise<EntityRelation> {
+    const relation = this.entityRelationRepository.create({
+      ...relationData,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
     await this.em.persistAndFlush(relation);
     return relation;
   }
 
   async update(
     id: string,
-    relationData: Partial<EntityRelation>,
+    relationData: UpdateEntityRelationDto,
   ): Promise<EntityRelation> {
     const relation = await this.findOne(id);
     if (!relation) {
@@ -107,6 +115,8 @@ export class EntityRelationService {
       targetId,
       relationType,
       ...options,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
     await this.em.persistAndFlush(relation);

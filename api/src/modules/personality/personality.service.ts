@@ -9,6 +9,7 @@ import {
 import { EntityRelationService } from '../entity-relation/entity-relation.service';
 import { PersonalityRelationService } from './personality-relation.service';
 import { Personality } from './personality.entity';
+import { CreatePersonalityDto, UpdatePersonalityDto } from './personality.dto';
 
 @Injectable()
 export class PersonalityService {
@@ -19,11 +20,9 @@ export class PersonalityService {
     private readonly personalityRelationService: PersonalityRelationService,
   ) {}
 
-  async create(data: Partial<Personality>): Promise<Personality> {
-    const personality = this.em.create(Personality, {
-      ...data,
-      published: false,
-    });
+  async create(data: CreatePersonalityDto): Promise<Personality> {
+    const personality = new Personality();
+    Object.assign(personality, data);
     await this.em.persistAndFlush(personality);
     return personality;
   }
@@ -94,7 +93,7 @@ export class PersonalityService {
 
   async update(
     id: string,
-    data: Partial<Personality>,
+    data: UpdatePersonalityDto,
   ): Promise<Personality | null> {
     const personality = await this.findOne(id);
     if (!personality) return null;

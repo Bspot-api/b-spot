@@ -3,6 +3,7 @@ import { EntityManager } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { Brand } from './brand.entity';
+import { CreateBrandDto, UpdateBrandDto } from './brand.dto';
 
 @Injectable()
 export class BrandService {
@@ -27,13 +28,14 @@ export class BrandService {
     );
   }
 
-  async create(brandData: Partial<Brand>): Promise<Brand> {
-    const brand = this.brandRepository.create(brandData);
+  async create(brandData: CreateBrandDto): Promise<Brand> {
+    const brand = new Brand();
+    Object.assign(brand, brandData);
     await this.em.persistAndFlush(brand);
     return brand;
   }
 
-  async update(id: string, brandData: Partial<Brand>): Promise<Brand> {
+  async update(id: string, brandData: UpdateBrandDto): Promise<Brand> {
     const brand = await this.findOne(id);
     if (!brand) {
       throw new Error('Brand not found');

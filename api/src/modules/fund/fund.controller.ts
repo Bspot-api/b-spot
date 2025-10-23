@@ -13,6 +13,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AllowAnonymous, AuthGuard } from '@thallesp/nestjs-better-auth';
 import { Company } from '../company/company.entity';
 import { Fund } from './fund.entity';
+import { CreateFundDto, UpdateFundDto } from './fund.dto';
 import { FundService } from './fund.service';
 
 @ApiTags('funds')
@@ -22,7 +23,7 @@ export class FundController {
 
   @Post()
   @UseGuards(AuthGuard)
-  async create(@Body() data: Partial<Fund>) {
+  async create(@Body() data: CreateFundDto) {
     return this.service.create(data);
   }
 
@@ -53,7 +54,7 @@ export class FundController {
 
   @Put(':id')
   @UseGuards(AuthGuard)
-  async update(@Param('id') id: string, @Body() data: Partial<Fund>) {
+  async update(@Param('id') id: string, @Body() data: UpdateFundDto) {
     const fund = await this.service.update(id, data);
     if (!fund) throw new NotFoundException('Fund not found');
     return fund;

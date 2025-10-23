@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { Request, Response } from 'express';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -43,7 +44,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   // Expose OpenAPI JSON for type generation
-  app.use('/api-json', (req, res) => {
+  app.use('/api-json', (_req: Request, res: Response) => {
     res.json(document);
   });
 

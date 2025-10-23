@@ -13,6 +13,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AllowAnonymous, AuthGuard } from '@thallesp/nestjs-better-auth';
 import { Company } from '../company/company.entity';
 import { Sector } from './sector.entity';
+import { CreateSectorDto, UpdateSectorDto } from './sector.dto';
 import { SectorService } from './sector.service';
 
 @ApiTags('sectors')
@@ -22,7 +23,7 @@ export class SectorController {
 
   @Post()
   @UseGuards(AuthGuard)
-  async create(@Body() data: Partial<Sector>) {
+  async create(@Body() data: CreateSectorDto) {
     return this.service.create(data);
   }
 
@@ -53,7 +54,7 @@ export class SectorController {
 
   @Put(':id')
   @UseGuards(AuthGuard)
-  async update(@Param('id') id: string, @Body() data: Partial<Sector>) {
+  async update(@Param('id') id: string, @Body() data: UpdateSectorDto) {
     const sector = await this.service.update(id, data);
     if (!sector) throw new NotFoundException('Sector not found');
     return sector;

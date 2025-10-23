@@ -1,6 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CompanyDto } from '../company/company.dto';
 
+export class CreateFundDto {
+  @ApiProperty({ description: 'Fund name' })
+  name: string;
+
+  @ApiProperty({ description: 'Fund description' })
+  description: string;
+}
+
+export class UpdateFundDto {
+  @ApiProperty({ description: 'Fund name', required: false })
+  name?: string;
+
+  @ApiProperty({ description: 'Fund description', required: false })
+  description?: string;
+}
+
 export class FundDto {
   @ApiProperty()
   id: string;
