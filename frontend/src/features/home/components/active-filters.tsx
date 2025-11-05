@@ -13,6 +13,7 @@ interface ActiveFiltersProps {
   onSectorIdsChange: (sectorIds: string[]) => void;
   onFundIdsChange: (fundIds: string[]) => void;
   onPersonalityIdsChange: (personalityIds: string[]) => void;
+  onClearAll?: () => void;
 }
 
 export function ActiveFilters({
@@ -24,6 +25,7 @@ export function ActiveFilters({
   onSectorIdsChange,
   onFundIdsChange,
   onPersonalityIdsChange,
+  onClearAll,
 }: ActiveFiltersProps) {
   const { t } = useTranslation();
   const client = useApiClient();
@@ -54,10 +56,14 @@ export function ActiveFilters({
   }
 
   const clearAllFilters = () => {
-    onSearchChange('');
-    onSectorIdsChange([]);
-    onFundIdsChange([]);
-    onPersonalityIdsChange([]);
+    if (onClearAll) {
+      onClearAll();
+    } else {
+      onSearchChange('');
+      onSectorIdsChange([]);
+      onFundIdsChange([]);
+      onPersonalityIdsChange([]);
+    }
   };
 
   const removeSector = (sectorId: string) => {

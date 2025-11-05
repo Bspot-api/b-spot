@@ -23,14 +23,15 @@ export interface CompaniesGridProps {
   onFundIdsChange: (fundIds: string[]) => void
   currentPersonalityIds: string[]
   onPersonalityIdsChange: (personalityIds: string[]) => void
+  onClearAllFilters?: () => void
   isLoading?: boolean
   isFetchingNextPage?: boolean
   hasNextPage?: boolean
   fetchNextPage?: () => void
 }
 
-export function CompaniesGrid({ 
-  companies, 
+export function CompaniesGrid({
+  companies,
   currentSearch,
   onSearchChange,
   currentSectorIds,
@@ -39,6 +40,7 @@ export function CompaniesGrid({
   onFundIdsChange,
   currentPersonalityIds,
   onPersonalityIdsChange,
+  onClearAllFilters,
   isLoading = false,
   isFetchingNextPage = false,
   hasNextPage = false,
@@ -111,6 +113,7 @@ export function CompaniesGrid({
         onSectorIdsChange={onSectorIdsChange}
         onFundIdsChange={onFundIdsChange}
         onPersonalityIdsChange={onPersonalityIdsChange}
+        onClearAll={onClearAllFilters}
       />
       
       {/* Companies Grid */}

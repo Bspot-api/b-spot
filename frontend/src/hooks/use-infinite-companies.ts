@@ -46,32 +46,26 @@ export function useInfiniteCompanies(
 
 // Hook for infinite scroll state management with URL sync
 export function useInfiniteCompaniesPagination() {
-  const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  
-  // Get current values from URL params or use defaults with proper fallbacks
-  const currentSearch = searchParams.get('search') || '';
-  const currentSectorIds = searchParams.get('sectorIds')?.split(',').filter(Boolean) || [];
-  const currentFundIds = searchParams.get('fundIds')?.split(',').filter(Boolean) || [];
-  const currentPersonalityIds = searchParams.get('personalityIds')?.split(',').filter(Boolean) || [];
-  
-  const [search, setSearch] = React.useState(currentSearch);
-  const [sectorIds, setSectorIds] = React.useState<string[]>(currentSectorIds);
-  const [fundIds, setFundIds] = React.useState<string[]>(currentFundIds);
-  const [personalityIds, setPersonalityIds] = React.useState<string[]>(currentPersonalityIds);
+
+  // Get current values from URL params - URL is the single source of truth
+  const search = searchParams.get('search') || '';
+  const sectorIds = searchParams.get('sectorIds')?.split(',').filter(Boolean) || [];
+  const fundIds = searchParams.get('fundIds')?.split(',').filter(Boolean) || [];
+  const personalityIds = searchParams.get('personalityIds')?.split(',').filter(Boolean) || [];
+
   const [isInitialized, setIsInitialized] = React.useState(false);
-  
-  const { 
-    data, 
-    isLoading, 
-    error, 
-    isFetching, 
+
+  const {
+    data,
+    isLoading,
+    error,
+    isFetching,
     isFetchingNextPage,
     hasNextPage,
-    fetchNextPage 
+    fetchNextPage
   } = useInfiniteCompanies(
-    search, 
+    search,
     sectorIds.length > 0 ? sectorIds : undefined,
     fundIds.length > 0 ? fundIds : undefined,
     personalityIds.length > 0 ? personalityIds : undefined
@@ -89,57 +83,60 @@ export function useInfiniteCompaniesPagination() {
     }
   }, [data, isInitialized]);
 
-  // Update URL params when state changes
+  // Update URL params - single source of truth
   const updateURLParams = React.useCallback((
     newSearch: string,
     newSectorIds: string[],
     newFundIds: string[],
     newPersonalityIds: string[]
   ) => {
+    const hasAnyFilters = newSearch || newSectorIds.length > 0 || newFundIds.length > 0 || newPersonalityIds.length > 0;
+
+    if (!hasAnyFilters) {
+      setSearchParams({}, { replace: true });
+      return;
+    }
+
     const params = new URLSearchParams();
     if (newSearch) params.set('search', newSearch);
     if (newSectorIds.length > 0) params.set('sectorIds', newSectorIds.join(','));
     if (newFundIds.length > 0) params.set('fundIds', newFundIds.join(','));
     if (newPersonalityIds.length > 0) params.set('personalityIds', newPersonalityIds.join(','));
-    
+
     setSearchParams(params, { replace: true });
   }, [setSearchParams]);
 
-  // Sync URL params with state when URL changes
-  React.useEffect(() => {
-    if (currentSearch !== search) {
-      setSearch(currentSearch);
-    }
-    if (JSON.stringify(currentSectorIds) !== JSON.stringify(sectorIds)) {
-      setSectorIds(currentSectorIds);
-    }
-    if (JSON.stringify(currentFundIds) !== JSON.stringify(fundIds)) {
-      setFundIds(currentFundIds);
-    }
-    if (JSON.stringify(currentPersonalityIds) !== JSON.stringify(personalityIds)) {
-      setPersonalityIds(currentPersonalityIds);
-    }
-  }, [currentSearch, currentSectorIds, currentFundIds, currentPersonalityIds, search, sectorIds, fundIds, personalityIds]);
+  const updateSearch = React.useCallback((newSearch: string) => {
+    const currentSectorIds = searchParams.get('sectorIds')?.split(',').filter(Boolean) || [];
+    const currentFundIds = searchParams.get('fundIds')?.split(',').filter(Boolean) || [];
+    const currentPersonalityIds = searchParams.get('personalityIds')?.split(',').filter(Boolean) || [];
+    updateURLParams(newSearch, currentSectorIds, currentFundIds, currentPersonalityIds);
+  }, [updateURLParams, searchParams]);
 
-  const updateSearch = (newSearch: string) => {
-    setSearch(newSearch);
-    updateURLParams(newSearch, sectorIds, fundIds, personalityIds);
-  };
+  const updateSectorIds = React.useCallback((newSectorIds: string[]) => {
+    const currentSearch = searchParams.get('search') || '';
+    const currentFundIds = searchParams.get('fundIds')?.split(',').filter(Boolean) || [];
+    const currentPersonalityIds = searchParams.get('personalityIds')?.split(',').filter(Boolean) || [];
+    updateURLParams(currentSearch, newSectorIds, currentFundIds, currentPersonalityIds);
+  }, [updateURLParams, searchParams]);
 
-  const updateSectorIds = (newSectorIds: string[]) => {
-    setSectorIds(newSectorIds);
-    updateURLParams(search, newSectorIds, fundIds, personalityIds);
-  };
+  const updateFundIds = React.useCallback((newFundIds: string[]) => {
+    const currentSearch = searchParams.get('search') || '';
+    const currentSectorIds = searchParams.get('sectorIds')?.split(',').filter(Boolean) || [];
+    const currentPersonalityIds = searchParams.get('personalityIds')?.split(',').filter(Boolean) || [];
+    updateURLParams(currentSearch, currentSectorIds, newFundIds, currentPersonalityIds);
+  }, [updateURLParams, searchParams]);
 
-  const updateFundIds = (newFundIds: string[]) => {
-    setFundIds(newFundIds);
-    updateURLParams(search, sectorIds, newFundIds, personalityIds);
-  };
+  const updatePersonalityIds = React.useCallback((newPersonalityIds: string[]) => {
+    const currentSearch = searchParams.get('search') || '';
+    const currentSectorIds = searchParams.get('sectorIds')?.split(',').filter(Boolean) || [];
+    const currentFundIds = searchParams.get('fundIds')?.split(',').filter(Boolean) || [];
+    updateURLParams(currentSearch, currentSectorIds, currentFundIds, newPersonalityIds);
+  }, [updateURLParams, searchParams]);
 
-  const updatePersonalityIds = (newPersonalityIds: string[]) => {
-    setPersonalityIds(newPersonalityIds);
-    updateURLParams(search, sectorIds, fundIds, newPersonalityIds);
-  };
+  const clearAllFilters = React.useCallback(() => {
+    setSearchParams({}, { replace: true });
+  }, [setSearchParams]);
 
   return {
     companies,
@@ -155,6 +152,7 @@ export function useInfiniteCompaniesPagination() {
     updateSectorIds,
     updateFundIds,
     updatePersonalityIds,
+    clearAllFilters,
     hasNextPage: hasNextPage ?? false,
     fetchNextPage
   };

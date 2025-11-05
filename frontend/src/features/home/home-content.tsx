@@ -15,6 +15,7 @@ export function HomeContent() {
     updateSectorIds,
     updateFundIds,
     updatePersonalityIds,
+    clearAllFilters,
     isFetching,
     isFetchingNextPage,
     hasNextPage,
@@ -36,9 +37,9 @@ export function HomeContent() {
   return (
     <div className="container mx-auto py-10 lg:px-0">
       <h1 className="text-3xl font-bold mb-8">{t('companies.title')}</h1>
-      
-      <CompaniesGrid 
-        companies={companies} 
+
+      <CompaniesGrid
+        companies={companies}
         currentSearch={search}
         onSearchChange={updateSearch}
         currentSectorIds={sectorIds}
@@ -47,6 +48,7 @@ export function HomeContent() {
         onFundIdsChange={updateFundIds}
         currentPersonalityIds={personalityIds}
         onPersonalityIdsChange={updatePersonalityIds}
+        onClearAllFilters={clearAllFilters}
         isLoading={isLoading}
         isFetchingNextPage={isFetchingNextPage}
         hasNextPage={hasNextPage}
