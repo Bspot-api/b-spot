@@ -1,10 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/shadcn/card"
 import { FundsSection } from "@/features/fund/components/funds-section"
-import { RelationBadge } from "@/features/home/components/relation-badge"
 import { RelatedPersonalitiesSection } from "@/features/personality/components/related-personalities-section"
 import { SectorsSection } from "@/features/sector/components/sectors-section"
 import type { Company } from "@/types/relation"
-import { ArrowLeft, Calendar, ExternalLink, Tag } from "lucide-react"
+import { ArrowLeft, Calendar, ExternalLink } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { Link } from "react-router-dom"
 
@@ -66,24 +65,6 @@ export function CompanyDetail({ company }: CompanyDetailProps) {
           </CardContent>
         </Card>
 
-        {/* Relation Matches Card (if filters active) */}
-        {company.matchedVia && company.matchedVia.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl flex items-center gap-2">
-                <Tag className="h-5 w-5" />
-{t('details.matchedRelations')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {company.matchedVia.map((match, index) => (
-                  <RelationBadge key={`${match.filterId}-${index}`} match={match} />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
         <FundsSection funds={company.funds || []} />
         <SectorsSection sectors={company.sectors || []} />

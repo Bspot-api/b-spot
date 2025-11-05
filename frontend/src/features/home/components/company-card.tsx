@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import type { Company } from "@/types/relation"
 import { useTranslation } from "react-i18next"
 import { Link } from "react-router-dom"
-import { RelationBadge } from "./relation-badge"
 
 interface CompanyCardProps {
   company: Company
@@ -27,20 +26,6 @@ export function CompanyCard({ company }: CompanyCardProps) {
       </CardHeader>
       
       <CardContent className="space-y-3">
-        {/* Relation matches - shown when filters are active */}
-        {company.matchedVia && company.matchedVia.length > 0 && (
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-gray-700">
-              {t('details.matchedVia')}
-            </p>
-            <div className="flex flex-wrap gap-1">
-              {company.matchedVia.map((match, index) => (
-                <RelationBadge key={`${match.filterId}-${index}`} match={match} />
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Sectors only */}
         {company.sectors && company.sectors.length > 0 ? (
           <div className="space-y-2">
