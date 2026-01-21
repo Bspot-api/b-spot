@@ -28,10 +28,10 @@ B-Spot is a mobile application (similar to Yuka) that empowers consumers to unde
 ### Project Setup
 
 - `pnpm install` - Install all dependencies for monorepo
-- `cp api/.env.example api/.env` - Set up API environment variables
-- `cp mobile/.env.example mobile/.env` - Set up mobile environment variables
+- `cp apps/api/.env.example apps/api/.env` - Set up API environment variables
+- `cp apps/mobile/.env.example apps/mobile/.env` - Set up mobile environment variables
 - `pnpm db:up` - Start PostgreSQL database with Docker
-- `cd api && pnpm migration:up` - Run database migrations
+- `cd apps/api && pnpm migration:up` - Run database migrations
 
 ### Development
 
@@ -42,23 +42,23 @@ B-Spot is a mobile application (similar to Yuka) that empowers consumers to unde
 
 ### Mobile Development (Expo)
 
-- `cd mobile && pnpm start` - Start Expo development server
-- `cd mobile && pnpm android` - Run on Android emulator/device
-- `cd mobile && pnpm ios` - Run on iOS simulator/device (macOS only)
-- `cd mobile && pnpm web` - Run in web browser (for quick testing)
-- `cd mobile && eas build --platform android` - Build Android APK with EAS
-- `cd mobile && eas build --platform ios` - Build iOS app with EAS
+- `cd apps/mobile && pnpm start` - Start Expo development server
+- `cd apps/mobile && pnpm android` - Run on Android emulator/device
+- `cd apps/mobile && pnpm ios` - Run on iOS simulator/device (macOS only)
+- `cd apps/mobile && pnpm web` - Run in web browser (for quick testing)
+- `cd apps/mobile && eas build --platform android` - Build Android APK with EAS
+- `cd apps/mobile && eas build --platform ios` - Build iOS app with EAS
 
 ### Database Management
 
 - `pnpm db:up` - Start PostgreSQL container
 - `pnpm db:down` - Stop PostgreSQL container
 - `pnpm db:logs` - View PostgreSQL logs
-- `cd api && pnpm migration:create` - Create new database migration
-- `cd api && pnpm migration:up` - Apply pending migrations
-- `cd api && pnpm migration:down` - Rollback last migration
-- `cd api && pnpm seed` - Seed database with initial data
-- `cd api && pnpm seed:clear` - Clear database and reseed
+- `cd apps/api && pnpm migration:create` - Create new database migration
+- `cd apps/api && pnpm migration:up` - Apply pending migrations
+- `cd apps/api && pnpm migration:down` - Rollback last migration
+- `cd apps/api && pnpm seed` - Seed database with initial data
+- `cd apps/api && pnpm seed:clear` - Clear database and reseed
 
 ### Build & Test
 
@@ -67,18 +67,18 @@ B-Spot is a mobile application (similar to Yuka) that empowers consumers to unde
 - `pnpm build:api` - Build NestJS API
 - `pnpm test` - Run tests for all packages
 - `pnpm lint` - Run ESLint for all packages
-- `cd api && pnpm test:watch` - Run API tests in watch mode
-- `cd api && pnpm test:e2e` - Run API end-to-end tests
-- `cd api && pnpm test:cov` - Run API tests with coverage
-- `cd mobile && pnpm test` - Run mobile tests with Jest
+- `cd apps/api && pnpm test:watch` - Run API tests in watch mode
+- `cd apps/api && pnpm test:e2e` - Run API end-to-end tests
+- `cd apps/api && pnpm test:cov` - Run API tests with coverage
+- `cd apps/mobile && pnpm test` - Run mobile tests with Jest
 
 ## Architecture Overview
 
 ### Monorepo Structure
 
-This is a pnpm workspace monorepo with two main packages:
-- **api/**: NestJS backend with PostgreSQL and MikroORM
-- **mobile/**: Expo (React Native) mobile application
+This is a pnpm workspace monorepo with two main packages in `apps/`:
+- **apps/api/**: NestJS backend with PostgreSQL and MikroORM
+- **apps/mobile/**: Expo (React Native) mobile application
 
 ### Backend (NestJS API)
 
@@ -119,10 +119,10 @@ This is a pnpm workspace monorepo with two main packages:
 
 ### Key Configuration Files
 
-- `mikro-orm.config.ts` - Database ORM configuration
-- `pnpm-workspace.yaml` - Monorepo workspace definition
-- `mobile/app.json` - Expo configuration
-- `mobile/eas.json` - EAS Build configuration
+- `apps/api/mikro-orm.config.ts` - Database ORM configuration
+- `pnpm-workspace.yaml` - Monorepo workspace definition (apps/*)
+- `apps/mobile/app.json` - Expo configuration
+- `apps/mobile/eas.json` - EAS Build configuration
 - API uses standard NestJS configuration with Swagger/OpenAPI
 
 ### Database Schema
@@ -184,7 +184,7 @@ Mobile types are auto-generated from the API's OpenAPI schema:
 1. API changes trigger OpenAPI schema updates
 2. Run `pnpm generate:types` to regenerate mobile client hooks
 3. Mobile uses type-safe API client with TanStack Query integration
-4. Generated files are in `mobile/src/api/`
+4. Generated files are in `apps/mobile/src/api/`
 
 ## Important Notes
 

@@ -15,26 +15,26 @@
 pnpm install
 ```
 
-This installs all dependencies for both `api/` and `mobile/` packages.
+This installs all dependencies for both `apps/api/` and `apps/mobile/` packages.
 
 ### 2. Configure Environment Variables
 
 **API Environment:**
 ```bash
-cp api/.env.example api/.env
+cp apps/api/.env.example apps/api/.env
 ```
 
-Edit `api/.env` and configure:
+Edit `apps/api/.env` and configure:
 - Database credentials
 - Pappers API key (get 250 free calls/month at pappers.fr)
 - SMTP credentials for admin alerts
 
 **Mobile Environment:**
 ```bash
-cp mobile/.env.example mobile/.env
+cp apps/mobile/.env.example apps/mobile/.env
 ```
 
-Edit `mobile/.env` and configure:
+Edit `apps/mobile/.env` and configure:
 - API URL (default: http://localhost:3000)
 
 ### 3. Start PostgreSQL Database
@@ -51,7 +51,7 @@ pnpm db:logs
 ### 4. Run Database Migrations
 
 ```bash
-cd api && pnpm migration:up
+cd apps/api && pnpm migration:up
 ```
 
 ### 5. Start Development Servers
@@ -97,23 +97,24 @@ Expected response:
 
 ```
 b-spot/
-├── api/                    # NestJS backend
-│   ├── src/
-│   │   ├── main.ts        # API entry point
-│   │   ├── app.module.ts  # Root module
-│   │   └── modules/       # Feature modules
-│   ├── mikro-orm.config.ts
-│   └── package.json
-├── mobile/                 # Expo React Native app
-│   ├── app/               # Expo Router routes
-│   │   ├── _layout.tsx    # Root layout
-│   │   ├── (tabs)/        # Tab navigation
-│   │   └── company/       # Company details
-│   ├── src/
-│   │   ├── api/           # API client
-│   │   ├── components/    # Reusable components
-│   │   └── store/         # Zustand stores
-│   └── package.json
+├── apps/
+│   ├── api/                # NestJS backend
+│   │   ├── src/
+│   │   │   ├── main.ts    # API entry point
+│   │   │   ├── app.module.ts  # Root module
+│   │   │   └── modules/   # Feature modules
+│   │   ├── mikro-orm.config.ts
+│   │   └── package.json
+│   └── mobile/             # Expo React Native app
+│       ├── app/            # Expo Router routes
+│       │   ├── _layout.tsx    # Root layout
+│       │   ├── (tabs)/    # Tab navigation
+│       │   └── company/   # Company details
+│       ├── src/
+│       │   ├── api/       # API client
+│       │   ├── components/    # Reusable components
+│       │   └── store/     # Zustand stores
+│       └── package.json
 ├── docker-compose.yml      # PostgreSQL container
 └── pnpm-workspace.yaml    # Monorepo config
 ```
@@ -132,12 +133,12 @@ pnpm db:logs
 
 Clear cache:
 ```bash
-cd mobile && rm -rf .expo node_modules && pnpm install && pnpm start --clear
+cd apps/mobile && rm -rf .expo node_modules && pnpm install && pnpm start --clear
 ```
 
 ### API Port Already in Use
 
-Change port in `api/.env`:
+Change port in `apps/api/.env`:
 ```
 PORT=3001
 ```
@@ -145,7 +146,7 @@ PORT=3001
 ## Next Steps
 
 After completing Phase 1 setup:
-1. Seed brand data (see `api/src/seeders/`)
+1. Seed brand data (see `apps/api/src/seeders/`)
 2. Test Pappers API integration
 3. Implement barcode scanner UI
 4. Test end-to-end scan flow

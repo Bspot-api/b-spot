@@ -18,7 +18,7 @@ importers:
         specifier: ^5.0.0
         version: 5.9.3
 
-  api:
+  apps/api:
     dependencies:
       '@mikro-orm/core':
         specifier: ^6.4.16
@@ -133,7 +133,7 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
 
-  mobile:
+  apps/mobile:
     dependencies:
       '@expo/vector-icons':
         specifier: ^14.0.0
