@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "B-Spot",
+    "slug": "b-spot",
+    "version": "2.0.0-alpha.1",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.bspot.mobile",
+      "infoPlist": {
+        "NSCameraUsageDescription": "B-Spot needs access to your camera to scan product barcodes."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.bspot.mobile",
+      "permissions": [
+        "CAMERA"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow B-Spot to access your camera to scan product barcodes."
+        }
+      ]
+    ],
+    "scheme": "bspot",
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

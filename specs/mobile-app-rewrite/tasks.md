@@ -83,54 +83,54 @@
 
 ### Monorepo Setup
 
-- [ ] T001 Initialize pnpm workspace structure
+- [X] T001 Initialize pnpm workspace structure
   - Create `api/` and `mobile/` directories
   - Update `pnpm-workspace.yaml`
   - Create root package.json scripts (dev, build, test)
 
-- [ ] T002 [P] Setup API package structure
+- [X] T002 [P] Setup API package structure
   - Create `api/package.json`
   - Install NestJS 10+ dependencies
   - Install MikroORM 6+ with PostgreSQL driver
   - Install Zod, Nodemailer, @nestjs/swagger
   - Create `api/tsconfig.json` with strict mode
 
-- [ ] T003 [P] Setup Mobile package structure
+- [X] T003 [P] Setup Mobile package structure
   - Initialize Expo project in `mobile/`
   - Install Expo SDK ~52.0
   - Install Expo Router, NativeWind, Zustand, TanStack Query
-  - Install expo-barcode-scanner, Lucide React Native
+  - Install expo-camera, Lucide React Native
   - Create `mobile/tsconfig.json` with strict mode
 
 ### Database Setup
 
-- [ ] T004 Create docker-compose.yml for PostgreSQL
+- [X] T004 Create docker-compose.yml for PostgreSQL
   - PostgreSQL 15+ service
   - Environment variables for credentials
   - Volume for data persistence
   - Expose port 5432
 
-- [ ] T005 Configure MikroORM
+- [X] T005 Configure MikroORM
   - Create `api/mikro-orm.config.ts`
   - Configure PostgreSQL connection
   - Set up migrations directory: `api/src/migrations/`
   - Set up seeders directory: `api/src/seeders/`
 
-- [ ] T006 Create initial database migration
+- [X] T006 Create initial database migration
   - Run `pnpm migration:create` to generate initial migration
   - Verify migration structure
   - Test: `pnpm db:up && pnpm migration:up`
 
 ### API Foundation
 
-- [ ] T007 [P] Setup NestJS application structure
+- [X] T007 [P] Setup NestJS application structure
   - Create `api/src/main.ts` with NestJS bootstrap
   - Create `api/src/app.module.ts`
   - Configure CORS for mobile access
   - Configure Swagger/OpenAPI at `/api` endpoint
   - Add global validation pipe (Zod)
 
-- [ ] T008 [P] Create Health module
+- [X] T008 [P] Create Health module
   - Create `api/src/modules/health/health.controller.ts`
   - Implement `GET /health` endpoint
   - Return { status: 'ok', timestamp, version }
@@ -138,23 +138,24 @@
 
 ### Mobile Foundation
 
-- [ ] T009 [P] Setup Expo Router file-based routing
+- [X] T009 [P] Setup Expo Router file-based routing
   - Create `mobile/app/_layout.tsx` (root layout)
   - Create `mobile/app/(tabs)/_layout.tsx` (tab navigation)
   - Create `mobile/app/(tabs)/index.tsx` (home/scanner screen)
   - Create `mobile/app/company/[id].tsx` (company detail)
   - Create `mobile/app/+not-found.tsx`
 
-- [ ] T010 [P] Configure NativeWind (Tailwind for RN)
+- [X] T010 [P] Configure NativeWind (Tailwind for RN)
   - Install and configure NativeWind
   - Create `mobile/tailwind.config.js`
   - Test styling with basic Text component
   - Verify hot reload works
 
-- [ ] T011 [P] Setup TanStack Query client
-  - Create `mobile/src/lib/queryClient.ts`
+- [X] T011 [P] Setup TanStack Query client
+  - Create `mobile/src/api/query-client.ts`
   - Configure default options (staleTime, retry, etc.)
   - Wrap app with QueryClientProvider in `_layout.tsx`
+  - Configure AsyncStorage persister for offline support
 
 **Checkpoint**: Foundation ready - feature implementation can now begin
 

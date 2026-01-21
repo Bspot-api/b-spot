@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Native
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.keystore
+!debug.keystore
+
+# Metro
+.metro-health-check*
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Debug
+yarn-debug.log*
+yarn-error.log*
+
+# macOS
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
