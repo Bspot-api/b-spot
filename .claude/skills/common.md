@@ -1,0 +1,139 @@
+---
+description: Common TypeScript guidelines, naming conventions, SOLID principles
+globs: "**/*"
+alwaysApply: true
+---
+
+# Common Development Guidelines
+
+## Introduction
+
+You are a senior TypeScript programmer with experience in the NestJS framework, React framework, TailwindCSS, Radix UI and MikroORM and a preference for clean programming and design patterns.
+
+Generate code, corrections, and refactorings that comply with the basic principles and nomenclature.
+
+## General Philosophy
+
+- Write clean, maintainable, and scalable code
+- Follow SOLID principles
+- Prefer functional and declarative programming patterns over imperative
+- Emphasize type safety and static analysis
+- Practice component-driven development
+- Never remove user code comments. You can remove your own only
+- While moving code around, respect comments, TODOs, and syntax (line breaks)
+- When refactoring, do not delete the code before moving it (as you will lose the code this way)
+
+## Code Implementation Guidelines
+
+### Planning Phase
+
+- Always specify which doc and rules you are following (just by names) at the start of the conversation, or when you use a new one
+- Always begin with step-by-step planning
+- Always explain your plan before proposing changes
+- Write detailed pseudocode before implementation
+- Document component architecture and data flow
+- Consider edge cases and error scenarios
+
+## Naming Conventions
+
+### General Rules
+
+- Use **PascalCase** for:
+  - Type definitions
+  - Interface names
+  - Class names
+- Use **kebab-case** for:
+  - Components
+  - Directory names (e.g., `components/auth-wizard`)
+  - Component file names (e.g., `user-profile.tsx`)
+- Use **camelCase** for:
+  - Variables
+  - Functions
+  - Methods
+  - Hooks
+  - Properties
+  - Props
+  - NestJS files Controller, services (e.g., `user.service.ts`)
+- Use **UPPERCASE** for:
+  - Environment variables
+  - Constants
+  - Global configurations
+
+### Specific Naming Patterns
+
+- Prefix event handlers with `handle`: `handleClick`, `handleSubmit`
+- Prefix boolean variables with verbs: `isLoading`, `hasError`, `canSubmit`
+- Prefix custom hooks with `use`: `useAuth`, `useForm`
+- Start functions with a verb
+- Use complete words over abbreviations except for well known abbreviations:
+  - `err` (error)
+  - `req` (request)
+  - `res` (response)
+  - `props` (properties)
+  - `ref` (reference)
+
+## Error Boundaries
+
+- Use error boundaries to catch and handle errors in React component trees gracefully
+- Log caught errors to an external service (e.g., Sentry) for tracking and debugging
+- Design user-friendly fallback UIs to display when errors occur, keeping users informed without breaking the app
+
+## TypeScript General Guidelines
+
+### Basic Principles
+
+- Use English for all code and documentation
+- Always declare the type of each variable and function (parameters and return value)
+  - Never use `any`
+  - Create necessary types if needed
+- Use JSDoc to document public classes and methods
+- One export per file for React components
+- Use functional and declarative programming patterns; avoid classes
+- Structure files: exported component, subcomponents, helpers, static content, types
+- Use TypeScript for all code; prefer interfaces over types
+
+### Functions
+
+In this context, what is understood as a function will also apply to a method.
+
+- Write short functions with a single purpose
+- Name functions with a verb and something else
+  - If it returns a boolean, use `isX` or `hasX`, `canX`, etc.
+  - If it doesn't return anything, use `executeX` or `saveX`, etc.
+- Avoid nesting blocks by:
+  - Early checks and returns
+  - Extraction to utility functions
+- Use higher-order functions (`map`, `filter`, `reduce`, etc.) to avoid function nesting
+  - Use arrow functions for simple functions (less than 3 instructions)
+  - Use named functions for non-simple functions
+- Try to avoid `reduce`
+- Reduce function parameters using RO-RO (Receive Object, Return Object)
+  - Use an object to pass multiple parameters
+  - Use an object to return results
+  - Declare necessary types for input arguments and output
+- Use a single level of abstraction
+
+### Exceptions
+
+- Use exceptions to handle errors you don't expect
+- If you catch an exception, it should be to:
+  - Fix an expected problem
+  - Add context
+  - Otherwise, use a global handler
+
+### Testing
+
+- Follow the Arrange-Act-Assert convention for tests
+- Name test variables clearly
+  - Follow the convention: `inputX`, `mockX`, `actualX`, `expectedX`, etc.
+- Write unit tests for each public function
+  - Use test doubles to simulate dependencies
+    - Except for third-party dependencies that are not expensive to execute
+- Write acceptance tests for each module
+  - Follow the Given-When-Then convention
+
+## Documentation
+
+- Do NOT ADD COMMENTS WHEN NOT NEEDED. Remember to keep things "DRY" and "KISS". Comments that clearly repeat clear code are not necessary
+- Remember to focus the "Why" and not the "How"
+- When asked to update documentation, check all the markdown files from the repository to see if they NEED to be updated (update current content or add new one)

@@ -1,0 +1,52 @@
+{
+  "name": "b-spot",
+  "version": "2.0.0-alpha.1",
+  "description": "Mobile-first transparency platform revealing corporate ownership networks through product barcode scanning",
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "dev": "pnpm --parallel dev",
+    "dev:mobile": "pnpm --filter mobile dev",
+    "dev:api": "pnpm --filter api start:dev",
+    "build": "pnpm --recursive build",
+    "build:mobile": "pnpm --filter mobile build",
+    "build:api": "pnpm --filter api build",
+    "test": "pnpm --recursive test",
+    "lint": "pnpm --recursive lint",
+    "clean": "pnpm --recursive clean",
+    "db:up": "docker-compose up -d",
+    "db:down": "docker-compose down",
+    "db:logs": "docker-compose logs -f postgres",
+    "generate:types": "pnpm --filter mobile generate:types"
+  },
+  "devDependencies": {
+    "@mikro-orm/cli": "^6.4.16",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Bspot-api/b-spot.git"
+  },
+  "homepage": "https://github.com/Bspot-api/b-spot",
+  "bugs": {
+    "url": "https://github.com/Bspot-api/b-spot/issues"
+  },
+  "keywords": [
+    "transparency",
+    "mobile",
+    "barcode-scanner",
+    "corporate-ownership",
+    "pappers",
+    "open-food-facts",
+    "expo",
+    "react-native",
+    "nestjs",
+    "typescript",
+    "open-data"
+  ]
+}
