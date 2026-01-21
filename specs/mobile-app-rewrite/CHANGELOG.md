@@ -4,6 +4,29 @@ All notable changes to this feature specification are documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/)
 
+## [2026-01-21 12:30] - /speckit.tasks
+### Added
+- Task breakdown: 86 detailed tasks organized in 11 phases
+- Research phase: 7 tasks (Pappers API, Open Food Facts, brand seed data)
+- Setup phase: 11 tasks (monorepo, database, API/mobile foundation)
+- Backend phases: 31 tasks (caching, data layer, scan endpoint)
+- Mobile phases: 17 tasks (scanner UI, company detail, offline support)
+- Testing & deployment: 16 tasks (integration tests, E2E, Docker, EAS Build)
+- **Author**: AI (Claude)
+- **Files**: tasks.md
+
+## [2026-01-21 12:20] - /speckit.plan
+### Added
+- Technical implementation plan with complete architecture
+- Constitution check: all 6 principles validated
+- Phase 0 research tasks (7 unknowns to resolve)
+- Phase 1 design: 6 database entities, OpenAPI contracts
+- Phase 2 task categories: 11 groups organized by user story
+- Project structure: monorepo with api/ and mobile/ packages
+- Complexity tracking and mitigation strategies
+- **Author**: AI (Claude)
+- **Files**: plan.md
+
 ## [2026-01-21 11:45] - /speckit.clarify
 ### Changed
 - Clarified: Pas d'authentification pour le MVP (feature post-MVP)
