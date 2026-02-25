@@ -201,9 +201,6 @@ importers:
       expo-status-bar:
         specifier: ~3.0.0
         version: 3.0.9(react-native@0.79.2(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
-      lucide-react-native:
-        specifier: ^0.309.0
-        version: 0.309.0(react-native-svg@15.11.2(react-native@0.79.2(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.79.2(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
       nativewind:
         specifier: ^4.1.23
         version: 4.2.1(react-native-reanimated@3.19.5(@babel/core@7.28.6)(react-native@0.79.2(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native-safe-area-context@5.4.0(react-native@0.79.2(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native-svg@15.11.2(react-native@0.79.2(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.79.2(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@20.19.30)(typescript@5.9.3)))
@@ -4896,13 +4893,6 @@ packages:
   lru-cache@6.0.0:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
     engines: {node: '>=10'}
-
-  lucide-react-native@0.309.0:
-    resolution: {integrity: sha512-Lc+mkttinSJPydLu8FJNvNiJrJvFO54NQP5FlN3ZmVqRklQ6Y/vEXdAAoIlMDvccESwCvMCagQWqdtWWeS3TZw==}
-    peerDependencies:
-      react: ^16.5.1 || ^17.0.0 || ^18.0.0
-      react-native: '*'
-      react-native-svg: ^12.0.0 || ^13.0.0 || ^14.0.0
 
   magic-string@0.30.8:
     resolution: {integrity: sha512-ISQTe55T2ao7XtlAStud6qwYPZjE4GK1S/BeVPus4jrq6JuOnQ00YKQC581RWhR122W7msZV263KzVeLoqidyQ==}
@@ -13126,12 +13116,6 @@ snapshots:
   lru-cache@6.0.0:
     dependencies:
       yallist: 4.0.0
-
-  lucide-react-native@0.309.0(react-native-svg@15.11.2(react-native@0.79.2(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.79.2(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
-    dependencies:
-      react: 19.1.0
-      react-native: 0.79.2(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0)
-      react-native-svg: 15.11.2(react-native@0.79.2(@babel/core@7.28.6)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
 
   magic-string@0.30.8:
     dependencies:
