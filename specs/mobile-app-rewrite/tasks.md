@@ -349,17 +349,17 @@
 
 ### Scan Module
 
-- [ ] T036 [P] [US1] Create ScanModule structure
+- [X] T036 [P] [US1] Create ScanModule structure
   - File: `apps/api/src/modules/scan/scan.module.ts`
   - Import ProductService, CompanyService, BrandService
   - Export ScanService
 
-- [ ] T037 [US1] Create BrandService (helper for mapping)
+- [X] T037 [US1] Create BrandService (helper for mapping)
   - File: `apps/api/src/modules/brand/brand.service.ts`
   - Method: `async findBrandByName(name: string): Promise<Brand | null>`
   - Fuzzy matching logic for brand names
 
-- [ ] T038 [US1] Implement ScanService (orchestrator)
+- [X] T038 [US1] Implement ScanService (orchestrator)
   - File: `apps/api/src/modules/scan/scan.service.ts`
   - Method: `async scanProduct(barcode: string): Promise<ScanResultDTO>`
   - Logic:
@@ -372,26 +372,26 @@
     7. Call CompanyService.getOrCreateCompany(siren)
     8. Return ScanResultDTO: { product, company, dataFreshness }
 
-- [ ] T039 [P] [US1] Create ScanController
+- [X] T039 [P] [US1] Create ScanController
   - File: `apps/api/src/modules/scan/scan.controller.ts`
   - Endpoint: `POST /api/scan` (OpenAPI: scanProduct)
   - Body: `{ barcode: string }`
   - Response: ScanResultDTO or 404
 
-- [ ] T040 [US1] Generate OpenAPI schema
+- [X] T040 [US1] Generate OpenAPI schema
   - Run NestJS Swagger plugin
   - Export OpenAPI spec to `apps/api/openapi.json`
   - Verify contracts match `specs/mobile-app-rewrite/contracts/scan.openapi.yaml`
 
 ### Tests for Scan Endpoint
 
-- [ ] T041 [P] [US1] Write integration tests for ScanService
+- [X] T041 [P] [US1] Write integration tests for ScanService
   - File: `apps/api/src/modules/scan/__tests__/scan.service.spec.ts`
   - Test: scanProduct with valid barcode returns ScanResultDTO
   - Test: scanProduct with unknown barcode returns 404
   - Test: scanProduct with unknown brand returns error
 
-- [ ] T042 [P] [US1] Write E2E test for scan flow
+- [X] T042 [P] [US1] Write E2E test for scan flow
   - File: `apps/api/test/scan-flow.e2e-spec.ts`
   - Test: POST /api/scan with Nespresso barcode
   - Assert: Response contains Nestlé company data

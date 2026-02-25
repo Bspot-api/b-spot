@@ -4,6 +4,45 @@ All notable changes to this feature specification are documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/)
 
+## [2026-02-25 15:00] - /speckit.implement (Phase 4 Complete)
+### Completed
+- Phase 4: Backend Scan Endpoint — Orchestration & E2E Tests (7/7 tasks)
+  - T036: ScanModule (imports ProductModule, CompanyModule, Brand entity)
+  - T037: BrandService (exact match via `$ilike`, then partial/fuzzy fallback)
+  - T038: ScanService orchestrator (OFF → brand lookup → Pappers → ScanResultDto)
+  - T039: ScanController (`POST /api/scan`, body validation via class-validator)
+  - T040: OpenAPI generation script (`pnpm generate:openapi`), Swagger plugin in nest-cli.json
+  - T041: ScanService unit tests (5 tests — 404, no brand, no brand name, quota, happy path)
+  - T042: E2E tests for scan flow (5 tests — 201, 400 validation, 404, unavailable)
+
+### Added
+- `apps/api/src/modules/brand/brand.service.ts`
+- `apps/api/src/modules/scan/scan.module.ts`
+- `apps/api/src/modules/scan/scan.service.ts`
+- `apps/api/src/modules/scan/scan.controller.ts`
+- `apps/api/src/modules/scan/dto/scan.dto.ts`
+- `apps/api/src/modules/scan/__tests__/scan.service.spec.ts`
+- `apps/api/src/generate-openapi.ts`
+- `apps/api/test/scan-flow.e2e-spec.ts`
+- `class-validator` + `class-transformer` dependencies
+
+### Changed
+- `apps/api/src/app.module.ts` — ScanModule registered
+- `apps/api/package.json` — added `generate:openapi` script
+- `apps/api/nest-cli.json` — added `@nestjs/swagger` CLI plugin
+
+### Technical Notes
+- ScanResultDto uses `dataFreshness: 'fresh' | 'cached' | 'unavailable'` to signal data quality
+- Brand fuzzy matching: exact `$ilike` → partial containment scan of all brands
+- class-validator `@Length(8, 14)` validates EAN-8 to EAN-13 barcodes
+- `import request = require('supertest')` required (namespace import not callable)
+- 46 unit tests + 5 E2E tests = 51 tests total passing
+
+### Author
+AI (Claude Sonnet 4.6)
+
+---
+
 ## [2026-02-25 14:50] - /speckit.implement (Phase 3 Complete)
 ### Completed
 - Phase 3: Backend Data Layer — Entities, Modules, Tests (15/15 tasks)
