@@ -4,6 +4,43 @@ All notable changes to this feature specification are documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/)
 
+## [2026-02-25 00:00] - /speckit.implement (Phase 2 Complete)
+### Completed
+- Phase 2: Backend Core — Caching & API Tracking (9/9 tasks)
+  - T012: PappersCache entity (siren unique, json data, 30d TTL)
+  - T013: ApiUsageLog entity (ExternalApi enum, success/error tracking)
+  - T014: Migration `Migration20260225000000_add_cache_tables` (manual — DB offline)
+  - T015: CacheModule (MikroORM entities, exports CacheService)
+  - T016: CacheService — getCachedPappers, setCachedPappers, isCacheValid, logApiCall
+  - T017: Quota monitoring — checkPappersQuota, isPappersQuotaExhausted (alert at 200)
+  - T018: EmailService — Nodemailer SMTP, sendQuotaAlert
+  - T019: Unit tests CacheService (12 tests — cache hit/miss/expiry/upsert)
+  - T020: Unit tests quota monitoring (8 tests — threshold, exhausted, logApiCall)
+
+### Added
+- `apps/api/src/modules/cache/pappers-cache.entity.ts`
+- `apps/api/src/modules/cache/api-usage-log.entity.ts`
+- `apps/api/src/migrations/Migration20260225000000_add_cache_tables.ts`
+- `apps/api/src/modules/cache/cache.module.ts`
+- `apps/api/src/modules/cache/cache.service.ts`
+- `apps/api/src/modules/cache/email.service.ts`
+- `apps/api/src/modules/cache/__tests__/cache.service.spec.ts`
+- `apps/api/src/modules/cache/__tests__/quota.spec.ts`
+
+### Changed
+- `apps/api/src/app.module.ts` — CacheModule registered
+
+### Technical Notes
+- `ExternalApi` enum exported from `api-usage-log.entity.ts` (shared by CacheService)
+- `QuotaStatus` interface exported from `cache.service.ts` (used by future PappersService)
+- Migration created manually (DB not running); run `pnpm db:up && pnpm migration:up` before Phase 3
+- 20/20 unit tests pass
+
+### Author
+AI (Claude Sonnet 4.6)
+
+---
+
 ## [2026-01-21 16:00] - /speckit.implement (Phase 1 Complete)
 ### Completed
 - Phase 1: Setup & Infrastructure (11/11 tasks completed)

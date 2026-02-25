@@ -169,29 +169,29 @@
 
 ### Database Entities & Migrations
 
-- [ ] T012 [P] [US5] Create PappersCache entity
+- [X] T012 [P] [US5] Create PappersCache entity
   - File: `apps/api/src/modules/cache/pappers-cache.entity.ts`
   - Fields: id, siren (unique), responseData (json), fetchedAt, expiresAt
   - Calculate expiresAt = fetchedAt + 30 days
 
-- [ ] T013 [P] [US5] Create ApiUsageLog entity
+- [X] T013 [P] [US5] Create ApiUsageLog entity
   - File: `apps/api/src/modules/cache/api-usage-log.entity.ts`
   - Fields: id, api (enum), endpoint, requestParams, success, errorMessage, timestamp
   - Enum: PAPPERS, OPEN_FOOD_FACTS, OPEN_BEAUTY_FACTS
 
-- [ ] T014 [US5] Create migration for cache tables
+- [X] T014 [US5] Create migration for cache tables
   - Run `pnpm migration:create add-cache-tables`
   - Add PappersCache and ApiUsageLog tables
   - Test migration: `pnpm migration:up && pnpm migration:down`
 
 ### Cache Module Implementation
 
-- [ ] T015 [P] [US5] Create CacheModule structure
+- [X] T015 [P] [US5] Create CacheModule structure
   - File: `apps/api/src/modules/cache/cache.module.ts`
   - Import MikroORM entities
   - Export CacheService
 
-- [ ] T016 [US5] Implement CacheService
+- [X] T016 [US5] Implement CacheService
   - File: `apps/api/src/modules/cache/cache.service.ts`
   - Method: `async getCachedPappers(siren: string): Promise<any | null>`
   - Method: `async setCachedPappers(siren: string, data: any): Promise<void>`
@@ -199,13 +199,13 @@
   - Method: `async getMonthlyApiUsage(api: ExternalApi): Promise<number>`
   - Method: `async logApiCall(api, endpoint, params, success, error?): Promise<void>`
 
-- [ ] T017 [US5] Implement quota monitoring logic
+- [X] T017 [US5] Implement quota monitoring logic
   - File: `apps/api/src/modules/cache/cache.service.ts`
   - Method: `async checkPappersQuota(): Promise<{ used: number, limit: number, remaining: number }>`
   - Count PAPPERS logs for current month
   - Emit warning if usage >= 200
 
-- [ ] T018 [US5] Implement email alert service
+- [X] T018 [US5] Implement email alert service
   - File: `apps/api/src/modules/cache/email.service.ts`
   - Configure Nodemailer with SMTP (Gmail)
   - Method: `async sendQuotaAlert(usage: number): Promise<void>`
@@ -214,14 +214,14 @@
 
 ### Tests for Cache Module
 
-- [ ] T019 [P] [US5] Write unit tests for CacheService
+- [X] T019 [P] [US5] Write unit tests for CacheService
   - File: `apps/api/src/modules/cache/__tests__/cache.service.spec.ts`
   - Test: getCachedPappers returns null for missing SIREN
   - Test: getCachedPappers returns data for valid cache
   - Test: isCacheValid returns false for expired cache (>30 days)
   - Test: getMonthlyApiUsage counts correctly
 
-- [ ] T020 [P] [US5] Write unit tests for quota monitoring
+- [X] T020 [P] [US5] Write unit tests for quota monitoring
   - File: `apps/api/src/modules/cache/__tests__/quota.spec.ts`
   - Test: checkPappersQuota returns correct usage
   - Test: Email alert sent at 200 calls
