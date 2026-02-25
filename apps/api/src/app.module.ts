@@ -5,6 +5,7 @@ import { HealthModule } from './modules/health/health.module';
 import { CacheModule } from './modules/cache/cache.module';
 import { ProductModule } from './modules/product/product.module';
 import { CompanyModule } from './modules/company/company.module';
+import { BrandSuggestionModule } from './modules/brand-suggestion/brand-suggestion.module';
 import { ScanModule } from './modules/scan/scan.module';
 
 @Module({
@@ -14,6 +15,7 @@ import { ScanModule } from './modules/scan/scan.module';
     CacheModule,
     ProductModule,
     CompanyModule,
+    BrandSuggestionModule,
     ScanModule,
   ],
   controllers: [],

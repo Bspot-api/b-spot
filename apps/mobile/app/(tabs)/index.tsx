@@ -2,10 +2,11 @@ import { useCallback, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { BarcodeScanner } from '../../src/features/scanner/components/BarcodeScanner';
 import { ScanOverlay } from '../../src/features/scanner/components/ScanOverlay';
+import { ScannerToast } from '../../src/features/scanner/components/ScannerToast';
 import { useBarcodeScanner } from '../../src/features/scanner/hooks/useBarcodeScanner';
 
 export default function ScannerScreen() {
-  const { state, errorMessage, isScanning, handleBarcodeScan } = useBarcodeScanner();
+  const { state, errorMessage, isScanning, toast, handleBarcodeScan } = useBarcodeScanner();
   const [isCameraActive, setIsCameraActive] = useState(false);
 
   const handleStartScan = useCallback(() => {
@@ -29,6 +30,7 @@ export default function ScannerScreen() {
         isCameraActive={isCameraActive}
       />
       <ScanOverlay state={state} errorMessage={errorMessage} isCameraActive={isCameraActive} />
+      <ScannerToast toast={toast} />
 
       {!isCameraActive && state !== 'loading' && (
         <View className="absolute inset-0 items-center justify-center px-6" pointerEvents="box-none">

@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { scanProduct, getCompany } from './client';
+import { createBrandSuggestion, getCompany, scanProduct } from './client';
+import type { CreateBrandSuggestionDto } from './types';
 
 export function useScanProduct() {
   return useMutation({
@@ -12,5 +13,11 @@ export function useGetCompany(siren: string | undefined) {
     queryKey: ['company', siren],
     queryFn: () => getCompany(siren!),
     enabled: !!siren,
+  });
+}
+
+export function useCreateBrandSuggestion() {
+  return useMutation({
+    mutationFn: (payload: CreateBrandSuggestionDto) => createBrandSuggestion(payload),
   });
 }

@@ -3,8 +3,11 @@ import { NotFoundException } from '@nestjs/common';
 import { ScanService } from '../scan.service';
 import { ProductService } from '../../product/product.service';
 import { BrandService } from '../../brand/brand.service';
+import { BrandDiscoveryService } from '../../brand/brand-discovery.service';
+import { BrandSuggestionService } from '../../brand-suggestion/brand-suggestion.service';
 import { CompanyService } from '../../company/company.service';
 import { ProductSource } from '../../product/product.entity';
+import { BrandStatus } from '../../brand/brand.entity';
 
 const NUTELLA_PRODUCT = {
   barcode: '3017620422003',
@@ -15,7 +18,7 @@ const NUTELLA_PRODUCT = {
   brandName: 'Ferrero',
 };
 
-const FERRERO_BRAND = { id: 1, name: 'Ferrero', siren: '303543440' };
+const FERRERO_BRAND = { id: 1, name: 'Ferrero', siren: '303543440', status: BrandStatus.ACTIVE };
 
 const FERRERO_COMPANY = {
   id: 1,
@@ -49,6 +52,14 @@ const companyServiceMock = {
   toDto: jest.fn(),
 };
 
+const brandDiscoveryServiceMock = {
+  discoverAndPersistBrand: jest.fn(),
+};
+
+const brandSuggestionServiceMock = {
+  createFromScan: jest.fn(),
+};
+
 describe('ScanService', () => {
   let service: ScanService;
 
@@ -60,6 +71,8 @@ describe('ScanService', () => {
         ScanService,
         { provide: ProductService, useValue: productServiceMock },
         { provide: BrandService, useValue: brandServiceMock },
+        { provide: BrandDiscoveryService, useValue: brandDiscoveryServiceMock },
+        { provide: BrandSuggestionService, useValue: brandSuggestionServiceMock },
         { provide: CompanyService, useValue: companyServiceMock },
       ],
     }).compile();
@@ -77,15 +90,24 @@ describe('ScanService', () => {
   });
 
   describe('scanProduct — brand not in DB', () => {
-    it('returns unavailable result when brand is unknown', async () => {
+    it('returns unavailable result and creates suggestion when discovery is uncertain', async () => {
       productServiceMock.fetchFromOpenFoodFacts.mockResolvedValue(NUTELLA_PRODUCT);
       brandServiceMock.findBrandByName.mockResolvedValue(null);
+      brandDiscoveryServiceMock.discoverAndPersistBrand.mockResolvedValue({
+        resolution: 'needs_user_input',
+        confidence: 42,
+        message: 'Confiance insuffisante',
+      });
+      brandSuggestionServiceMock.createFromScan.mockResolvedValue({ id: 99 });
 
       const result = await service.scanProduct('3017620422003');
 
       expect(result.dataFreshness).toBe('unavailable');
       expect(result.company).toBeUndefined();
-      expect(result.message).toContain('non référencée');
+      expect(result.message).toContain('Confiance');
+      expect(result.brandResolution).toBe('needs_user_input');
+      expect(result.userActionRequired).toBe('submit_brand_suggestion');
+      expect(result.brandSuggestionId).toBe(99);
     });
   });
 
@@ -101,6 +123,7 @@ describe('ScanService', () => {
       expect(result.dataFreshness).toBe('unavailable');
       expect(result.company).toBeUndefined();
       expect(brandServiceMock.findBrandByName).not.toHaveBeenCalled();
+      expect(result.userActionRequired).toBe('submit_brand_suggestion');
     });
   });
 
@@ -129,6 +152,8 @@ describe('ScanService', () => {
       expect(result.dataFreshness).toBe('fresh');
       expect(result.product).toEqual(NUTELLA_PRODUCT);
       expect(result.company).toEqual(FERRERO_COMPANY_DTO);
+      expect(result.brandResolution).toBe('existing');
+      expect(result.brandStatus).toBe('active');
       expect(productServiceMock.saveProduct).toHaveBeenCalledWith(NUTELLA_PRODUCT);
       expect(brandServiceMock.findBrandByName).toHaveBeenCalledWith('Ferrero');
       expect(companyServiceMock.getOrCreateCompany).toHaveBeenCalledWith('303543440');

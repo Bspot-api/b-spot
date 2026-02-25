@@ -34,6 +34,13 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
+          name="brand-suggestion/new"
+          options={{
+            title: 'Ajouter une marque',
+            presentation: 'modal',
+          }}
+        />
+        <Stack.Screen
           name="+not-found"
           options={{
             title: 'Not Found',

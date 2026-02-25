@@ -1,4 +1,9 @@
-import type { ScanResultDto, CompanyDto } from './types';
+import type {
+  BrandSuggestionDto,
+  CompanyDto,
+  CreateBrandSuggestionDto,
+  ScanResultDto,
+} from './types';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
 const API_TIMEOUT = parseInt(process.env.EXPO_PUBLIC_API_TIMEOUT ?? '10000', 10);
@@ -49,4 +54,13 @@ export async function scanProduct(barcode: string): Promise<ScanResultDto> {
 
 export async function getCompany(siren: string): Promise<CompanyDto> {
   return apiFetch<CompanyDto>(`/api/companies/${siren}`);
+}
+
+export async function createBrandSuggestion(
+  payload: CreateBrandSuggestionDto,
+): Promise<BrandSuggestionDto> {
+  return apiFetch<BrandSuggestionDto>('/api/brand-suggestions', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
 }

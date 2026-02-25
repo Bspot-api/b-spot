@@ -13,8 +13,9 @@ import { ShareholdersList } from '../../src/features/company/components/Sharehol
 import { useCompanyData } from '../../src/features/company/hooks/useCompanyData';
 
 export default function CompanyDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, brandStatus } = useLocalSearchParams<{ id: string; brandStatus?: string }>();
   const siren = Array.isArray(id) ? id[0] : id;
+  const resolvedBrandStatus = Array.isArray(brandStatus) ? brandStatus[0] : brandStatus;
   const { company, executives, shareholders, isLoading, errorMessage, retry } =
     useCompanyData(siren);
 
@@ -59,6 +60,13 @@ export default function CompanyDetailScreen() {
 
   return (
     <ScrollView className="flex-1 bg-zinc-50" contentContainerClassName="p-4 pb-8">
+      {resolvedBrandStatus === 'pending' && (
+        <View className="mb-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2">
+          <Text className="text-sm font-medium text-amber-900">
+            Correspondance marque en validation (pending)
+          </Text>
+        </View>
+      )}
       <CompanyHeader company={company} onShare={handleShare} />
 
       <View className="mt-4 gap-4">
