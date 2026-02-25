@@ -28,7 +28,9 @@
       },
       "package": "com.bspot.mobile",
       "permissions": [
-        "CAMERA"
+        "CAMERA",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -47,6 +49,13 @@
     "scheme": "bspot",
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "62be19b4-6a9a-4246-9fdd-5262dd92e99c"
+      }
+    },
+    "owner": "tat-lonestone"
   }
 }
