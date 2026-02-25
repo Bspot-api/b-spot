@@ -239,28 +239,28 @@
 
 ### Database Entities & Migrations
 
-- [ ] T021 [P] [US1] Create Product entity
+- [X] T021 [P] [US1] Create Product entity
   - File: `apps/api/src/modules/product/product.entity.ts`
   - Fields: id, barcode (unique), name, category, imageUrl, source (enum: OFF/OBF), brand (ManyToOne), createdAt, updatedAt
 
-- [ ] T022 [P] [US1] Create Brand entity
+- [X] T022 [P] [US1] Create Brand entity
   - File: `apps/api/src/modules/brand/brand.entity.ts`
   - Fields: id, name (unique), siren (unique), createdAt, updatedAt
   - OneToMany: products
 
-- [ ] T023 [P] [US1] Create Company entity
+- [X] T023 [P] [US1] Create Company entity
   - File: `apps/api/src/modules/company/company.entity.ts`
   - Fields: id, siren (unique), legalName, logoUrl, rawPappersData (json), lastFetchedAt, createdAt
   - JSON fields: executives (array), shareholders (array), subsidiaries (array)
 
-- [ ] T024 [US1] Create migration for core entities
+- [X] T024 [US1] Create migration for core entities
   - Run `pnpm migration:create add-core-entities`
   - Add Product, Brand, Company tables
   - Test migration
 
 ### Brand Seed Data
 
-- [ ] T025 [US1] Create brands seed file
+- [X] T025 [US1] Create brands seed file
   - File: `apps/api/src/seeders/brands.seed.ts`
   - Load data from research phase (R004)
   - Insert top 100 French brands with SIREN mappings
@@ -268,12 +268,12 @@
 
 ### Product Module (Open Food Facts Integration)
 
-- [ ] T026 [P] [US1] Create ProductModule structure
+- [X] T026 [P] [US1] Create ProductModule structure
   - File: `apps/api/src/modules/product/product.module.ts`
   - Import Product entity
   - Export ProductService
 
-- [ ] T027 [US1] Implement ProductService
+- [X] T027 [US1] Implement ProductService
   - File: `apps/api/src/modules/product/product.service.ts`
   - Method: `async fetchFromOpenFoodFacts(barcode: string): Promise<ProductDTO | null>`
   - HTTP client: call `https://world.openfoodfacts.org/api/v2/product/{barcode}`
@@ -281,19 +281,19 @@
   - Method: `async saveProduct(data: ProductDTO, source: 'OFF' | 'OBF'): Promise<Product>`
   - Link product to Brand entity if brand exists in DB
 
-- [ ] T028 [P] [US1] Create ProductController
+- [X] T028 [P] [US1] Create ProductController
   - File: `apps/api/src/modules/product/product.controller.ts`
   - Endpoint: `GET /api/products/:barcode` (for debugging)
   - Return product info
 
 ### Company Module (Pappers Integration)
 
-- [ ] T029 [P] [US1] Create CompanyModule structure
+- [X] T029 [P] [US1] Create CompanyModule structure
   - File: `apps/api/src/modules/company/company.module.ts`
   - Import Company entity, CacheService
   - Export CompanyService, PappersService
 
-- [ ] T030 [US1] Implement PappersService (cache-first)
+- [X] T030 [US1] Implement PappersService (cache-first)
   - File: `apps/api/src/modules/company/pappers.service.ts`
   - Inject CacheService
   - Method: `async getCompanyBySiren(siren: string): Promise<CompanyDTO>`
@@ -306,33 +306,33 @@
     6. Log API call with CacheService.logApiCall()
     7. Return CompanyDTO
 
-- [ ] T031 [US1] Implement CompanyService
+- [X] T031 [US1] Implement CompanyService
   - File: `apps/api/src/modules/company/company.service.ts`
   - Method: `async getOrCreateCompany(siren: string): Promise<Company>`
   - Call PappersService.getCompanyBySiren()
   - Save Company entity to database
   - Method: `async getCompanyById(id: number): Promise<Company>`
 
-- [ ] T032 [P] [US1] Create CompanyController
+- [X] T032 [P] [US1] Create CompanyController
   - File: `apps/api/src/modules/company/company.controller.ts`
   - Endpoint: `GET /api/companies/:siren` (OpenAPI: getCompany)
   - Return CompanyDTO with executives and shareholders
 
 ### Tests for Data Layer
 
-- [ ] T033 [P] [US1] Write integration tests for ProductService
+- [X] T033 [P] [US1] Write integration tests for ProductService
   - File: `apps/api/src/modules/product/__tests__/product.service.spec.ts`
   - Test: fetchFromOpenFoodFacts with real barcode (3017620422003)
   - Test: saveProduct creates entity in DB
 
-- [ ] T034 [P] [US1] Write unit tests for PappersService
+- [X] T034 [P] [US1] Write unit tests for PappersService
   - File: `apps/api/src/modules/company/__tests__/pappers.service.spec.ts`
   - Test: getCompanyBySiren returns cached data if valid
   - Test: getCompanyBySiren calls Pappers API if cache expired
   - Test: getCompanyBySiren skips API call if quota exhausted
   - Mock CacheService, mock HTTP client
 
-- [ ] T035 [P] [US1] Write integration tests for CompanyController
+- [X] T035 [P] [US1] Write integration tests for CompanyController
   - File: `apps/api/src/modules/company/__tests__/company.controller.spec.ts`
   - Test: GET /api/companies/552108011 returns 200 with CompanyDTO
   - Test: GET /api/companies/invalid returns 404

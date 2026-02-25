@@ -4,6 +4,64 @@ All notable changes to this feature specification are documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/)
 
+## [2026-02-25 14:50] - /speckit.implement (Phase 3 Complete)
+### Completed
+- Phase 3: Backend Data Layer — Entities, Modules, Tests (15/15 tasks)
+  - T021: Product entity (barcode, name, category, imageUrl, source enum, ManyToOne Brand)
+  - T022: Brand entity (name unique, siren, timestamps)
+  - T023: Company entity (siren, legalName, json: executives/shareholders/subsidiaries)
+  - T024: Migration `Migration20260225010000_add_core_entities` (manual — DB offline)
+  - T025: Brand seed data (~50 French brands with SIREN), BrandsSeeder, DatabaseSeeder
+  - T026: ProductModule (Product + Brand entities, exports ProductService)
+  - T027: ProductService (fetchFromOpenFoodFacts, saveProduct with brand linking)
+  - T028: ProductController (`GET /api/products/:barcode`)
+  - T029: CompanyModule (imports CacheModule, exports CompanyService + PappersService)
+  - T030: PappersService (cache-first, quota guard, parse executives/shareholders)
+  - T031: CompanyService (getOrCreateCompany, refreshCompany, toDto)
+  - T032: CompanyController (`GET /api/companies/:siren`, 404 on miss)
+  - T033: ProductService tests (8 tests — OFF fetch, saveProduct, brand linking)
+  - T034: PappersService tests (10 tests — cache hit, quota exhausted, API call, errors)
+  - T035: CompanyController tests (4 tests — 200 with DTO, 404 with French message)
+
+### Added
+- `apps/api/src/modules/brand/brand.entity.ts`
+- `apps/api/src/modules/product/product.entity.ts`
+- `apps/api/src/modules/company/company.entity.ts`
+- `apps/api/src/migrations/Migration20260225010000_add_core_entities.ts`
+- `apps/api/src/seeders/brand-data.ts`
+- `apps/api/src/seeders/brands.seed.ts`
+- `apps/api/src/seeders/DatabaseSeeder.ts`
+- `apps/api/src/modules/product/product.module.ts`
+- `apps/api/src/modules/product/product.service.ts`
+- `apps/api/src/modules/product/product.controller.ts`
+- `apps/api/src/modules/product/dto/product.dto.ts`
+- `apps/api/src/modules/company/company.module.ts`
+- `apps/api/src/modules/company/pappers.service.ts`
+- `apps/api/src/modules/company/company.service.ts`
+- `apps/api/src/modules/company/company.controller.ts`
+- `apps/api/src/modules/company/dto/company.dto.ts`
+- `apps/api/src/modules/product/__tests__/product.service.spec.ts`
+- `apps/api/src/modules/company/__tests__/pappers.service.spec.ts`
+- `apps/api/src/modules/company/__tests__/company.controller.spec.ts`
+
+### Changed
+- `apps/api/src/app.module.ts` — ProductModule + CompanyModule registered
+- `apps/api/src/modules/product/product.service.ts` — fixed MikroORM createdAt/updatedAt
+- `apps/api/src/modules/company/company.service.ts` — fixed MikroORM createdAt
+
+### Technical Notes
+- Native `fetch` (Node 18) used for both OFF API and Pappers API (no @nestjs/axios)
+- Brand→Company link via `siren` on Brand entity (no FK join, MVP simplicity)
+- PappersService: cache-first → quota guard → API call → log + cache response
+- OneToMany on Brand deliberately omitted to avoid circular import at MVP
+- EntityManager injected directly in ProductService/CompanyService for persistAndFlush
+- 41/41 unit tests pass (full suite)
+
+### Author
+AI (Claude Sonnet 4.6)
+
+---
+
 ## [2026-02-25 00:00] - /speckit.implement (Phase 2 Complete)
 ### Completed
 - Phase 2: Backend Core — Caching & API Tracking (9/9 tasks)
