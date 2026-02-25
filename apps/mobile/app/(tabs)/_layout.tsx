@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Camera, History } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function TabLayout() {
   return (
@@ -18,14 +18,14 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Scanner',
-          tabBarIcon: ({ color, size }) => <Camera color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <Ionicons name="camera" color={color} size={size} />,
         }}
       />
       <Tabs.Screen
         name="history"
         options={{
-          title: 'History',
-          tabBarIcon: ({ color, size }) => <History color={color} size={size} />,
+          title: 'Historique',
+          tabBarIcon: ({ color, size }) => <Ionicons name="time" color={color} size={size} />,
         }}
       />
     </Tabs>

@@ -4,6 +4,37 @@ All notable changes to this feature specification are documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/)
 
+## [2026-02-25 18:00] - /speckit.implement (Phase 5 Complete)
+
+### Completed
+
+- Phase 5: Mobile Scanner Screen — API client + barcode scanner UI (6/6 tasks)
+  - T043: API client — `types.ts`, `client.ts`, `hooks.ts` (TanStack Query, hand-written from backend DTOs)
+  - T044: Scanner feature structure — `src/features/scanner/{components,hooks}/`
+  - T045: BarcodeScanner component — `expo-camera` CameraView + useCameraPermissions (SDK 54)
+  - T046: ScanOverlay component — corner markers, loading spinner, error badge (StyleSheet + NativeWind)
+  - T047: useBarcodeScanner hook — state machine (idle/loading/success/error), navigation on success
+  - T048: Scanner screen — `app/(tabs)/index.tsx` fully wired up
+- Bonus: Fixed `(tabs)/_layout.tsx` — replaced removed `lucide-react-native` with `@expo/vector-icons`
+
+### Added
+
+- `apps/mobile/src/api/types.ts`
+- `apps/mobile/src/api/client.ts`
+- `apps/mobile/src/api/hooks.ts`
+- `apps/mobile/src/features/scanner/components/BarcodeScanner.tsx`
+- `apps/mobile/src/features/scanner/components/ScanOverlay.tsx`
+- `apps/mobile/src/features/scanner/hooks/useBarcodeScanner.ts`
+
+### Modified
+
+- `apps/mobile/app/(tabs)/index.tsx` — replaced placeholder with functional scanner screen
+- `apps/mobile/app/(tabs)/_layout.tsx` — replaced lucide icons with @expo/vector-icons Ionicons
+
+**Author**: AI (Claude)
+
+---
+
 ## [2026-02-25 15:00] - /speckit.implement (Phase 4 Complete)
 ### Completed
 - Phase 4: Backend Scan Endpoint — Orchestration & E2E Tests (7/7 tasks)

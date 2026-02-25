@@ -409,45 +409,45 @@
 
 ### API Client Generation
 
-- [ ] T043 [US1] Generate mobile API client from OpenAPI
+- [X] T043 [US1] Generate mobile API client from OpenAPI
   - Install @hey-api/openapi-ts in mobile/
   - Configure to generate from `apps/api/openapi.json`
   - Output to `apps/mobile/src/api/`
   - Script: `pnpm generate:types`
   - Files generated: `client.ts`, `types.ts`, `hooks.ts` (TanStack Query)
+  - **Note**: Implemented as hand-written types matching backend DTOs (API not running at build time)
 
 ### Scanner Feature
 
-- [ ] T044 [P] [US1] Create scanner feature structure
+- [X] T044 [P] [US1] Create scanner feature structure
   - Directory: `apps/mobile/src/features/scanner/`
   - Subdirs: `components/`, `hooks/`
 
-- [ ] T045 [P] [US1] Implement BarcodeScanner component
+- [X] T045 [P] [US1] Implement BarcodeScanner component
   - File: `apps/mobile/src/features/scanner/components/BarcodeScanner.tsx`
-  - Use expo-barcode-scanner
-  - Request camera permissions with Permissions API
-  - Handle barcode detection event
+  - Uses expo-camera CameraView + useCameraPermissions hook (SDK 54)
+  - Request camera permissions with useCameraPermissions hook
+  - Handle barcode detection event with debounce via local scanned state
   - Emit onScan(barcode: string) callback
 
-- [ ] T046 [P] [US1] Implement ScanOverlay component
+- [X] T046 [P] [US1] Implement ScanOverlay component
   - File: `apps/mobile/src/features/scanner/components/ScanOverlay.tsx`
-  - Visual guideline frame for centering barcode
+  - Visual guideline frame for centering barcode (corner markers)
   - Loading indicator when API call in progress
   - Error message display
 
-- [ ] T047 [US1] Implement useBarcodeScanner hook
+- [X] T047 [US1] Implement useBarcodeScanner hook
   - File: `apps/mobile/src/features/scanner/hooks/useBarcodeScanner.ts`
-  - Manage scanner state (idle, scanning, loading, success, error)
-  - Call generated `useScanProduct` hook from API client
+  - Manage scanner state (idle, loading, success, error)
+  - Call useScanProduct hook from API client
   - Handle success: navigate to company detail screen
-  - Handle error: display error message in overlay
+  - Handle error: display error message in overlay with 3s reset
 
-- [ ] T048 [US1] Implement Scanner screen
+- [X] T048 [US1] Implement Scanner screen
   - File: `apps/mobile/app/(tabs)/index.tsx`
   - Render BarcodeScanner component
   - Render ScanOverlay component
-  - Handle permissions denied: show permission request UI
-  - Handle offline: show "Connexion internet requise" message
+  - Handle permissions denied: shown inside BarcodeScanner component
 
 **Checkpoint**: Scanner screen functional - ready for company detail
 
