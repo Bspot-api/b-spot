@@ -1,6 +1,6 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
-import { Brand } from '../modules/brand/brand.entity';
+import { Brand, BrandMatchSource, BrandStatus } from '../modules/brand/brand.entity';
 import { BRAND_SEED_DATA } from './brand-data';
 
 export class BrandsSeeder extends Seeder {
@@ -12,6 +12,8 @@ export class BrandsSeeder extends Seeder {
       em.create(Brand, {
         name: entry.name,
         siren: entry.siren,
+        status: BrandStatus.ACTIVE,
+        matchSource: BrandMatchSource.SEED,
         createdAt: new Date(),
         updatedAt: new Date(),
       });

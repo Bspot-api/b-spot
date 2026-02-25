@@ -6,9 +6,10 @@ import { PappersCache } from './src/modules/cache/pappers-cache.entity';
 import { ApiUsageLog } from './src/modules/cache/api-usage-log.entity';
 import { Product } from './src/modules/product/product.entity';
 import { Brand } from './src/modules/brand/brand.entity';
+import { BrandSuggestion } from './src/modules/brand-suggestion/brand-suggestion.entity';
 import { Company } from './src/modules/company/company.entity';
 
-const entities = [PappersCache, ApiUsageLog, Product, Brand, Company];
+const entities = [PappersCache, ApiUsageLog, Product, Brand, BrandSuggestion, Company];
 
 export default defineConfig({
   entities,
