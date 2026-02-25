@@ -5,17 +5,17 @@ export class HealthResponseDto {
     description: 'Health status of the API',
     example: 'ok',
   })
-  status: string;
+  status!: string;
 
   @ApiProperty({
     description: 'Current timestamp in ISO format',
     example: '2026-01-21T15:30:00.000Z',
   })
-  timestamp: string;
+  timestamp!: string;
 
   @ApiProperty({
     description: 'API version',
     example: '2.0.0-alpha.1',
   })
-  version: string;
+  version!: string;
 }

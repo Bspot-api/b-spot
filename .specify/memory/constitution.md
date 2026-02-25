@@ -1,46 +1,42 @@
 <!--
-Sync Impact Report - Constitution v1.0.0
+Sync Impact Report - Constitution v1.0.1
 ═══════════════════════════════════════════════════════════════════════════════
 
-Version Change: INITIAL → 1.0.0
-Rationale: Initial constitution creation for B-Spot platform
+Version Change: 1.0.0 → 1.0.1
+Rationale: PATCH — corrected Principle 4 module paths to include monorepo
+  `apps/` prefix, aligning with actual project structure in CLAUDE.md.
+  No semantic governance changes.
 
-New Sections Added:
-  - Complete constitutional framework
-  - Six core principles established
-  - Governance section with amendment procedures
-  - Versioning policy defined
+Modified Principles:
+  - Principle 4 (Feature-Based Architecture): paths updated
+      api/src/modules/{feature}/  →  apps/api/src/modules/{feature}/
+      mobile/src/features/{feature}/  →  apps/mobile/src/features/{feature}/
+    File organization example tree also updated to apps/api/src/modules/.
 
-Principles Defined:
-  1. Type Safety First - Strict typing enforcement
-  2. Resource Constraint Awareness - API call limits and cost optimization
-  3. Mobile-First User Experience - Cross-platform consistency
-  4. Feature-Based Architecture - Module organization
-  5. Simplicity Over Abstraction - Pragmatic engineering
-  6. Test-Driven Quality - Comprehensive testing strategy
+Added Sections: None
+Removed Sections: None
 
 Templates Requiring Updates:
-  ✅ Updated: .specify/templates/plan-template.md
-     - Constitution Check section now validates against 6 principles
-  ✅ Updated: .specify/templates/spec-template.md
-     - User scenarios align with mobile-first principle
-     - Requirements validation includes type safety checks
+  ✅ Updated: .specify/memory/constitution.md (this file)
   ✅ Updated: .specify/templates/tasks-template.md
-     - Task categorization reflects constitution-driven priorities
-     - Resource constraint tasks included in foundational phase
+     - Mobile path convention updated to reflect apps/ monorepo prefix
+  — .specify/templates/plan-template.md: No changes needed
+  — .specify/templates/spec-template.md: No changes needed
 
 Follow-up TODOs:
-  - None: All placeholders filled with concrete values
+  - None: All placeholders filled, paths now consistent with CLAUDE.md
 
 Dependencies Scanned:
-  - README.md: ✅ Aligned
-  - CLAUDE.md: ✅ Aligned
-  - Plan template: ✅ Validated
-  - Spec template: ✅ Validated
-  - Tasks template: ✅ Validated
+  - CLAUDE.md: ✅ Aligned (source of truth for monorepo structure)
+  - .specify/templates/plan-template.md: ✅ Validated
+  - .specify/templates/spec-template.md: ✅ Validated
+  - .specify/templates/tasks-template.md: ✅ Updated
+  - .specify/templates/agent-file-template.md: ✅ No constitution references
+  - .specify/templates/checklist-template.md: ✅ No constitution references
+  - .specify/templates/changelog-template.md: ✅ No constitution references
 
 Commit Message (suggested):
-  docs: establish project constitution v1.0.0 (governance + 6 core principles)
+  docs: amend constitution to v1.0.1 (fix Principle 4 monorepo paths)
 
 ═══════════════════════════════════════════════════════════════════════════════
 -->
@@ -51,9 +47,9 @@ Commit Message (suggested):
 **Project Type**: Mobile-First Transparency Platform (Expo + NestJS Monorepo)
 **Target Platform**: iOS/Android (Expo ~52.0) + Docker-deployed Backend
 **Primary Language**: TypeScript
-**Constitution Version**: 1.0.0
+**Constitution Version**: 1.0.1
 **Ratification Date**: 2026-01-21
-**Last Amended Date**: 2026-01-21
+**Last Amended Date**: 2026-02-25
 
 ---
 
@@ -150,8 +146,8 @@ function processData(input: Array<{ value: string }>): string[] {
 **Rationale**: Feature-based architecture supports parallel development, independent testing, easier onboarding, and clear feature ownership. With a mobile + backend monorepo, this prevents "big ball of mud" anti-pattern.
 
 **Enforcement Rules**:
-- Backend modules MUST be in `api/src/modules/{feature}/` (e.g., `company/`, `scan/`, `auth/`)
-- Mobile features MUST be in `mobile/src/features/{feature}/` (e.g., `scanner/`, `company-detail/`)
+- Backend modules MUST be in `apps/api/src/modules/{feature}/` (e.g., `company/`, `scan/`, `auth/`)
+- Mobile features MUST be in `apps/mobile/src/features/{feature}/` (e.g., `scanner/`, `company-detail/`)
 - Each feature module MUST contain: models/types, service logic, API routes (backend) or screens (mobile), and tests
 - Shared utilities go in `shared/` or `common/` but MUST NOT contain business logic
 - Maximum 10 feature modules per application (if more needed, justify architectural refactoring)
@@ -159,7 +155,7 @@ function processData(input: Array<{ value: string }>): string[] {
 
 **File Organization Example (Backend)**:
 ```
-api/src/modules/
+apps/api/src/modules/
 ├── company/
 │   ├── company.entity.ts
 │   ├── company.service.ts
@@ -324,6 +320,7 @@ When multiple principles conflict, use this matrix to prioritize (higher number 
 | Version | Date | Changes | Amended By |
 |---------|------|---------|------------|
 | 1.0.0 | 2026-01-21 | Initial constitution ratification | System |
+| 1.0.1 | 2026-02-25 | Fix Principle 4 module paths to include `apps/` monorepo prefix | Claude |
 
 ---
 

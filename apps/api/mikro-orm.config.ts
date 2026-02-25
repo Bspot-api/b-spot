@@ -10,6 +10,10 @@ export default defineConfig({
   port: Number(process.env.DATABASE_PORT) || 5432,
   user: process.env.DATABASE_USER || 'postgres',
   password: process.env.DATABASE_PASSWORD || 'postgres',
+  discovery: {
+    requireEntitiesArray: false,
+    warnWhenNoEntities: false,
+  },
   migrations: {
     path: './dist/migrations',
     pathTs: './src/migrations',

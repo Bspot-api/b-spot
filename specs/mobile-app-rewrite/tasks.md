@@ -11,7 +11,7 @@
 
 - **[P]**: Can run in parallel (different files, no dependencies)
 - **[Story]**: Which user story this task belongs to (e.g., US1, US2, Foundation, Research)
-- All paths follow monorepo structure: `api/src/` and `mobile/src/`
+- All paths follow monorepo structure: `apps/api/src/` and `apps/mobile/src/`
 
 ---
 
@@ -46,7 +46,7 @@
   - Research: Wikidata SPARQL, Wikipedia exports, public registries
   - Manually curate top 50-100 French brands if no automated source
   - Create initial seed list: brand name + SIREN
-  - **Output**: `api/src/seeders/brands.seed.ts` (initial data)
+  - **Output**: `apps/api/src/seeders/brands.seed.ts` (initial data)
   - **Result**: ✅ Manual curation strategy defined (50-100 brands, 2-4 hours)
 
 - [X] R005 [P] [Research] Prototype barcode scanner on physical devices
@@ -68,7 +68,7 @@
   - Set up Gmail app-specific password
   - Send test email from Node.js
   - Document environment variables
-  - **Output**: `api/.env.example` (SMTP config)
+  - **Output**: `apps/api/.env.example` (SMTP config)
   - **Result**: ✅ Gmail SMTP sufficient for MVP (<10 emails/month)
 
 **Checkpoint**: Research complete - proceed to setup phase
@@ -113,8 +113,8 @@
 - [X] T005 Configure MikroORM
   - Create `api/mikro-orm.config.ts`
   - Configure PostgreSQL connection
-  - Set up migrations directory: `api/src/migrations/`
-  - Set up seeders directory: `api/src/seeders/`
+  - Set up migrations directory: `apps/api/src/migrations/`
+  - Set up seeders directory: `apps/api/src/seeders/`
 
 - [X] T006 Create initial database migration
   - Run `pnpm migration:create` to generate initial migration
@@ -124,14 +124,14 @@
 ### API Foundation
 
 - [X] T007 [P] Setup NestJS application structure
-  - Create `api/src/main.ts` with NestJS bootstrap
-  - Create `api/src/app.module.ts`
+  - Create `apps/api/src/main.ts` with NestJS bootstrap
+  - Create `apps/api/src/app.module.ts`
   - Configure CORS for mobile access
   - Configure Swagger/OpenAPI at `/api` endpoint
   - Add global validation pipe (Zod)
 
 - [X] T008 [P] Create Health module
-  - Create `api/src/modules/health/health.controller.ts`
+  - Create `apps/api/src/modules/health/health.controller.ts`
   - Implement `GET /health` endpoint
   - Return { status: 'ok', timestamp, version }
   - Test: `curl http://localhost:3000/health`
@@ -139,11 +139,11 @@
 ### Mobile Foundation
 
 - [X] T009 [P] Setup Expo Router file-based routing
-  - Create `mobile/app/_layout.tsx` (root layout)
-  - Create `mobile/app/(tabs)/_layout.tsx` (tab navigation)
-  - Create `mobile/app/(tabs)/index.tsx` (home/scanner screen)
-  - Create `mobile/app/company/[id].tsx` (company detail)
-  - Create `mobile/app/+not-found.tsx`
+  - Create `apps/mobile/app/_layout.tsx` (root layout)
+  - Create `apps/mobile/app/(tabs)/_layout.tsx` (tab navigation)
+  - Create `apps/mobile/app/(tabs)/index.tsx` (home/scanner screen)
+  - Create `apps/mobile/app/company/[id].tsx` (company detail)
+  - Create `apps/mobile/app/+not-found.tsx`
 
 - [X] T010 [P] Configure NativeWind (Tailwind for RN)
   - Install and configure NativeWind
@@ -152,7 +152,7 @@
   - Verify hot reload works
 
 - [X] T011 [P] Setup TanStack Query client
-  - Create `mobile/src/api/query-client.ts`
+  - Create `apps/mobile/src/api/query-client.ts`
   - Configure default options (staleTime, retry, etc.)
   - Wrap app with QueryClientProvider in `_layout.tsx`
   - Configure AsyncStorage persister for offline support
@@ -170,12 +170,12 @@
 ### Database Entities & Migrations
 
 - [ ] T012 [P] [US5] Create PappersCache entity
-  - File: `api/src/modules/cache/pappers-cache.entity.ts`
+  - File: `apps/api/src/modules/cache/pappers-cache.entity.ts`
   - Fields: id, siren (unique), responseData (json), fetchedAt, expiresAt
   - Calculate expiresAt = fetchedAt + 30 days
 
 - [ ] T013 [P] [US5] Create ApiUsageLog entity
-  - File: `api/src/modules/cache/api-usage-log.entity.ts`
+  - File: `apps/api/src/modules/cache/api-usage-log.entity.ts`
   - Fields: id, api (enum), endpoint, requestParams, success, errorMessage, timestamp
   - Enum: PAPPERS, OPEN_FOOD_FACTS, OPEN_BEAUTY_FACTS
 
@@ -187,12 +187,12 @@
 ### Cache Module Implementation
 
 - [ ] T015 [P] [US5] Create CacheModule structure
-  - File: `api/src/modules/cache/cache.module.ts`
+  - File: `apps/api/src/modules/cache/cache.module.ts`
   - Import MikroORM entities
   - Export CacheService
 
 - [ ] T016 [US5] Implement CacheService
-  - File: `api/src/modules/cache/cache.service.ts`
+  - File: `apps/api/src/modules/cache/cache.service.ts`
   - Method: `async getCachedPappers(siren: string): Promise<any | null>`
   - Method: `async setCachedPappers(siren: string, data: any): Promise<void>`
   - Method: `async isCacheValid(siren: string): Promise<boolean>` (check expiresAt)
@@ -200,13 +200,13 @@
   - Method: `async logApiCall(api, endpoint, params, success, error?): Promise<void>`
 
 - [ ] T017 [US5] Implement quota monitoring logic
-  - File: `api/src/modules/cache/cache.service.ts`
+  - File: `apps/api/src/modules/cache/cache.service.ts`
   - Method: `async checkPappersQuota(): Promise<{ used: number, limit: number, remaining: number }>`
   - Count PAPPERS logs for current month
   - Emit warning if usage >= 200
 
 - [ ] T018 [US5] Implement email alert service
-  - File: `api/src/modules/cache/email.service.ts`
+  - File: `apps/api/src/modules/cache/email.service.ts`
   - Configure Nodemailer with SMTP (Gmail)
   - Method: `async sendQuotaAlert(usage: number): Promise<void>`
   - Environment variables: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, ADMIN_EMAIL
@@ -215,14 +215,14 @@
 ### Tests for Cache Module
 
 - [ ] T019 [P] [US5] Write unit tests for CacheService
-  - File: `api/src/modules/cache/__tests__/cache.service.spec.ts`
+  - File: `apps/api/src/modules/cache/__tests__/cache.service.spec.ts`
   - Test: getCachedPappers returns null for missing SIREN
   - Test: getCachedPappers returns data for valid cache
   - Test: isCacheValid returns false for expired cache (>30 days)
   - Test: getMonthlyApiUsage counts correctly
 
 - [ ] T020 [P] [US5] Write unit tests for quota monitoring
-  - File: `api/src/modules/cache/__tests__/quota.spec.ts`
+  - File: `apps/api/src/modules/cache/__tests__/quota.spec.ts`
   - Test: checkPappersQuota returns correct usage
   - Test: Email alert sent at 200 calls
   - Mock Nodemailer
@@ -240,16 +240,16 @@
 ### Database Entities & Migrations
 
 - [ ] T021 [P] [US1] Create Product entity
-  - File: `api/src/modules/product/product.entity.ts`
+  - File: `apps/api/src/modules/product/product.entity.ts`
   - Fields: id, barcode (unique), name, category, imageUrl, source (enum: OFF/OBF), brand (ManyToOne), createdAt, updatedAt
 
 - [ ] T022 [P] [US1] Create Brand entity
-  - File: `api/src/modules/brand/brand.entity.ts`
+  - File: `apps/api/src/modules/brand/brand.entity.ts`
   - Fields: id, name (unique), siren (unique), createdAt, updatedAt
   - OneToMany: products
 
 - [ ] T023 [P] [US1] Create Company entity
-  - File: `api/src/modules/company/company.entity.ts`
+  - File: `apps/api/src/modules/company/company.entity.ts`
   - Fields: id, siren (unique), legalName, logoUrl, rawPappersData (json), lastFetchedAt, createdAt
   - JSON fields: executives (array), shareholders (array), subsidiaries (array)
 
@@ -261,7 +261,7 @@
 ### Brand Seed Data
 
 - [ ] T025 [US1] Create brands seed file
-  - File: `api/src/seeders/brands.seed.ts`
+  - File: `apps/api/src/seeders/brands.seed.ts`
   - Load data from research phase (R004)
   - Insert top 100 French brands with SIREN mappings
   - Test: `pnpm seed`
@@ -269,12 +269,12 @@
 ### Product Module (Open Food Facts Integration)
 
 - [ ] T026 [P] [US1] Create ProductModule structure
-  - File: `api/src/modules/product/product.module.ts`
+  - File: `apps/api/src/modules/product/product.module.ts`
   - Import Product entity
   - Export ProductService
 
 - [ ] T027 [US1] Implement ProductService
-  - File: `api/src/modules/product/product.service.ts`
+  - File: `apps/api/src/modules/product/product.service.ts`
   - Method: `async fetchFromOpenFoodFacts(barcode: string): Promise<ProductDTO | null>`
   - HTTP client: call `https://world.openfoodfacts.org/api/v2/product/{barcode}`
   - Parse response: extract name, category, imageUrl, brand
@@ -282,19 +282,19 @@
   - Link product to Brand entity if brand exists in DB
 
 - [ ] T028 [P] [US1] Create ProductController
-  - File: `api/src/modules/product/product.controller.ts`
+  - File: `apps/api/src/modules/product/product.controller.ts`
   - Endpoint: `GET /api/products/:barcode` (for debugging)
   - Return product info
 
 ### Company Module (Pappers Integration)
 
 - [ ] T029 [P] [US1] Create CompanyModule structure
-  - File: `api/src/modules/company/company.module.ts`
+  - File: `apps/api/src/modules/company/company.module.ts`
   - Import Company entity, CacheService
   - Export CompanyService, PappersService
 
 - [ ] T030 [US1] Implement PappersService (cache-first)
-  - File: `api/src/modules/company/pappers.service.ts`
+  - File: `apps/api/src/modules/company/pappers.service.ts`
   - Inject CacheService
   - Method: `async getCompanyBySiren(siren: string): Promise<CompanyDTO>`
   - Logic:
@@ -307,33 +307,33 @@
     7. Return CompanyDTO
 
 - [ ] T031 [US1] Implement CompanyService
-  - File: `api/src/modules/company/company.service.ts`
+  - File: `apps/api/src/modules/company/company.service.ts`
   - Method: `async getOrCreateCompany(siren: string): Promise<Company>`
   - Call PappersService.getCompanyBySiren()
   - Save Company entity to database
   - Method: `async getCompanyById(id: number): Promise<Company>`
 
 - [ ] T032 [P] [US1] Create CompanyController
-  - File: `api/src/modules/company/company.controller.ts`
+  - File: `apps/api/src/modules/company/company.controller.ts`
   - Endpoint: `GET /api/companies/:siren` (OpenAPI: getCompany)
   - Return CompanyDTO with executives and shareholders
 
 ### Tests for Data Layer
 
 - [ ] T033 [P] [US1] Write integration tests for ProductService
-  - File: `api/src/modules/product/__tests__/product.service.spec.ts`
+  - File: `apps/api/src/modules/product/__tests__/product.service.spec.ts`
   - Test: fetchFromOpenFoodFacts with real barcode (3017620422003)
   - Test: saveProduct creates entity in DB
 
 - [ ] T034 [P] [US1] Write unit tests for PappersService
-  - File: `api/src/modules/company/__tests__/pappers.service.spec.ts`
+  - File: `apps/api/src/modules/company/__tests__/pappers.service.spec.ts`
   - Test: getCompanyBySiren returns cached data if valid
   - Test: getCompanyBySiren calls Pappers API if cache expired
   - Test: getCompanyBySiren skips API call if quota exhausted
   - Mock CacheService, mock HTTP client
 
 - [ ] T035 [P] [US1] Write integration tests for CompanyController
-  - File: `api/src/modules/company/__tests__/company.controller.spec.ts`
+  - File: `apps/api/src/modules/company/__tests__/company.controller.spec.ts`
   - Test: GET /api/companies/552108011 returns 200 with CompanyDTO
   - Test: GET /api/companies/invalid returns 404
 
@@ -350,17 +350,17 @@
 ### Scan Module
 
 - [ ] T036 [P] [US1] Create ScanModule structure
-  - File: `api/src/modules/scan/scan.module.ts`
+  - File: `apps/api/src/modules/scan/scan.module.ts`
   - Import ProductService, CompanyService, BrandService
   - Export ScanService
 
 - [ ] T037 [US1] Create BrandService (helper for mapping)
-  - File: `api/src/modules/brand/brand.service.ts`
+  - File: `apps/api/src/modules/brand/brand.service.ts`
   - Method: `async findBrandByName(name: string): Promise<Brand | null>`
   - Fuzzy matching logic for brand names
 
 - [ ] T038 [US1] Implement ScanService (orchestrator)
-  - File: `api/src/modules/scan/scan.service.ts`
+  - File: `apps/api/src/modules/scan/scan.service.ts`
   - Method: `async scanProduct(barcode: string): Promise<ScanResultDTO>`
   - Logic:
     1. Call ProductService.fetchFromOpenFoodFacts(barcode)
@@ -373,26 +373,26 @@
     8. Return ScanResultDTO: { product, company, dataFreshness }
 
 - [ ] T039 [P] [US1] Create ScanController
-  - File: `api/src/modules/scan/scan.controller.ts`
+  - File: `apps/api/src/modules/scan/scan.controller.ts`
   - Endpoint: `POST /api/scan` (OpenAPI: scanProduct)
   - Body: `{ barcode: string }`
   - Response: ScanResultDTO or 404
 
 - [ ] T040 [US1] Generate OpenAPI schema
   - Run NestJS Swagger plugin
-  - Export OpenAPI spec to `api/openapi.json`
+  - Export OpenAPI spec to `apps/api/openapi.json`
   - Verify contracts match `specs/mobile-app-rewrite/contracts/scan.openapi.yaml`
 
 ### Tests for Scan Endpoint
 
 - [ ] T041 [P] [US1] Write integration tests for ScanService
-  - File: `api/src/modules/scan/__tests__/scan.service.spec.ts`
+  - File: `apps/api/src/modules/scan/__tests__/scan.service.spec.ts`
   - Test: scanProduct with valid barcode returns ScanResultDTO
   - Test: scanProduct with unknown barcode returns 404
   - Test: scanProduct with unknown brand returns error
 
 - [ ] T042 [P] [US1] Write E2E test for scan flow
-  - File: `api/test/scan-flow.e2e-spec.ts`
+  - File: `apps/api/test/scan-flow.e2e-spec.ts`
   - Test: POST /api/scan with Nespresso barcode
   - Assert: Response contains Nestlé company data
   - Assert: Pappers cache is populated
@@ -411,39 +411,39 @@
 
 - [ ] T043 [US1] Generate mobile API client from OpenAPI
   - Install @hey-api/openapi-ts in mobile/
-  - Configure to generate from `api/openapi.json`
-  - Output to `mobile/src/api/`
+  - Configure to generate from `apps/api/openapi.json`
+  - Output to `apps/mobile/src/api/`
   - Script: `pnpm generate:types`
   - Files generated: `client.ts`, `types.ts`, `hooks.ts` (TanStack Query)
 
 ### Scanner Feature
 
 - [ ] T044 [P] [US1] Create scanner feature structure
-  - Directory: `mobile/src/features/scanner/`
+  - Directory: `apps/mobile/src/features/scanner/`
   - Subdirs: `components/`, `hooks/`
 
 - [ ] T045 [P] [US1] Implement BarcodeScanner component
-  - File: `mobile/src/features/scanner/components/BarcodeScanner.tsx`
+  - File: `apps/mobile/src/features/scanner/components/BarcodeScanner.tsx`
   - Use expo-barcode-scanner
   - Request camera permissions with Permissions API
   - Handle barcode detection event
   - Emit onScan(barcode: string) callback
 
 - [ ] T046 [P] [US1] Implement ScanOverlay component
-  - File: `mobile/src/features/scanner/components/ScanOverlay.tsx`
+  - File: `apps/mobile/src/features/scanner/components/ScanOverlay.tsx`
   - Visual guideline frame for centering barcode
   - Loading indicator when API call in progress
   - Error message display
 
 - [ ] T047 [US1] Implement useBarcodeScanner hook
-  - File: `mobile/src/features/scanner/hooks/useBarcodeScanner.ts`
+  - File: `apps/mobile/src/features/scanner/hooks/useBarcodeScanner.ts`
   - Manage scanner state (idle, scanning, loading, success, error)
   - Call generated `useScanProduct` hook from API client
   - Handle success: navigate to company detail screen
   - Handle error: display error message in overlay
 
 - [ ] T048 [US1] Implement Scanner screen
-  - File: `mobile/app/(tabs)/index.tsx`
+  - File: `apps/mobile/app/(tabs)/index.tsx`
   - Render BarcodeScanner component
   - Render ScanOverlay component
   - Handle permissions denied: show permission request UI
@@ -462,34 +462,34 @@
 ### Company Feature
 
 - [ ] T049 [P] [US2/3] Create company feature structure
-  - Directory: `mobile/src/features/company/`
+  - Directory: `apps/mobile/src/features/company/`
   - Subdirs: `components/`, `hooks/`
 
 - [ ] T050 [P] [US2] Implement CompanyHeader component
-  - File: `mobile/src/features/company/components/CompanyHeader.tsx`
+  - File: `apps/mobile/src/features/company/components/CompanyHeader.tsx`
   - Display: company logo, legal name, SIREN
   - Display: "Données au [DATE]" badge (lastFetchedAt)
 
 - [ ] T051 [P] [US2] Implement ExecutivesList component
-  - File: `mobile/src/features/company/components/ExecutivesList.tsx`
+  - File: `apps/mobile/src/features/company/components/ExecutivesList.tsx`
   - Display: List of executives with name + role
   - CEO at top with "Directeur Général" badge
   - Touchable cards (future: modal with details)
 
 - [ ] T052 [P] [US3] Implement ShareholdersList component
-  - File: `mobile/src/features/company/components/ShareholdersList.tsx`
+  - File: `apps/mobile/src/features/company/components/ShareholdersList.tsx`
   - Display: List of shareholders with name + percentage
   - Distinguish individual vs corporate (icon or badge)
   - Sort by percentage descending
 
 - [ ] T053 [US2/3] Implement useCompanyData hook
-  - File: `mobile/src/features/company/hooks/useCompanyData.ts`
+  - File: `apps/mobile/src/features/company/hooks/useCompanyData.ts`
   - Use generated `useGetCompany` hook from API client
   - Handle loading, error states
   - Return: { company, executives, shareholders, isLoading, error }
 
 - [ ] T054 [US2/3] Implement Company Detail screen
-  - File: `mobile/app/company/[id].tsx`
+  - File: `apps/mobile/app/company/[id].tsx`
   - Get SIREN from route params
   - Call useCompanyData(siren)
   - Render: CompanyHeader, ExecutivesList, ShareholdersList
@@ -515,23 +515,23 @@
 ### Offline Infrastructure
 
 - [ ] T056 [P] [Offline] Configure TanStack Query persister
-  - File: `mobile/src/lib/queryClient.ts`
+  - File: `apps/mobile/src/lib/queryClient.ts`
   - Install @tanstack/query-async-storage-persister
   - Configure AsyncStorage persister
   - Set cacheTime: 7 days (cached company data available for 7 days offline)
 
 - [ ] T057 [P] [Offline] Implement useOfflineStatus hook
-  - File: `mobile/src/features/common/hooks/useOfflineStatus.ts`
+  - File: `apps/mobile/src/features/common/hooks/useOfflineStatus.ts`
   - Use NetInfo from @react-native-community/netinfo
   - Return: { isOffline: boolean }
 
 - [ ] T058 [Offline] Update Scanner screen for offline mode
-  - File: `mobile/app/(tabs)/index.tsx`
+  - File: `apps/mobile/app/(tabs)/index.tsx`
   - If isOffline = true, disable scanner
   - Show message: "Mode hors-ligne : scanner désactivé. Données en cache disponibles."
 
 - [ ] T059 [Offline] Update Company Detail for offline mode
-  - File: `mobile/app/company/[id].tsx`
+  - File: `apps/mobile/app/company/[id].tsx`
   - If isOffline AND data in cache, display cached data
   - If isOffline AND no cache, show message: "Données non disponibles hors-ligne"
 
@@ -548,20 +548,20 @@
 ### Product Service Extension
 
 - [ ] T060 [US4] Extend ProductService for Open Beauty Facts
-  - File: `api/src/modules/product/product.service.ts`
+  - File: `apps/api/src/modules/product/product.service.ts`
   - Method: `async fetchFromOpenBeautyFacts(barcode: string): Promise<ProductDTO | null>`
   - HTTP client: call `https://world.openbeautyfacts.org/api/v2/product/{barcode}`
   - Update `fetchProduct()` to try OFF first, then OBF if 404
 
 - [ ] T061 [US4] Update ScanService to support OBF
-  - File: `api/src/modules/scan/scan.service.ts`
+  - File: `apps/api/src/modules/scan/scan.service.ts`
   - Update scanProduct() to call new ProductService logic
   - Return source: 'OFF' or 'OBF' in ScanResultDTO
 
 ### Mobile UI Updates
 
 - [ ] T062 [P] [US4] Add product type badge in Company Detail
-  - File: `mobile/src/features/company/components/CompanyHeader.tsx`
+  - File: `apps/mobile/src/features/company/components/CompanyHeader.tsx`
   - Display badge: "Produit alimentaire" (OFF) or "Produit cosmétique" (OBF)
 
 **Checkpoint**: Open Beauty Facts support added
@@ -575,41 +575,41 @@
 ### Backend Error Handling
 
 - [ ] T063 [P] [Errors] Implement custom exceptions
-  - File: `api/src/shared/exceptions/`
+  - File: `apps/api/src/shared/exceptions/`
   - ProductNotFoundException
   - BrandNotMappedException
   - PappersUnavailableException
   - QuotaExhaustedException
 
 - [ ] T064 [Errors] Add global exception filter
-  - File: `api/src/shared/filters/http-exception.filter.ts`
+  - File: `apps/api/src/shared/filters/http-exception.filter.ts`
   - Map exceptions to HTTP status codes + user-friendly messages
   - Log errors with context
 
 ### Mobile Error Handling
 
 - [ ] T065 [P] [Errors] Create error UI components
-  - File: `mobile/src/features/common/components/ErrorMessage.tsx`
+  - File: `apps/mobile/src/features/common/components/ErrorMessage.tsx`
   - Props: message, onRetry callback
   - Display: icon, message, "Réessayer" button
 
 - [ ] T066 [Errors] Handle "Product not found" error in Scanner
-  - File: `mobile/app/(tabs)/index.tsx`
+  - File: `apps/mobile/app/(tabs)/index.tsx`
   - Display: "Produit non référencé" with illustration
   - Option: "Contribuer" button (future: community contributions)
 
 - [ ] T067 [Errors] Handle "Company not in Pappers" error
-  - File: `mobile/app/company/[id].tsx`
+  - File: `apps/mobile/app/company/[id].tsx`
   - Display: "Entreprise non disponible dans Pappers"
 
 - [ ] T068 [Errors] Handle "Quota exhausted" degraded mode
-  - File: `api/src/modules/company/pappers.service.ts`
+  - File: `apps/api/src/modules/company/pappers.service.ts`
   - If quota >= 250, return cached data even if expired
   - Set flag in response: `quotaExhausted: true`
   - Mobile: display banner "Données en cache uniquement (quota épuisé)"
 
 - [ ] T069 [Errors] Handle camera permission denial
-  - File: `mobile/app/(tabs)/index.tsx`
+  - File: `apps/mobile/app/(tabs)/index.tsx`
   - If permission denied, show UI: "Permission caméra requise" + "Ouvrir les paramètres" button
 
 **Checkpoint**: All error cases handled
@@ -623,18 +623,18 @@
 ### Backend Tests
 
 - [ ] T070 [P] [Tests] Write integration tests for scan flow
-  - File: `api/test/scan-flow.e2e-spec.ts`
+  - File: `apps/api/test/scan-flow.e2e-spec.ts`
   - Test: Full flow from barcode → company data
   - Assert: Pappers called only once per SIREN
   - Assert: Cache hit on second scan
 
 - [ ] T071 [P] [Tests] Write integration tests for cache expiry
-  - File: `api/src/modules/cache/__tests__/cache-expiry.spec.ts`
+  - File: `apps/api/src/modules/cache/__tests__/cache-expiry.spec.ts`
   - Test: Cache expires after 30 days
   - Test: Pappers re-called for expired cache
 
 - [ ] T072 [P] [Tests] Write integration tests for quota limit
-  - File: `api/src/modules/cache/__tests__/quota.spec.ts`
+  - File: `apps/api/src/modules/cache/__tests__/quota.spec.ts`
   - Test: Quota limit enforced at 250 calls
   - Test: Email alert sent at 200 calls
 
@@ -671,7 +671,7 @@
 ### Backend Deployment
 
 - [ ] T076 [P] [Deploy] Create Dockerfile for API
-  - File: `api/Dockerfile`
+  - File: `apps/api/Dockerfile`
   - Multi-stage build: builder + runtime
   - Install dependencies, build NestJS app
   - Expose port 3000
@@ -697,7 +697,7 @@
 ### Mobile Deployment
 
 - [ ] T080 [P] [Deploy] Configure EAS Build
-  - File: `mobile/eas.json`
+  - File: `apps/mobile/eas.json`
   - Configure build profiles: development, preview, production
   - Set bundle identifier (iOS), package name (Android)
 
