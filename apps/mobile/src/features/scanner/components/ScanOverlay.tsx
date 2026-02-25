@@ -5,9 +5,10 @@ export type ScanState = 'idle' | 'loading' | 'success' | 'error';
 interface ScanOverlayProps {
   state: ScanState;
   errorMessage?: string;
+  isCameraActive?: boolean;
 }
 
-export function ScanOverlay({ state, errorMessage }: ScanOverlayProps) {
+export function ScanOverlay({ state, errorMessage, isCameraActive = true }: ScanOverlayProps) {
   return (
     <View style={StyleSheet.absoluteFill} className="items-center justify-center" pointerEvents="none">
       {/* Scanning frame with corner markers */}
@@ -35,7 +36,9 @@ export function ScanOverlay({ state, errorMessage }: ScanOverlayProps) {
 
         {state === 'idle' && (
           <View className="rounded-full px-5 py-2.5" style={styles.pill}>
-            <Text className="text-white text-sm opacity-90">Pointez vers un code-barres</Text>
+            <Text className="text-white text-sm opacity-90">
+              {isCameraActive ? 'Pointez vers un code-barres' : 'Appuyez sur Scanner pour démarrer'}
+            </Text>
           </View>
         )}
       </View>

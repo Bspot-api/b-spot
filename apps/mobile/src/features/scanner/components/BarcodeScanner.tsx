@@ -6,17 +6,18 @@ import type { BarcodeScanningResult } from 'expo-camera';
 interface BarcodeScannerProps {
   onScan: (barcode: string) => void;
   isScanning: boolean;
+  isCameraActive: boolean;
 }
 
-export function BarcodeScanner({ onScan, isScanning }: BarcodeScannerProps) {
+export function BarcodeScanner({ onScan, isScanning, isCameraActive }: BarcodeScannerProps) {
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
 
   useEffect(() => {
-    if (!isScanning) {
+    if (!isScanning && !isCameraActive) {
       setScanned(false);
     }
-  }, [isScanning]);
+  }, [isScanning, isCameraActive]);
 
   const handleBarcodeScan = useCallback(
     ({ data }: BarcodeScanningResult) => {
@@ -54,13 +55,17 @@ export function BarcodeScanner({ onScan, isScanning }: BarcodeScannerProps) {
     );
   }
 
+  if (!isCameraActive) {
+    return <View className="flex-1 bg-black" />;
+  }
+
   return (
     <CameraView
       style={{ flex: 1 }}
       barcodeScannerSettings={{
         barcodeTypes: ['ean13', 'ean8', 'upc_a', 'upc_e'],
       }}
-      onBarcodeScanned={scanned || isScanning ? undefined : handleBarcodeScan}
+      onBarcodeScanned={scanned || isScanning || !isCameraActive ? undefined : handleBarcodeScan}
     />
   );
 }
