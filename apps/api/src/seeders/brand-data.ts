@@ -5,7 +5,9 @@
  * SIRENs marked ✅ are confirmed via public registries.
  * SIRENs marked ⚠️ are tentative and must be validated against the Pappers API.
  *
- * The `name` field must match (case-insensitively) the `brands` field from Open Food Facts.
+ * The `name` field stores a canonical brand label.
+ * Variants/typos should be handled by matching logic (normalization + fuzzy search),
+ * not by duplicating seed rows.
  */
 
 export interface BrandSeedEntry {
@@ -17,13 +19,10 @@ export interface BrandSeedEntry {
 export const BRAND_SEED_DATA: BrandSeedEntry[] = [
   // ─── Nestlé France (SIREN confirmed) ─────────────────────────────────────
   { name: 'Nestlé', siren: '542014428', parentCompany: 'Nestlé France SA' }, // ✅
-  { name: 'Nestle', siren: '542014428', parentCompany: 'Nestlé France SA' }, // alias sans accent
   { name: 'Nespresso', siren: '542014428', parentCompany: 'Nestlé France SA' }, // ✅
   { name: 'Nescafé', siren: '542014428', parentCompany: 'Nestlé France SA' }, // ✅
-  { name: 'Nescafe', siren: '542014428', parentCompany: 'Nestlé France SA' },
   { name: 'Chocapic', siren: '542014428', parentCompany: 'Nestlé France SA' }, // ✅ Open Food Facts
   { name: 'KitKat', siren: '542014428', parentCompany: 'Nestlé France SA' },
-  { name: 'Kit Kat', siren: '542014428', parentCompany: 'Nestlé France SA' },
   { name: 'Maggi', siren: '542014428', parentCompany: 'Nestlé France SA' },
   { name: 'Herta', siren: '542014428', parentCompany: 'Nestlé France SA' },
   { name: 'Perrier', siren: '542014428', parentCompany: 'Nestlé France SA' },
@@ -48,7 +47,6 @@ export const BRAND_SEED_DATA: BrandSeedEntry[] = [
 
   // ─── Coca-Cola France (⚠️ SIREN à valider) ────────────────────────────────
   { name: 'Coca-Cola', siren: '343688016', parentCompany: 'Coca-Cola European Partners France' }, // ⚠️
-  { name: 'Coca Cola', siren: '343688016', parentCompany: 'Coca-Cola European Partners France' },
   { name: 'Fanta', siren: '343688016', parentCompany: 'Coca-Cola European Partners France' },
   { name: 'Sprite', siren: '343688016', parentCompany: 'Coca-Cola European Partners France' },
   { name: 'Powerade', siren: '343688016', parentCompany: 'Coca-Cola European Partners France' },
@@ -64,14 +62,12 @@ export const BRAND_SEED_DATA: BrandSeedEntry[] = [
 
   // ─── PepsiCo France (⚠️ SIREN à valider) ────────────────────────────────
   { name: "Lay's", siren: '381511039', parentCompany: 'PepsiCo France SAS' }, // ⚠️
-  { name: 'Lays', siren: '381511039', parentCompany: 'PepsiCo France SAS' },
   { name: 'Quaker', siren: '381511039', parentCompany: 'PepsiCo France SAS' }, // ✅ Open Food Facts
   { name: 'Pepsi', siren: '381511039', parentCompany: 'PepsiCo France SAS' },
   { name: 'Lipton', siren: '381511039', parentCompany: 'PepsiCo France SAS' },
 
   // ─── Lactalis (⚠️ SIREN à valider) ────────────────────────────────────────
   { name: 'Président', siren: '331142554', parentCompany: 'Lactalis' }, // ⚠️
-  { name: 'President', siren: '331142554', parentCompany: 'Lactalis' },
   { name: 'Lactel', siren: '331142554', parentCompany: 'Lactalis' },
   { name: 'Bridel', siren: '331142554', parentCompany: 'Lactalis' },
 
