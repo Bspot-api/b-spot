@@ -1,10 +1,18 @@
+import 'dotenv/config';
 import { defineConfig } from '@mikro-orm/postgresql';
 import { Migrator } from '@mikro-orm/migrations';
 import { SeedManager } from '@mikro-orm/seeder';
+import { PappersCache } from './src/modules/cache/pappers-cache.entity';
+import { ApiUsageLog } from './src/modules/cache/api-usage-log.entity';
+import { Product } from './src/modules/product/product.entity';
+import { Brand } from './src/modules/brand/brand.entity';
+import { Company } from './src/modules/company/company.entity';
+
+const entities = [PappersCache, ApiUsageLog, Product, Brand, Company];
 
 export default defineConfig({
-  entities: ['./dist/modules/**/*.entity.js'],
-  entitiesTs: ['./src/modules/**/*.entity.ts'],
+  entities,
+  entitiesTs: entities,
   dbName: process.env.DATABASE_NAME || 'b_spot',
   host: process.env.DATABASE_HOST || 'localhost',
   port: Number(process.env.DATABASE_PORT) || 5432,

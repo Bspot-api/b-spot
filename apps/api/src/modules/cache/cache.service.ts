@@ -7,6 +7,7 @@ import { EmailService } from './email.service';
 
 const QUOTA_LIMIT = 250;
 const QUOTA_WARNING_THRESHOLD = 200;
+const DEFAULT_PAPPERS_CACHE_TTL_DAYS = 30;
 
 export interface QuotaStatus {
   used: number;
@@ -18,6 +19,8 @@ export interface QuotaStatus {
 @Injectable()
 export class CacheService {
   private readonly logger = new Logger(CacheService.name);
+  private readonly pappersCacheTtlMs =
+    this.getPappersCacheTtlDays() * 24 * 60 * 60 * 1000;
 
   constructor(
     @InjectRepository(PappersCache)
@@ -35,21 +38,20 @@ export class CacheService {
   }
 
   async setCachedPappers(siren: string, data: Record<string, unknown>): Promise<void> {
-    const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
     const now = new Date();
     const existing = await this.pappersCacheRepo.findOne({ siren });
 
     if (existing) {
       existing.responseData = data;
       existing.fetchedAt = now;
-      existing.expiresAt = new Date(now.getTime() + thirtyDaysMs);
+      existing.expiresAt = new Date(now.getTime() + this.pappersCacheTtlMs);
       await this.pappersCacheRepo.getEntityManager().flush();
     } else {
       const entry = this.pappersCacheRepo.create({
         siren,
         responseData: data,
         fetchedAt: now,
-        expiresAt: new Date(now.getTime() + thirtyDaysMs),
+        expiresAt: new Date(now.getTime() + this.pappersCacheTtlMs),
       });
       await this.pappersCacheRepo.getEntityManager().persistAndFlush(entry);
     }
@@ -107,5 +109,16 @@ export class CacheService {
   async isPappersQuotaExhausted(): Promise<boolean> {
     const used = await this.getMonthlyApiUsage(ExternalApi.PAPPERS);
     return used >= QUOTA_LIMIT;
+  }
+
+  private getPappersCacheTtlDays(): number {
+    const raw = process.env.PAPPERS_CACHE_TTL_DAYS;
+    const parsed = raw ? Number.parseInt(raw, 10) : NaN;
+
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      return DEFAULT_PAPPERS_CACHE_TTL_DAYS;
+    }
+
+    return parsed;
   }
 }
