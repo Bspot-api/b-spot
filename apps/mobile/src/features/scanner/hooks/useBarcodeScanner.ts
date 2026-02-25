@@ -1,47 +1,23 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { ApiError } from '../../../api/client';
 import { useScanProduct } from '../../../api/hooks';
 import type { ScanResultDto } from '../../../api/types';
+import { Toast } from '../../../components/reacticx/Toast';
 import type { ScanState } from '../components/ScanOverlay';
-
-type ScannerToastTone = 'info' | 'success' | 'warning' | 'error';
-
-export interface ScannerToast {
-  message: string;
-  tone: ScannerToastTone;
-}
 
 interface UseBarcodeScanner {
   state: ScanState;
   errorMessage: string | undefined;
   isScanning: boolean;
-  toast: ScannerToast | null;
   handleBarcodeScan: (barcode: string) => void;
 }
 
 export function useBarcodeScanner(): UseBarcodeScanner {
   const [state, setState] = useState<ScanState>('idle');
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
-  const [toast, setToast] = useState<ScannerToast | null>(null);
-  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
   const { mutateAsync: scan } = useScanProduct();
-
-  useEffect(
-    () => () => {
-      if (toastTimeoutRef.current) {
-        clearTimeout(toastTimeoutRef.current);
-      }
-    },
-    [],
-  );
-
-  const showToast = useCallback((message: string, tone: ScannerToastTone, durationMs = 2600) => {
-    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-    setToast({ message, tone });
-    toastTimeoutRef.current = setTimeout(() => setToast(null), durationMs);
-  }, []);
 
   const navigateToBrandSuggestion = useCallback(
     (result: ScanResultDto) => {
@@ -64,21 +40,14 @@ export function useBarcodeScanner(): UseBarcodeScanner {
     async (barcode: string) => {
       setState('loading');
       setErrorMessage(undefined);
+      Toast.show("La marque n'existe pas encore, on va essayer de la retrouver depuis le code-barres.", {
+        type: 'info',
+        position: 'top',
+        duration: 1800,
+      });
 
       try {
         const result = await scan(barcode);
-
-        if (result.brandResolution === 'auto_active') {
-          showToast("La marque n'existait pas encore. On l'a retrouvée !", 'success');
-        }
-
-        if (result.brandResolution === 'auto_pending') {
-          showToast(
-            "On a trouvé une correspondance probable. Elle est marquée comme pending.",
-            'warning',
-            3200,
-          );
-        }
 
         if (result.company) {
           setState('success');
@@ -87,15 +56,16 @@ export function useBarcodeScanner(): UseBarcodeScanner {
             params: {
               id: result.company.siren,
               brandStatus: result.brandStatus,
+              brandResolution: result.brandResolution,
             },
           });
         } else {
           if (result.brandResolution === 'needs_user_input') {
-            showToast(
-              "Arf, on n'est pas sûrs de la marque. Tu veux bien nous donner plus d'infos ?",
-              'warning',
-              3600,
-            );
+            Toast.show("Arf, on n'est pas sûrs de la marque, tu veux bien nous donner plus d'infos ?", {
+              type: 'warning',
+              position: 'top',
+              duration: 3600,
+            });
             setState('idle');
             navigateToBrandSuggestion(result);
             return;
@@ -104,25 +74,24 @@ export function useBarcodeScanner(): UseBarcodeScanner {
           const msg = result.message ?? 'Entreprise non trouvée pour ce produit.';
           setErrorMessage(msg);
           setState('error');
-          showToast(msg, 'error', 3000);
+          Toast.show(msg, { type: 'error', position: 'top', duration: 3000 });
           setTimeout(() => setState('idle'), 3000);
         }
       } catch (error: unknown) {
         const msg = resolveErrorMessage(error);
         setErrorMessage(msg);
         setState('error');
-        showToast(msg, 'error', 3000);
+        Toast.show(msg, { type: 'error', position: 'top', duration: 3000 });
         setTimeout(() => setState('idle'), 3000);
       }
     },
-    [scan, router, showToast],
+    [scan, router, navigateToBrandSuggestion],
   );
 
   return {
     state,
     errorMessage,
     isScanning: state === 'loading',
-    toast,
     handleBarcodeScan,
   };
 }

@@ -6,18 +6,44 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useEffect } from 'react';
 import { useLocalSearchParams } from 'expo-router';
+import { Toast } from '../../src/components/reacticx/Toast';
 import { CompanyHeader } from '../../src/features/company/components/CompanyHeader';
 import { ExecutivesList } from '../../src/features/company/components/ExecutivesList';
 import { ShareholdersList } from '../../src/features/company/components/ShareholdersList';
 import { useCompanyData } from '../../src/features/company/hooks/useCompanyData';
 
 export default function CompanyDetailScreen() {
-  const { id, brandStatus } = useLocalSearchParams<{ id: string; brandStatus?: string }>();
+  const { id, brandStatus, brandResolution } = useLocalSearchParams<{
+    id: string;
+    brandStatus?: string;
+    brandResolution?: string;
+  }>();
   const siren = Array.isArray(id) ? id[0] : id;
   const resolvedBrandStatus = Array.isArray(brandStatus) ? brandStatus[0] : brandStatus;
+  const resolvedBrandResolution = Array.isArray(brandResolution)
+    ? brandResolution[0]
+    : brandResolution;
   const { company, executives, shareholders, isLoading, errorMessage, retry } =
     useCompanyData(siren);
+
+  useEffect(() => {
+    if (resolvedBrandResolution === 'auto_pending') {
+      Toast.show("On a trouvé une correspondance probable et ajouté la marque (pending).", {
+        type: 'warning',
+        position: 'top',
+        duration: 3200,
+      });
+    }
+    if (resolvedBrandResolution === 'auto_active') {
+      Toast.show("Tu viens d'aider l'app : on a ajouté cette marque grâce à ton scan !", {
+        type: 'success',
+        position: 'top',
+        duration: 3200,
+      });
+    }
+  }, [resolvedBrandResolution]);
 
   async function handleShare() {
     if (!company) return;
@@ -59,21 +85,23 @@ export default function CompanyDetailScreen() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-zinc-50" contentContainerClassName="p-4 pb-8">
-      {resolvedBrandStatus === 'pending' && (
-        <View className="mb-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2">
-          <Text className="text-sm font-medium text-amber-900">
-            Correspondance marque en validation (pending)
-          </Text>
-        </View>
-      )}
-      <CompanyHeader company={company} onShare={handleShare} />
+    <View className="flex-1 bg-zinc-50">
+      <ScrollView className="flex-1" contentContainerClassName="p-4 pb-8">
+        {resolvedBrandStatus === 'pending' && (
+          <View className="mb-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2">
+            <Text className="text-sm font-medium text-amber-900">
+              Correspondance marque en validation (pending)
+            </Text>
+          </View>
+        )}
+        <CompanyHeader company={company} onShare={handleShare} />
 
-      <View className="mt-4 gap-4">
-        <ExecutivesList executives={executives} />
-        <ShareholdersList shareholders={shareholders} />
-      </View>
-    </ScrollView>
+        <View className="mt-4 gap-4">
+          <ExecutivesList executives={executives} />
+          <ShareholdersList shareholders={shareholders} />
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
