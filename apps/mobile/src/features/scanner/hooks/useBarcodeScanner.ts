@@ -40,10 +40,10 @@ export function useBarcodeScanner(): UseBarcodeScanner {
     async (barcode: string) => {
       setState('loading');
       setErrorMessage(undefined);
-      Toast.show("La marque n'existe pas encore, on va essayer de la retrouver depuis le code-barres.", {
+      Toast.show('Scan en cours, on vérifie le produit et la marque…', {
         type: 'info',
         position: 'top',
-        duration: 1800,
+        duration: 2200,
       });
 
       try {
@@ -61,10 +61,15 @@ export function useBarcodeScanner(): UseBarcodeScanner {
           });
         } else {
           if (result.brandResolution === 'needs_user_input') {
+            Toast.show("La marque n'existe pas encore, on va essayer de la retrouver depuis le code-barres.", {
+              type: 'info',
+              position: 'top',
+              duration: 3200,
+            });
             Toast.show("Arf, on n'est pas sûrs de la marque, tu veux bien nous donner plus d'infos ?", {
               type: 'warning',
               position: 'top',
-              duration: 3600,
+              duration: 5200,
             });
             setState('idle');
             navigateToBrandSuggestion(result);
@@ -74,14 +79,14 @@ export function useBarcodeScanner(): UseBarcodeScanner {
           const msg = result.message ?? 'Entreprise non trouvée pour ce produit.';
           setErrorMessage(msg);
           setState('error');
-          Toast.show(msg, { type: 'error', position: 'top', duration: 3000 });
+          Toast.show(msg, { type: 'error', position: 'top', duration: 5000 });
           setTimeout(() => setState('idle'), 3000);
         }
       } catch (error: unknown) {
         const msg = resolveErrorMessage(error);
         setErrorMessage(msg);
         setState('error');
-        Toast.show(msg, { type: 'error', position: 'top', duration: 3000 });
+        Toast.show(msg, { type: 'error', position: 'top', duration: 5000 });
         setTimeout(() => setState('idle'), 3000);
       }
     },

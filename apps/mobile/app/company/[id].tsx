@@ -33,14 +33,14 @@ export default function CompanyDetailScreen() {
       Toast.show("On a trouvé une correspondance probable et ajouté la marque (pending).", {
         type: 'warning',
         position: 'top',
-        duration: 3200,
+        duration: 5200,
       });
     }
     if (resolvedBrandResolution === 'auto_active') {
       Toast.show("Tu viens d'aider l'app : on a ajouté cette marque grâce à ton scan !", {
         type: 'success',
         position: 'top',
-        duration: 3200,
+        duration: 5200,
       });
     }
   }, [resolvedBrandResolution]);
