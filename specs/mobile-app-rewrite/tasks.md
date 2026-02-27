@@ -134,7 +134,7 @@
   - Create `apps/api/src/modules/health/health.controller.ts`
   - Implement `GET /health` endpoint
   - Return { status: 'ok', timestamp, version }
-  - Test: `curl http://localhost:3000/health`
+  - Test: `curl http://localhost:3001/health`
 
 ### Mobile Foundation
 
@@ -674,7 +674,7 @@
   - File: `apps/api/Dockerfile`
   - Multi-stage build: builder + runtime
   - Install dependencies, build NestJS app
-  - Expose port 3000
+  - Expose port 3001
 
 - [ ] T077 [P] [Deploy] Create production docker-compose.yml
   - File: `docker-compose.prod.yml`

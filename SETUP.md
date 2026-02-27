@@ -35,7 +35,7 @@ cp apps/mobile/.env.example apps/mobile/.env
 ```
 
 Edit `apps/mobile/.env` and configure:
-- API URL (default: http://localhost:3000)
+- API URL (default: http://localhost:3001)
 
 ### 3. Start PostgreSQL Database
 
@@ -77,7 +77,7 @@ pnpm dev:mobile
 
 **Test API:**
 ```bash
-curl http://localhost:3000/health
+curl http://localhost:3001/health
 ```
 
 Expected response:
@@ -153,7 +153,7 @@ After completing Phase 1 setup:
 
 ## Documentation
 
-- API Documentation: http://localhost:3000/api (when API is running)
+- API Documentation: http://localhost:3001/api (when API is running)
 - Expo Router: https://docs.expo.dev/router/introduction/
 - NestJS: https://docs.nestjs.com/
 - MikroORM: https://mikro-orm.io/

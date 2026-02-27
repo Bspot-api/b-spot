@@ -5,7 +5,7 @@ import type {
   ScanResultDto,
 } from './types';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
+const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3001';
 const API_TIMEOUT = parseInt(process.env.EXPO_PUBLIC_API_TIMEOUT ?? '10000', 10);
 
 export class ApiError extends Error {
