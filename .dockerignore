@@ -1,0 +1,11 @@
+node_modules
+dist
+.git
+*.md
+apps/mobile
+.env*
+coverage
+.playwright-mcp
+.nyc_output
+.vscode
+.idea
