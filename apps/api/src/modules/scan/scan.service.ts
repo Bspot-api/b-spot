@@ -5,7 +5,7 @@ import { BrandService } from '../brand/brand.service';
 import { BrandDiscoveryService } from '../brand/brand-discovery.service';
 import { BrandStatus } from '../brand/brand.entity';
 import { BrandSuggestionService } from '../brand-suggestion/brand-suggestion.service';
-import type { ScanResultDto } from './dto/scan.dto';
+import type { BrandScanResultDto, ScanResultDto } from './dto/scan.dto';
 
 @Injectable()
 export class ScanService {
@@ -87,6 +87,55 @@ export class ScanService {
     return {
       product: productDto,
       company: companyDto,
+      dataFreshness: 'fresh',
+      brandResolution,
+      brandStatus: brand.status,
+      discoveryConfidence,
+      message:
+        brand.status === BrandStatus.PENDING
+          ? 'Correspondance marque trouvée, en attente de validation'
+          : undefined,
+    };
+  }
+
+  async scanByBrandName(brandName: string): Promise<BrandScanResultDto> {
+    let brand = await this.brandService.findBrandByName(brandName);
+    let brandResolution: BrandScanResultDto['brandResolution'] = 'existing';
+    let discoveryConfidence: number | undefined;
+
+    if (!brand) {
+      this.logger.warn(`Brand not found in DB: "${brandName}" — trying auto discovery`);
+      const discovery = await this.brandDiscoveryService.discoverAndPersistBrand(brandName);
+      brand = discovery.brand ?? null;
+      discoveryConfidence = discovery.confidence;
+      if (discovery.resolution === 'auto_active') brandResolution = 'auto_active';
+      if (discovery.resolution === 'auto_pending') brandResolution = 'auto_pending';
+
+      if (!brand) {
+        return {
+          dataFreshness: 'unavailable',
+          message:
+            discovery.message ??
+            `Marque "${brandName}" non trouvée avec certitude. Essayez un nom plus précis.`,
+          brandResolution: 'needs_user_input',
+          discoveryConfidence,
+        };
+      }
+    }
+
+    const company = await this.companyService.getOrCreateCompany(brand.siren);
+    if (!company) {
+      return {
+        dataFreshness: 'unavailable',
+        message: 'Données entreprise temporairement indisponibles (quota Pappers atteint)',
+        brandResolution,
+        brandStatus: brand.status,
+        discoveryConfidence,
+      };
+    }
+
+    return {
+      company: this.companyService.toDto(company),
       dataFreshness: 'fresh',
       brandResolution,
       brandStatus: brand.status,

@@ -4,6 +4,44 @@ All notable changes to this feature specification are documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/)
 
+## [2026-02-27 03:00] - /speckit.implement (Phase 13 Complete)
+
+### Completed (Phase 13)
+
+- T091: `app/(tabs)/_layout.web.tsx` — `<Slot />` sans tab bar (web uniquement, mobile inchangé)
+- T092: `BrandScanRequestDto` + `BrandScanResultDto` dans `scan.dto.ts`
+- T093: `scanByBrandName()` dans `scan.service.ts` — réutilise BrandService + BrandDiscoveryService + CompanyService
+- T094: `POST /api/scan/brand` dans `scan.controller.ts`
+- T095: `BrandScanResultDto` dans `mobile/src/api/types.ts`
+- T096: `scanByBrand()` dans `mobile/src/api/client.ts`
+- T097: `useScanByBrand()` dans `mobile/src/api/hooks.ts`
+- T098: `useBrandSearch.ts` — state machine idle/loading/success/error, même pattern que useBarcodeScanner
+- T099: `index.web.tsx` — toggle Code-barres | Marque, validation adaptée au mode, erreurs et loading partagés
+- **Author**: AI (Claude Sonnet 4.6)
+- **Files**: `apps/mobile/app/(tabs)/_layout.web.tsx` (créé), `apps/api/src/modules/scan/dto/scan.dto.ts` (modifié), `apps/api/src/modules/scan/scan.service.ts` (modifié), `apps/api/src/modules/scan/scan.controller.ts` (modifié), `apps/mobile/src/api/types.ts` (modifié), `apps/mobile/src/api/client.ts` (modifié), `apps/mobile/src/api/hooks.ts` (modifié), `apps/mobile/src/features/scanner/hooks/useBrandSearch.ts` (créé), `apps/mobile/app/(tabs)/index.web.tsx` (modifié)
+
+---
+
+## [2026-02-27 02:00] - /speckit.tasks (Phase 13)
+
+### Added (Phase 13)
+
+- Phase 13: Web UI Améliorations — 10 tasks (T091-T100)
+  - T091: `_layout.web.tsx` — suppression tab bar sur web via `<Slot />`
+  - T092: `BrandScanRequestDto` + `BrandScanResultDto` dans scan.dto.ts
+  - T093: `scanByBrandName()` dans scan.service.ts
+  - T094: `POST /api/scan/brand` dans scan.controller.ts
+  - T095: `BrandScanResultDto` dans mobile/src/api/types.ts
+  - T096: `scanByBrand()` dans mobile/src/api/client.ts
+  - T097: `useScanByBrand()` dans mobile/src/api/hooks.ts
+  - T098: `useBrandSearch.ts` hook
+  - T099: `index.web.tsx` — toggle barcode/marque + formulaire marque
+  - T100: Validation E2E manuelle
+- **Author**: AI (Claude Sonnet 4.6)
+- **Files**: tasks.md
+
+---
+
 ## [2026-02-27 01:00] - /speckit.implement (Phase 12 Complete)
 
 ### Completed (Phase 12)

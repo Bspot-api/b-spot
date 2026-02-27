@@ -42,6 +42,17 @@ export interface ScanResultDto {
   brandSuggestionId?: number;
 }
 
+export interface BrandScanResultDto {
+  company?: CompanyDto;
+  dataFreshness: 'fresh' | 'cached' | 'unavailable';
+  message?: string;
+  brandResolution?: 'existing' | 'auto_active' | 'auto_pending' | 'needs_user_input';
+  brandStatus?: 'active' | 'pending' | 'deleted';
+  discoveryConfidence?: number;
+  userActionRequired?: 'submit_brand_suggestion';
+  brandSuggestionId?: number;
+}
+
 export interface CreateBrandSuggestionDto {
   brandName: string;
   barcode?: string;

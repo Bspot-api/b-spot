@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { createBrandSuggestion, getCompany, scanProduct } from './client';
+import { createBrandSuggestion, getCompany, scanByBrand, scanProduct } from './client';
 import type { CreateBrandSuggestionDto } from './types';
 
 export function useScanProduct() {
@@ -13,6 +13,12 @@ export function useGetCompany(siren: string | undefined) {
     queryKey: ['company', siren],
     queryFn: () => getCompany(siren!),
     enabled: !!siren,
+  });
+}
+
+export function useScanByBrand() {
+  return useMutation({
+    mutationFn: (brandName: string) => scanByBrand(brandName),
   });
 }
 

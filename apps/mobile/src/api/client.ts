@@ -1,4 +1,5 @@
 import type {
+  BrandScanResultDto,
   BrandSuggestionDto,
   CompanyDto,
   CreateBrandSuggestionDto,
@@ -54,6 +55,13 @@ export async function scanProduct(barcode: string): Promise<ScanResultDto> {
 
 export async function getCompany(siren: string): Promise<CompanyDto> {
   return apiFetch<CompanyDto>(`/api/companies/${siren}`);
+}
+
+export async function scanByBrand(brandName: string): Promise<BrandScanResultDto> {
+  return apiFetch<BrandScanResultDto>('/api/scan/brand', {
+    method: 'POST',
+    body: JSON.stringify({ brandName }),
+  });
 }
 
 export async function createBrandSuggestion(

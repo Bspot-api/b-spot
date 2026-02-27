@@ -7,25 +7,51 @@ import {
   View,
 } from 'react-native';
 import { useBarcodeScanner } from '../../src/features/scanner/hooks/useBarcodeScanner';
+import { useBrandSearch } from '../../src/features/scanner/hooks/useBrandSearch';
+
+type SearchMode = 'barcode' | 'brand';
 
 export default function WebSearchScreen() {
-  const { state, errorMessage, handleBarcodeScan } = useBarcodeScanner();
-  const [barcode, setBarcode] = useState('');
+  const [mode, setMode] = useState<SearchMode>('barcode');
+  const [input, setInput] = useState('');
   const [validationError, setValidationError] = useState<string | undefined>();
 
-  const handleSubmit = useCallback(() => {
-    const trimmed = barcode.trim();
-    if (trimmed.length < 8 || trimmed.length > 14) {
-      setValidationError('Le code-barres doit contenir entre 8 et 14 chiffres.');
-      return;
-    }
-    setValidationError(undefined);
-    handleBarcodeScan(trimmed);
-    setBarcode('');
-  }, [barcode, handleBarcodeScan]);
+  const { state: barcodeState, errorMessage: barcodeError, handleBarcodeScan } = useBarcodeScanner();
+  const { state: brandState, errorMessage: brandError, handleBrandSearch } = useBrandSearch();
 
-  const isLoading = state === 'loading';
-  const displayError = validationError ?? (state === 'error' ? errorMessage : undefined);
+  const isLoading = barcodeState === 'loading' || brandState === 'loading';
+  const apiError = mode === 'barcode'
+    ? (barcodeState === 'error' ? barcodeError : undefined)
+    : (brandState === 'error' ? brandError : undefined);
+  const displayError = validationError ?? apiError;
+
+  const handleModeChange = useCallback((next: SearchMode) => {
+    setMode(next);
+    setInput('');
+    setValidationError(undefined);
+  }, []);
+
+  const handleSubmit = useCallback(() => {
+    const trimmed = input.trim();
+
+    if (mode === 'barcode') {
+      if (trimmed.length < 8 || trimmed.length > 14) {
+        setValidationError('Le code-barres doit contenir entre 8 et 14 chiffres.');
+        return;
+      }
+      setValidationError(undefined);
+      handleBarcodeScan(trimmed);
+      setInput('');
+    } else {
+      if (trimmed.length < 2) {
+        setValidationError('Saisissez au moins 2 caractères.');
+        return;
+      }
+      setValidationError(undefined);
+      handleBrandSearch(trimmed);
+      setInput('');
+    }
+  }, [input, mode, handleBarcodeScan, handleBrandSearch]);
 
   return (
     <View className="flex-1 bg-zinc-50 items-center justify-center px-6">
@@ -35,22 +61,45 @@ export default function WebSearchScreen() {
       </Text>
 
       <View className="w-full max-w-sm bg-white rounded-2xl border border-zinc-200 p-6">
+        {/* Mode toggle */}
+        <View className="flex-row rounded-xl bg-zinc-100 p-1 mb-5">
+          <Pressable
+            onPress={() => handleModeChange('barcode')}
+            className={`flex-1 rounded-lg py-2 items-center ${mode === 'barcode' ? 'bg-white shadow-sm' : ''}`}
+            accessibilityRole="button"
+          >
+            <Text className={`text-sm font-semibold ${mode === 'barcode' ? 'text-zinc-900' : 'text-zinc-500'}`}>
+              Code-barres
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => handleModeChange('brand')}
+            className={`flex-1 rounded-lg py-2 items-center ${mode === 'brand' ? 'bg-white shadow-sm' : ''}`}
+            accessibilityRole="button"
+          >
+            <Text className={`text-sm font-semibold ${mode === 'brand' ? 'text-zinc-900' : 'text-zinc-500'}`}>
+              Marque
+            </Text>
+          </Pressable>
+        </View>
+
+        {/* Input */}
         <Text className="text-sm font-semibold text-zinc-700 mb-2">
-          Code-barres du produit
+          {mode === 'barcode' ? 'Code-barres du produit' : 'Nom de la marque'}
         </Text>
         <TextInput
-          value={barcode}
+          value={input}
           onChangeText={(text) => {
-            setBarcode(text);
+            setInput(text);
             setValidationError(undefined);
           }}
-          placeholder="Ex: 3017620422003"
-          keyboardType="numeric"
+          placeholder={mode === 'barcode' ? 'Ex: 3017620422003' : "Ex: nutella, danone, l'oréal"}
+          keyboardType={mode === 'barcode' ? 'numeric' : 'default'}
           className="border border-zinc-300 rounded-xl px-4 py-3 text-zinc-900 bg-zinc-50 mb-4"
           onSubmitEditing={handleSubmit}
           returnKeyType="search"
           editable={!isLoading}
-          accessibilityLabel="Code-barres du produit"
+          accessibilityLabel={mode === 'barcode' ? 'Code-barres du produit' : 'Nom de la marque'}
         />
 
         <Pressable
@@ -75,7 +124,9 @@ export default function WebSearchScreen() {
       </View>
 
       <Text className="mt-8 text-xs text-zinc-400 text-center max-w-xs">
-        Saisissez le code-barres EAN-8, EAN-13 ou UPC imprimé sur l'emballage
+        {mode === 'barcode'
+          ? 'Saisissez le code EAN-8, EAN-13 ou UPC imprimé sur l\'emballage'
+          : 'Saisissez le nom exact ou approché de la marque'}
       </Text>
     </View>
   );

@@ -461,34 +461,34 @@
 
 ### Company Feature
 
-- [ ] T049 [P] [US2/3] Create company feature structure
+- [X] T049 [P] [US2/3] Create company feature structure
   - Directory: `apps/mobile/src/features/company/`
   - Subdirs: `components/`, `hooks/`
 
-- [ ] T050 [P] [US2] Implement CompanyHeader component
+- [X] T050 [P] [US2] Implement CompanyHeader component
   - File: `apps/mobile/src/features/company/components/CompanyHeader.tsx`
   - Display: company logo, legal name, SIREN
   - Display: "Données au [DATE]" badge (lastFetchedAt)
 
-- [ ] T051 [P] [US2] Implement ExecutivesList component
+- [X] T051 [P] [US2] Implement ExecutivesList component
   - File: `apps/mobile/src/features/company/components/ExecutivesList.tsx`
   - Display: List of executives with name + role
   - CEO at top with "Directeur Général" badge
   - Touchable cards (future: modal with details)
 
-- [ ] T052 [P] [US3] Implement ShareholdersList component
+- [X] T052 [P] [US3] Implement ShareholdersList component
   - File: `apps/mobile/src/features/company/components/ShareholdersList.tsx`
   - Display: List of shareholders with name + percentage
   - Distinguish individual vs corporate (icon or badge)
   - Sort by percentage descending
 
-- [ ] T053 [US2/3] Implement useCompanyData hook
+- [X] T053 [US2/3] Implement useCompanyData hook
   - File: `apps/mobile/src/features/company/hooks/useCompanyData.ts`
   - Use generated `useGetCompany` hook from API client
   - Handle loading, error states
   - Return: { company, executives, shareholders, isLoading, error }
 
-- [ ] T054 [US2/3] Implement Company Detail screen
+- [X] T054 [US2/3] Implement Company Detail screen
   - File: `apps/mobile/app/company/[id].tsx`
   - Get SIREN from route params
   - Call useCompanyData(siren)
@@ -499,7 +499,7 @@
 
 ### Share Functionality
 
-- [ ] T055 [P] [US1] Implement share functionality
+- [X] T055 [P] [US1] Implement share functionality
   - Use React Native Share API
   - Share text: "Découvrez [Company Name] sur B-Spot"
   - Share URL: deep link to company (future: https://b-spot.app/company/:siren)
@@ -514,11 +514,12 @@
 
 ### Offline Infrastructure
 
-- [ ] T056 [P] [Offline] Configure TanStack Query persister
+- [X] T056 [P] [Offline] Configure TanStack Query persister
   - File: `apps/mobile/src/lib/queryClient.ts`
   - Install @tanstack/query-async-storage-persister
   - Configure AsyncStorage persister
   - Set cacheTime: 7 days (cached company data available for 7 days offline)
+  - **Note**: Implemented at `apps/mobile/src/api/query-client.ts` with networkMode: 'offlineFirst'
 
 - [ ] T057 [P] [Offline] Implement useOfflineStatus hook
   - File: `apps/mobile/src/features/common/hooks/useOfflineStatus.ts`
@@ -813,7 +814,7 @@
 
 ### Validation
 
-- [ ] T090 [US-Web] Run `pnpm web` and validate web front-end end-to-end
+- [X] T090 [US-Web] Run `pnpm web` and validate web front-end end-to-end
   - Run: `cd apps/mobile && pnpm web`
   - Test 1: `http://localhost:8081` → formulaire de saisie visible, pas d'erreur console
   - Test 2: Saisir `3017620422003` (Nutella/Ferrero) → Chargement... → `/company/{SIREN}` → nom entreprise + dirigeants affichés
@@ -827,29 +828,121 @@
 
 ---
 
+## Phase 13: Web UI — Navigation + Recherche par Marque
+
+**Purpose**: Améliorer l'interface web : supprimer la barre de navigation des onglets (hors-sujet sur desktop), et ajouter la recherche par nom de marque (en complément du code-barres).
+
+**User stories**:
+- **US-Web2** : En tant qu'utilisateur web, je ne vois pas de barre de navigation mobile inutile.
+- **US-Web3** : En tant qu'utilisateur web, je peux saisir un nom de marque (ex: "nutella") et voir l'entreprise propriétaire, sans avoir à connaître le code-barres.
+
+**Independent test**:
+- `pnpm web` → aucune tab bar visible en bas de page
+- Onglet "Marque" → saisir "nutella" → navigation vers `/company/{SIREN}` de Ferrero
+
+**Prerequisites**: Phase 12 ✅ (web front-end de base)
+
+### Suppression de la barre de navigation sur web
+
+- [X] T091 [US-Web2] Create `apps/mobile/app/(tabs)/_layout.web.tsx`
+  - Metro résout `.web.tsx` avant `.tsx` → ce fichier remplace `_layout.tsx` sur web uniquement
+  - Contenu : `import { Slot } from 'expo-router'; export default function WebLayout() { return <Slot />; }`
+  - `<Slot />` rend l'écran actif sans aucune tab bar ni header
+  - Mobile inchangé : `_layout.tsx` reste intact pour iOS/Android
+
+### Backend : Endpoint `POST /api/scan/brand`
+
+- [X] T092 [P] [US-Web3] Add `BrandScanRequestDto` and `BrandScanResultDto` in `apps/api/src/modules/scan/dto/scan.dto.ts`
+  - `BrandScanRequestDto` : `brandName: string` (IsString, MinLength(2), MaxLength(100))
+  - `BrandScanResultDto` : `company?: CompanyDto`, `dataFreshness`, `message?`, `brandResolution?`, `brandStatus?`, `discoveryConfidence?`, `userActionRequired?`, `brandSuggestionId?`
+  - Note : `product` est absent (pas de barcode pour la recherche par marque)
+
+- [X] T093 [US-Web3] Add `scanByBrandName(brandName: string): Promise<BrandScanResultDto>` in `apps/api/src/modules/scan/scan.service.ts`
+  - Réutiliser : `BrandService.findBrandByName()`, `BrandDiscoveryService.discoverAndPersistBrand()`, `CompanyService.getOrCreateCompany()`
+  - Flow : `findBrandByName()` → si trouvé : `brandResolution: 'existing'` → `getOrCreateCompany(siren)` → return
+  - Si non trouvé : `discoverAndPersistBrand(brandName)` → même logique de résolution que `scanProduct()` (auto_active / auto_pending / needs_user_input)
+  - Si brand résolue : `getOrCreateCompany(brand.siren)` → return avec `dataFreshness` du résultat Pappers
+  - Si `needs_user_input` : return `{ company: undefined, dataFreshness: 'unavailable', brandResolution: 'needs_user_input', message: 'Marque non trouvée avec certitude.' }`
+
+- [X] T094 [US-Web3] Add `POST /api/scan/brand` endpoint in `apps/api/src/modules/scan/scan.controller.ts`
+  - `@Post('brand')` — appelle `this.scanService.scanByBrandName(dto.brandName)`
+  - Body : `BrandScanRequestDto` ; Response : `BrandScanResultDto`
+  - Swagger `@ApiOperation({ summary: 'Search company by brand name' })`
+
+### Mobile : Couche API
+
+- [X] T095 [P] [US-Web3] Add `BrandScanResultDto` interface in `apps/mobile/src/api/types.ts`
+  - Miroir du DTO backend : `company?: CompanyDto`, `dataFreshness`, `message?`, `brandResolution?`, `brandStatus?`, `discoveryConfidence?`, `userActionRequired?`, `brandSuggestionId?`
+
+- [X] T096 [P] [US-Web3] Add `scanByBrand(brandName: string)` in `apps/mobile/src/api/client.ts`
+  - `POST /api/scan/brand` avec body `{ brandName }` via `apiFetch<BrandScanResultDto>()`
+
+- [X] T097 [P] [US-Web3] Add `useScanByBrand()` hook in `apps/mobile/src/api/hooks.ts`
+  - `useMutation({ mutationFn: (brandName: string) => scanByBrand(brandName) })`
+
+### Mobile : Hook `useBrandSearch`
+
+- [X] T098 [US-Web3] Create `apps/mobile/src/features/scanner/hooks/useBrandSearch.ts`
+  - Même pattern que `useBarcodeScanner` (state machine `idle | loading | success | error`)
+  - `handleBrandSearch(brandName: string)` : appelle `useScanByBrand()` mutation
+  - Sur succès avec `result.company` : navigate vers `/company/[siren]` avec `brandStatus` + `brandResolution`
+  - Sur `needs_user_input` : Toast warning "Marque non trouvée avec certitude. Essayez un nom plus précis." + reset idle
+  - Sur erreur API : Toast error + `setErrorMessage` + reset idle après 3s
+
+### Mobile : Mise à jour `index.web.tsx`
+
+- [X] T099 [US-Web3] Update `apps/mobile/app/(tabs)/index.web.tsx` — toggle barcode / brand search
+  - Ajouter state local `searchMode: 'barcode' | 'brand'` (useState)
+  - Toggle UI : deux boutons dans la carte ("Code-barres" | "Marque"), style actif/inactif via NativeWind
+  - Mode "Code-barres" : formulaire actuel inchangé → `useBarcodeScanner.handleBarcodeScan()`
+  - Mode "Marque" : `TextInput` texte libre, validation min 2 chars → `useBrandSearch.handleBrandSearch()`
+  - Le champ input + bouton + loading + erreur s'adaptent au mode actif
+  - Helper text : mode barcode "EAN-8, EAN-13 ou UPC" / mode marque "Ex: nutella, danone, l'oréal"
+
+### Validation Phase 13
+
+- [ ] T100 [US-Web3] Manual E2E validation of Phase 13
+  - Test 1 : `pnpm web` → aucune tab bar visible en bas ✓
+  - Test 2 : Onglet "Code-barres" → saisir `3017620422003` → navigation vers Ferrero ✓
+  - Test 3 : Onglet "Marque" → saisir `nutella` → navigation vers Ferrero ✓
+  - Test 4 : Onglet "Marque" → saisir `zzz` → message d'erreur clair ✓
+  - Test 5 : `pnpm ios` → tab bar toujours présente (non-regression mobile) ✓
+
+**Checkpoint**: UI web améliorée — pas de nav bar, recherche barcode + marque fonctionnelle ✅
+
+---
+
 ## Summary
 
-**Total Tasks**: 93 tasks
-- **Research (Phase 0)**: 7 tasks
-- **Setup (Phase 1)**: 11 tasks
-- **Backend Core (Phase 2)**: 9 tasks
-- **Backend Data Layer (Phase 3)**: 15 tasks
-- **Backend Scan (Phase 4)**: 7 tasks
-- **Mobile Scanner (Phase 5)**: 6 tasks
-- **Mobile Company (Phase 6)**: 7 tasks
-- **Offline Support (Phase 7)**: 4 tasks
-- **Open Beauty Facts (Phase 8)**: 3 tasks
-- **Error Handling (Phase 9)**: 7 tasks
-- **Testing (Phase 10)**: 6 tasks
-- **Deployment (Phase 11)**: 7 tasks
-- **Post-Implementation**: 3 tasks
-- **Web Front-End (Phase 12)**: 4 tasks ← nouveau
+**Total Tasks**: 103 tasks
+
+| Phase | Count | Status |
+| --- | --- | --- |
+| Research (Phase 0) | 7 | ✅ |
+| Setup (Phase 1) | 11 | ✅ |
+| Backend Core (Phase 2) | 9 | ✅ |
+| Backend Data Layer (Phase 3) | 15 | ✅ |
+| Backend Scan (Phase 4) | 7 | ✅ |
+| Mobile Scanner (Phase 5) | 6 | ✅ |
+| Mobile Company (Phase 6) | 7 | ✅ |
+| Offline Support (Phase 7) | 4 | pending |
+| Open Beauty Facts (Phase 8) | 3 | pending |
+| Error Handling (Phase 9) | 7 | pending |
+| Testing (Phase 10) | 6 | pending |
+| Deployment (Phase 11) | 7 | pending |
+| Post-Implementation | 3 | pending |
+| Web Front-End (Phase 12) | 4 | ✅ |
+| Web UI Améliorations (Phase 13) | 10 | ← nouveau |
 
 **Critical Path (MVP)**:
-1. Research (R001-R007) → 2. Setup (T001-T011) → 3. Cache (T012-T020) → 4. Data Layer (T021-T035) → 5. Scan API (T036-T042) → 6. Mobile Scanner (T043-T048) → 7. Company Detail (T049-T055) → 8. Testing (T070-T075) → 9. Deploy (T076-T082)
+
+Research (R001-R007) → Setup (T001-T011) → Cache (T012-T020) → Data Layer (T021-T035) → Scan API (T036-T042) → Mobile Scanner (T043-T048) → Company Detail (T049-T055) → Testing (T070-T075) → Deploy (T076-T082)
 
 **Estimated MVP Timeline**: 4-6 weeks (with 1 developer)
-- Phase 0-1: 1 week
-- Phase 2-4: 2 weeks
-- Phase 5-7: 1.5 weeks
-- Phase 9-11: 1.5 weeks
+
+| Period | Work |
+| --- | --- |
+| Phase 0-1 | 1 week |
+| Phase 2-4 | 2 weeks |
+| Phase 5-7 | 1.5 weeks |
+| Phase 9-11 | 1.5 weeks |

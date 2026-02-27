@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, Length } from 'class-validator';
+import { IsString, Length, MaxLength, MinLength } from 'class-validator';
 import type { ProductDto } from '../../product/dto/product.dto';
 import type { CompanyDto } from '../../company/dto/company.dto';
 import { BrandStatus } from '../../brand/brand.entity';
@@ -9,6 +9,42 @@ export class ScanRequestDto {
   @IsString()
   @Length(8, 14)
   barcode!: string;
+}
+
+export class BrandScanRequestDto {
+  @ApiProperty({ example: 'nutella', description: 'Brand name to search' })
+  @IsString()
+  @MinLength(2)
+  @MaxLength(100)
+  brandName!: string;
+}
+
+export class BrandScanResultDto {
+  @ApiPropertyOptional()
+  company?: CompanyDto;
+
+  @ApiProperty({ enum: ['fresh', 'cached', 'unavailable'], example: 'fresh' })
+  dataFreshness!: 'fresh' | 'cached' | 'unavailable';
+
+  @ApiPropertyOptional()
+  message?: string;
+
+  @ApiPropertyOptional({
+    enum: ['existing', 'auto_active', 'auto_pending', 'needs_user_input'],
+  })
+  brandResolution?: 'existing' | 'auto_active' | 'auto_pending' | 'needs_user_input';
+
+  @ApiPropertyOptional({ enum: ['active', 'pending', 'deleted'] })
+  brandStatus?: BrandStatus;
+
+  @ApiPropertyOptional({ example: 87 })
+  discoveryConfidence?: number;
+
+  @ApiPropertyOptional({ enum: ['submit_brand_suggestion'] })
+  userActionRequired?: 'submit_brand_suggestion';
+
+  @ApiPropertyOptional({ example: 12 })
+  brandSuggestionId?: number;
 }
 
 export class ScanResultDto {

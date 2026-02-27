@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ScanService } from './scan.service';
-import { ScanRequestDto, ScanResultDto } from './dto/scan.dto';
+import { BrandScanRequestDto, BrandScanResultDto, ScanRequestDto, ScanResultDto } from './dto/scan.dto';
 
 @ApiTags('scan')
 @Controller('api/scan')
@@ -15,5 +15,13 @@ export class ScanController {
   @ApiResponse({ status: 404, description: 'Product not found in Open Food Facts' })
   async scanProduct(@Body() body: ScanRequestDto): Promise<ScanResultDto> {
     return this.scanService.scanProduct(body.barcode);
+  }
+
+  @Post('brand')
+  @ApiOperation({ summary: 'Search company by brand name' })
+  @ApiBody({ type: BrandScanRequestDto })
+  @ApiResponse({ status: 201, type: BrandScanResultDto, description: 'Company data for the brand' })
+  async scanByBrand(@Body() body: BrandScanRequestDto): Promise<BrandScanResultDto> {
+    return this.scanService.scanByBrandName(body.brandName);
   }
 }
