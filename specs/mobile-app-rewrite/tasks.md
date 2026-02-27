@@ -741,9 +741,95 @@
 
 ---
 
+## Phase 12: Web Front-End (Expo Web Mode)
+
+**Purpose**: Expose B-Spot functionality in a web browser using Expo's web mode (Metro bundler + react-native-web). The camera scanner is replaced by a barcode text input form. Existing API hooks and company detail components are reused as-is.
+
+**User story**: En tant qu'utilisateur desktop, je peux saisir un code-barres dans un formulaire et consulter les informations de l'entreprise propriétaire dans un navigateur.
+
+**Independent test**: `cd apps/mobile && pnpm web` → formulaire visible à `/`, saisir `3017620422003` → page `/company/{SIREN}` s'affiche avec dirigeants et actionnaires.
+
+**Prerequisites**: Phase 5 ✅ (scanner natif), Phase 6 (company detail components)
+
+**How Expo web mode works**: Metro bundler automatically resolves `.web.tsx` files over `.tsx` files when targeting web (`pnpm web`). No changes to imports are needed — the bundler selects the right variant. All existing files without a `.web.tsx` variant run unchanged on web via `react-native-web` polyfills.
+
+### Foundation: Toast Web Variant
+
+- [X] T087 [P] [US-Web] Create `apps/mobile/src/components/reacticx/Toast/Toast.web.tsx`
+  - **Why**: `Toast.tsx` imports `react-native-worklets` (`scheduleOnRN`) which is incompatible with web. Metro will use this `.web.tsx` variant instead on web builds.
+  - Re-implement the `Toast` component using **React Native's built-in `Animated`** (not Reanimated, not Worklets) — guaranteed cross-platform
+  - Preserve the exact same `ToastProps` interface as `Toast.tsx`
+  - Preserve the same visual output: colored pill, icon, text, action button, expanded content
+  - Replace `scheduleOnRN(handleDismiss)` with `setTimeout(handleDismiss, 0)`
+  - Remove: `LayoutAnimation`, `UIManager`, `react-native-reanimated`, `react-native-worklets`
+  - Use: `Animated.View` + `Animated.timing()` for enter/exit opacity + translateY
+  - Keep: `Pressable`, `TouchableOpacity`, `StyleSheet`, `Text`, `View` from `react-native`
+  - Note: `ToastViewPort.tsx` does NOT need a web variant — `useSafeAreaInsets()` returns zeros on web ✅
+
+### Web Home Screen
+
+- [X] T088 [US-Web] Create `apps/mobile/app/(tabs)/index.web.tsx`
+  - **Why**: `index.tsx` imports `expo-camera` (via `BarcodeScanner.tsx`) which crashes on web. Metro will use `index.web.tsx` on web builds.
+  - Reuse `useBarcodeScanner` hook from `src/features/scanner/hooks/useBarcodeScanner.ts` (hook is web-safe — it calls `handleBarcodeScan(barcode: string)`)
+  - UI layout:
+    - Centered container with `View className="flex-1 bg-zinc-50 items-center justify-center px-6"`
+    - Title: "B-Spot — Transparence Corporate"
+    - Subtitle: "Entrez un code-barres EAN pour découvrir l'entreprise derrière le produit"
+    - `TextInput` (from react-native) with placeholder "Ex: 3017620422003" for barcode input
+    - "Rechercher" `Pressable` button that calls `handleBarcodeScan(barcode)`
+    - Conditional loading spinner (`ActivityIndicator`) when `state === 'loading'`
+    - Conditional error message (`Text`) when `state === 'error'` with `errorMessage`
+    - Input validation: trim + length check (8-14 chars) before calling handler
+  - Style with NativeWind Tailwind classes (consistent with rest of app)
+  - Do NOT import `BarcodeScanner`, `ScanOverlay`, or `expo-camera`
+
+### Web Compatibility Fix
+
+- [X] T089 [US-Web] Fix `Share.share()` in `apps/mobile/app/company/[id].tsx`
+  - **Why**: `Share.share()` from react-native is not available on web (no native share sheet)
+  - Add `import { Platform } from 'react-native'` (already imported via other RN imports)
+  - Replace the `handleShare` function body:
+
+    ```tsx
+    async function handleShare() {
+      if (!company) return;
+      const url = `https://b-spot.app/company/${company.siren}`;
+      if (Platform.OS === 'web') {
+        await navigator.clipboard.writeText(url);
+        Toast.show('Lien copié dans le presse-papiers !', {
+          type: 'success',
+          position: 'top',
+          duration: 2000,
+        });
+      } else {
+        await Share.share({
+          message: `Decouvrez ${company.legalName} sur B-Spot\n${url}`,
+        });
+      }
+    }
+    ```
+
+  - Note: `navigator.clipboard` requires HTTPS or localhost — acceptable for production and dev
+
+### Validation
+
+- [ ] T090 [US-Web] Run `pnpm web` and validate web front-end end-to-end
+  - Run: `cd apps/mobile && pnpm web`
+  - Test 1: `http://localhost:8081` → formulaire de saisie visible, pas d'erreur console
+  - Test 2: Saisir `3017620422003` (Nutella/Ferrero) → Chargement... → `/company/{SIREN}` → nom entreprise + dirigeants affichés
+  - Test 3: Naviguer directement vers `http://localhost:8081/company/552108011` → page Nestlé
+  - Test 4: Bouton "Partager" → toast "Lien copié" + contenu clipboard correct
+  - Test 5: Saisir un code-barres invalide (ex: "123") → message d'erreur affiché
+  - Test 6: `pnpm ios` (ou `pnpm android`) → scanner caméra natif inchangé (non-regression)
+  - Report: any console errors or missing UI elements
+
+**Checkpoint**: Web front-end fonctionnel — formulaire → company detail → partage ✅
+
+---
+
 ## Summary
 
-**Total Tasks**: 86 tasks
+**Total Tasks**: 93 tasks
 - **Research (Phase 0)**: 7 tasks
 - **Setup (Phase 1)**: 11 tasks
 - **Backend Core (Phase 2)**: 9 tasks
@@ -757,6 +843,7 @@
 - **Testing (Phase 10)**: 6 tasks
 - **Deployment (Phase 11)**: 7 tasks
 - **Post-Implementation**: 3 tasks
+- **Web Front-End (Phase 12)**: 4 tasks ← nouveau
 
 **Critical Path (MVP)**:
 1. Research (R001-R007) → 2. Setup (T001-T011) → 3. Cache (T012-T020) → 4. Data Layer (T021-T035) → 5. Scan API (T036-T042) → 6. Mobile Scanner (T043-T048) → 7. Company Detail (T049-T055) → 8. Testing (T070-T075) → 9. Deploy (T076-T082)

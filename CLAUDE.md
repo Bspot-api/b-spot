@@ -218,3 +218,10 @@ Mobile types are auto-generated from the API's OpenAPI schema:
 - **Mobile**: Expo EAS Build for app store distribution
 - **Database**: PostgreSQL (managed or self-hosted)
 - **Hosting**: Optimized for low-cost deployment (Pappers free tier constraint)
+
+## Active Technologies
+- TypeScript strict (`strict: true`, `noImplicitAny`, `strictNullChecks`) + Expo ~52.0 (Metro bundler), NestJS 10, MikroORM 6, NativeWind 4, TanStack Query 5, Expo Router 6 (refactor/mobile-app-rewrite)
+- PostgreSQL 15 (MikroORM) côté API ; TanStack Query + AsyncStorage côté mobile (refactor/mobile-app-rewrite)
+
+## Recent Changes
+- refactor/mobile-app-rewrite: Added TypeScript strict (`strict: true`, `noImplicitAny`, `strictNullChecks`) + Expo ~52.0 (Metro bundler), NestJS 10, MikroORM 6, NativeWind 4, TanStack Query 5, Expo Router 6

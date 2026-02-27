@@ -4,6 +4,33 @@ All notable changes to this feature specification are documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/)
 
+## [2026-02-27 01:00] - /speckit.implement (Phase 12 Complete)
+
+### Completed (Phase 12)
+
+- Phase 12: Web Front-End (Expo Web Mode) — 3/4 tasks (T090 = manual validation)
+  - T087: `Toast.web.tsx` — re-implemented with React Native `Animated` (no react-native-reanimated, no react-native-worklets). Same visual design and public API.
+  - T088: `app/(tabs)/index.web.tsx` — barcode search form. Reuses `useBarcodeScanner` hook, NativeWind styling, validation (8-14 chars), loading + error states.
+  - T089: `app/company/[id].tsx` — `Share.share()` guarded by `Platform.OS === 'web'`. Web: `navigator.clipboard.writeText()` + Toast confirmation. Native: unchanged.
+- **Author**: AI (Claude Sonnet 4.6)
+- **Files**: `apps/mobile/src/components/reacticx/Toast/Toast.web.tsx` (created), `apps/mobile/app/(tabs)/index.web.tsx` (created), `apps/mobile/app/company/[id].tsx` (modified), `specs/mobile-app-rewrite/tasks.md` (T087-T089 marked ✅), `specs/mobile-app-rewrite/plan.md` (template replaced)
+
+---
+
+## [2026-02-27 00:00] - /speckit.tasks
+
+### Added (Phase 12)
+
+- Phase 12: Web Front-End (Expo Web Mode) — 4 tasks (T087-T090)
+  - T087: Toast.web.tsx — simplified Toast without react-native-worklets
+  - T088: index.web.tsx — barcode search form (replaces camera scanner on web)
+  - T089: Fix Share.share() in company/[id].tsx with Platform.OS guard
+  - T090: Manual E2E validation of web front-end
+- **Author**: AI (Claude Sonnet 4.6)
+- **Files**: tasks.md (Phase 12 added), plan.md (template replaced with actual content)
+
+---
+
 ## [2026-02-25 18:00] - /speckit.implement (Phase 5 Complete)
 
 ### Completed

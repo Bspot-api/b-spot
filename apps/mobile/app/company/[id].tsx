@@ -1,5 +1,6 @@
 import {
   ActivityIndicator,
+  Platform,
   Pressable,
   ScrollView,
   Share,
@@ -47,9 +48,19 @@ export default function CompanyDetailScreen() {
 
   async function handleShare() {
     if (!company) return;
-    await Share.share({
-      message: `Decouvrez ${company.legalName} sur B-Spot\nhttps://b-spot.app/company/${company.siren}`,
-    });
+    const url = `https://b-spot.app/company/${company.siren}`;
+    if (Platform.OS === 'web') {
+      await navigator.clipboard.writeText(url);
+      Toast.show('Lien copié dans le presse-papiers !', {
+        type: 'success',
+        position: 'top',
+        duration: 2000,
+      });
+    } else {
+      await Share.share({
+        message: `Decouvrez ${company.legalName} sur B-Spot\n${url}`,
+      });
+    }
   }
 
   if (!siren) {
