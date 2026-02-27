@@ -2,7 +2,9 @@ node_modules
 dist
 .git
 *.md
-apps/mobile
+apps/mobile/node_modules
+apps/mobile/.expo
+apps/mobile/dist
 .env*
 coverage
 .playwright-mcp
