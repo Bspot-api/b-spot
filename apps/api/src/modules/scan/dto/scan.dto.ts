@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, Length, MaxLength, MinLength } from 'class-validator';
+import { IsOptional, IsString, Length, MaxLength, MinLength } from 'class-validator';
 import type { ProductDto } from '../../product/dto/product.dto';
 import type { CompanyDto } from '../../company/dto/company.dto';
 import { BrandStatus } from '../../brand/brand.entity';
@@ -17,6 +17,20 @@ export class BrandScanRequestDto {
   @MinLength(2)
   @MaxLength(100)
   brandName!: string;
+}
+
+export class SirenScanRequestDto {
+  @ApiProperty({ example: '552032534', description: 'SIREN (9 digits)' })
+  @IsString()
+  @Length(9, 9)
+  siren!: string;
+
+  @ApiPropertyOptional({ example: 'Danone', description: 'Brand name to associate with this SIREN' })
+  @IsOptional()
+  @IsString()
+  @MinLength(2)
+  @MaxLength(100)
+  brandName?: string;
 }
 
 export class BrandScanResultDto {

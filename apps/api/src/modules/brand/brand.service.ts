@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityManager } from '@mikro-orm/core';
 import { EntityRepository } from '@mikro-orm/postgresql';
-import { Brand } from './brand.entity';
+import { Brand, BrandMatchSource, BrandStatus } from './brand.entity';
 
 interface BrandFuzzyRow {
   id: number;
@@ -71,6 +71,23 @@ export class BrandService {
 
     // Re-hydrate the entity to keep return type and ORM behavior consistent.
     return this.brandRepo.findOne({ id: best.id });
+  }
+
+  async findBrandBySiren(siren: string): Promise<Brand | null> {
+    return this.brandRepo.findOne({ siren });
+  }
+
+  async createBrand(name: string, siren: string): Promise<Brand> {
+    const brand = this.brandRepo.create({
+      name,
+      siren,
+      status: BrandStatus.ACTIVE,
+      matchSource: BrandMatchSource.MANUAL_REVIEW,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    await this.em.persistAndFlush(brand);
+    return brand;
   }
 
   private normalizeBrandText(value: string): string {

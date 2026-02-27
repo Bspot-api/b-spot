@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ScanService } from './scan.service';
-import { BrandScanRequestDto, BrandScanResultDto, ScanRequestDto, ScanResultDto } from './dto/scan.dto';
+import { BrandScanRequestDto, BrandScanResultDto, ScanRequestDto, ScanResultDto, SirenScanRequestDto } from './dto/scan.dto';
 
 @ApiTags('scan')
 @Controller('api/scan')
@@ -23,5 +23,13 @@ export class ScanController {
   @ApiResponse({ status: 201, type: BrandScanResultDto, description: 'Company data for the brand' })
   async scanByBrand(@Body() body: BrandScanRequestDto): Promise<BrandScanResultDto> {
     return this.scanService.scanByBrandName(body.brandName);
+  }
+
+  @Post('siren')
+  @ApiOperation({ summary: 'Lookup company by SIREN and optionally create a brand mapping' })
+  @ApiBody({ type: SirenScanRequestDto })
+  @ApiResponse({ status: 201, type: BrandScanResultDto, description: 'Company data for the SIREN' })
+  async scanBySiren(@Body() body: SirenScanRequestDto): Promise<BrandScanResultDto> {
+    return this.scanService.scanBySiren(body.siren, body.brandName);
   }
 }

@@ -5,6 +5,7 @@ import { BrandService } from '../brand/brand.service';
 import { BrandDiscoveryService } from '../brand/brand-discovery.service';
 import { BrandStatus } from '../brand/brand.entity';
 import { BrandSuggestionService } from '../brand-suggestion/brand-suggestion.service';
+import { BrandMatchSource } from '../brand/brand.entity';
 import type { BrandScanResultDto, ScanResultDto } from './dto/scan.dto';
 
 @Injectable()
@@ -95,6 +96,31 @@ export class ScanService {
         brand.status === BrandStatus.PENDING
           ? 'Correspondance marque trouvée, en attente de validation'
           : undefined,
+    };
+  }
+
+  async scanBySiren(siren: string, brandName?: string): Promise<BrandScanResultDto> {
+    const company = await this.companyService.getOrCreateCompany(siren);
+    if (!company) {
+      return {
+        dataFreshness: 'unavailable',
+        message: `Impossible de récupérer les données pour le SIREN ${siren}`,
+      };
+    }
+
+    if (brandName) {
+      const existing = await this.brandService.findBrandBySiren(siren);
+      if (!existing) {
+        await this.brandService.createBrand(brandName, siren);
+        this.logger.log(`Brand "${brandName}" created for SIREN ${siren}`);
+      }
+    }
+
+    return {
+      company: this.companyService.toDto(company),
+      dataFreshness: 'fresh',
+      brandResolution: 'existing',
+      brandStatus: BrandStatus.ACTIVE,
     };
   }
 
