@@ -20,6 +20,7 @@ COPY apps/mobile/ ./apps/mobile/
 # Export web build
 WORKDIR /app/apps/mobile
 ENV EXPO_PUBLIC_APP_ENV=staging
+ENV EXPO_PUBLIC_API_URL=https://api.b-spot.org
 RUN npx expo export --platform web
 
 # Production stage with Nginx
