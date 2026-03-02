@@ -24,13 +24,13 @@ export default defineConfig({
     warnWhenNoEntities: false,
   },
   migrations: {
-    path: './dist/migrations',
+    path: './dist/src/migrations',
     pathTs: './src/migrations',
     tableName: 'mikro_orm_migrations',
     transactional: true,
   },
   seeder: {
-    path: './dist/seeders',
+    path: './dist/src/seeders',
     pathTs: './src/seeders',
     defaultSeeder: 'DatabaseSeeder',
   },
