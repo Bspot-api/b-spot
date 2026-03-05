@@ -24,6 +24,25 @@ const NUTELLA_SCAN_RESULT = {
   dataFreshness: 'fresh',
 };
 
+const BEAUTY_SCAN_RESULT = {
+  product: {
+    barcode: '3600523951970',
+    name: 'Shampoo Test',
+    category: 'Hair care',
+    imageUrl: 'https://images.openbeautyfacts.org/shampoo.jpg',
+    source: ProductSource.OPEN_BEAUTY_FACTS,
+    brandName: 'Ferrero',
+  },
+  company: {
+    siren: '303543440',
+    legalName: 'Ferrero France SAS',
+    executives: [],
+    shareholders: [],
+    lastFetchedAt: '2026-02-25T00:00:00.000Z',
+  },
+  dataFreshness: 'fresh',
+};
+
 const scanServiceMock = {
   scanProduct: jest.fn(),
 };
@@ -60,9 +79,24 @@ describe('ScanController (E2E)', () => {
         .expect(201);
 
       expect(response.body.product.name).toBe('Nutella');
+      expect(response.body.product.source).toBe(ProductSource.OPEN_FOOD_FACTS);
       expect(response.body.company.legalName).toBe('Ferrero France SAS');
       expect(response.body.dataFreshness).toBe('fresh');
       expect(scanServiceMock.scanProduct).toHaveBeenCalledWith('3017620422003');
+    });
+
+    it('returns 201 with OBF source when scan is resolved from Open Beauty Facts', async () => {
+      scanServiceMock.scanProduct.mockResolvedValue(BEAUTY_SCAN_RESULT);
+
+      const response = await request(app.getHttpServer())
+        .post('/api/scan')
+        .send({ barcode: '3600523951970' })
+        .expect(201);
+
+      expect(response.body.product.name).toBe('Shampoo Test');
+      expect(response.body.product.source).toBe(ProductSource.OPEN_BEAUTY_FACTS);
+      expect(response.body.company.legalName).toBe('Ferrero France SAS');
+      expect(response.body.dataFreshness).toBe('fresh');
     });
 
     it('returns 400 when barcode is missing', async () => {

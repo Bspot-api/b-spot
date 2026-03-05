@@ -548,20 +548,20 @@
 
 ### Product Service Extension
 
-- [ ] T060 [US4] Extend ProductService for Open Beauty Facts
+- [X] T060 [US4] Extend ProductService for Open Beauty Facts
   - File: `apps/api/src/modules/product/product.service.ts`
   - Method: `async fetchFromOpenBeautyFacts(barcode: string): Promise<ProductDTO | null>`
   - HTTP client: call `https://world.openbeautyfacts.org/api/v2/product/{barcode}`
-  - Update `fetchProduct()` to try OFF first, then OBF if 404
+  - Update `fetchProduct()` to try OFF first, then OBF only when OFF is functional "not found" (`status != 1`)
 
-- [ ] T061 [US4] Update ScanService to support OBF
+- [X] T061 [US4] Update ScanService to support OBF
   - File: `apps/api/src/modules/scan/scan.service.ts`
   - Update scanProduct() to call new ProductService logic
   - Return source: 'OFF' or 'OBF' in ScanResultDTO
 
 ### Mobile UI Updates
 
-- [ ] T062 [P] [US4] Add product type badge in Company Detail
+- [X] T062 [P] [US4] Add product type badge in Company Detail
   - File: `apps/mobile/src/features/company/components/CompanyHeader.tsx`
   - Display badge: "Produit alimentaire" (OFF) or "Produit cosmétique" (OBF)
 

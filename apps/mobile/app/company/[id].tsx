@@ -16,16 +16,20 @@ import { ShareholdersList } from '../../src/features/company/components/Sharehol
 import { useCompanyData } from '../../src/features/company/hooks/useCompanyData';
 
 export default function CompanyDetailScreen() {
-  const { id, brandStatus, brandResolution } = useLocalSearchParams<{
+  const { id, brandStatus, brandResolution, productSource } = useLocalSearchParams<{
     id: string;
     brandStatus?: string;
     brandResolution?: string;
+    productSource?: 'OFF' | 'OBF' | 'OPEN_FOOD_FACTS' | 'OPEN_BEAUTY_FACTS';
   }>();
   const siren = Array.isArray(id) ? id[0] : id;
   const resolvedBrandStatus = Array.isArray(brandStatus) ? brandStatus[0] : brandStatus;
   const resolvedBrandResolution = Array.isArray(brandResolution)
     ? brandResolution[0]
     : brandResolution;
+  const resolvedProductSource = Array.isArray(productSource)
+    ? productSource[0]
+    : productSource;
   const { company, executives, shareholders, isLoading, errorMessage, retry } =
     useCompanyData(siren);
 
@@ -105,7 +109,11 @@ export default function CompanyDetailScreen() {
             </Text>
           </View>
         )}
-        <CompanyHeader company={company} onShare={handleShare} />
+        <CompanyHeader
+          company={company}
+          onShare={handleShare}
+          productSource={resolvedProductSource}
+        />
 
         <View className="mt-4 gap-4">
           <ExecutivesList executives={executives} />

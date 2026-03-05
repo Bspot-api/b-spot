@@ -14,7 +14,7 @@ export class ProductController {
   @ApiResponse({ status: 200, type: ProductDto })
   @ApiResponse({ status: 404, description: 'Produit non référencé' })
   async getProduct(@Param('barcode') barcode: string): Promise<ProductDto> {
-    const product = await this.productService.fetchFromOpenFoodFacts(barcode);
+    const product = await this.productService.fetchProduct(barcode);
     if (!product) throw new NotFoundException('Produit non référencé');
     return product;
   }

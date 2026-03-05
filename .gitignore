@@ -12,6 +12,7 @@ node_modules/
 
 # Deployment secrets
 create-junction-tables.sql
+google-service-account.json
 
 # Production configurations with secrets  
 docker-compose.prod.yml

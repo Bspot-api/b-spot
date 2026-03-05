@@ -4,9 +4,10 @@ import type { CompanyDto } from '../../../api/types';
 interface CompanyHeaderProps {
   company: CompanyDto;
   onShare: () => void;
+  productSource?: 'OFF' | 'OBF' | 'OPEN_FOOD_FACTS' | 'OPEN_BEAUTY_FACTS';
 }
 
-export function CompanyHeader({ company, onShare }: CompanyHeaderProps) {
+export function CompanyHeader({ company, onShare, productSource }: CompanyHeaderProps) {
   const initials = company.legalName
     .split(' ')
     .filter(Boolean)
@@ -27,10 +28,21 @@ export function CompanyHeader({ company, onShare }: CompanyHeaderProps) {
       </View>
 
       <View className="mt-4 flex-row items-center justify-between gap-3">
-        <View className="rounded-full bg-zinc-100 px-3 py-2">
-          <Text className="text-xs font-medium text-zinc-700">
-            Donnees au {formatDate(company.lastFetchedAt)}
-          </Text>
+        <View className="flex-row items-center gap-2">
+          <View className="rounded-full bg-zinc-100 px-3 py-2">
+            <Text className="text-xs font-medium text-zinc-700">
+              Donnees au {formatDate(company.lastFetchedAt)}
+            </Text>
+          </View>
+          {productSource && (
+            <View className="rounded-full bg-emerald-100 px-3 py-2">
+              <Text className="text-xs font-medium text-emerald-800">
+                {isBeautySource(productSource)
+                  ? 'Produit cosmetique'
+                  : 'Produit alimentaire'}
+              </Text>
+            </View>
+          )}
         </View>
 
         <Pressable
@@ -56,3 +68,8 @@ function formatDate(value: string): string {
   }).format(date);
 }
 
+function isBeautySource(
+  source: 'OFF' | 'OBF' | 'OPEN_FOOD_FACTS' | 'OPEN_BEAUTY_FACTS',
+): boolean {
+  return source === 'OBF' || source === 'OPEN_BEAUTY_FACTS';
+}

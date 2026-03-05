@@ -57,6 +57,7 @@ export function useBarcodeScanner(): UseBarcodeScanner {
               id: result.company.siren,
               brandStatus: result.brandStatus,
               brandResolution: result.brandResolution,
+              productSource: result.product.source,
             },
           });
         } else {

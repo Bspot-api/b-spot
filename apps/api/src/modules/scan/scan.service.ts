@@ -21,8 +21,8 @@ export class ScanService {
   ) {}
 
   async scanProduct(barcode: string): Promise<ScanResultDto> {
-    // Step 1: Fetch product from Open Food Facts
-    const productDto = await this.productService.fetchFromOpenFoodFacts(barcode);
+    // Step 1: Fetch product from Open Food Facts, with Open Beauty Facts fallback.
+    const productDto = await this.productService.fetchProduct(barcode);
     if (!productDto) {
       throw new NotFoundException(`Produit introuvable pour le code-barres ${barcode}`);
     }

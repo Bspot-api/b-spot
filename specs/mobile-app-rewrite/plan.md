@@ -154,6 +154,7 @@ Aucune modification des imports n'est nécessaire. Les fichiers `.web.tsx` prenn
 - **Phase 6** — Mobile Company Detail
 - **Phase 7** — Offline Support
 - **Phase 8** — Open Beauty Facts (P2)
+  - Politique fallback: OFF d'abord, puis OBF uniquement si OFF retourne "produit introuvable" (pas de fallback OBF sur erreur technique OFF).
 - **Phase 9** — Error Handling
 - **Phase 10** — Testing & Validation
 - **Phase 11** — Deployment

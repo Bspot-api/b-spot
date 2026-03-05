@@ -76,6 +76,13 @@ export default function RootLayout() {
             }}
           />
           <Stack.Screen
+            name="privacy"
+            options={{
+              title: 'Politique de confidentialité',
+              presentation: 'card',
+            }}
+          />
+          <Stack.Screen
             name="+not-found"
             options={{
               title: 'Not Found',

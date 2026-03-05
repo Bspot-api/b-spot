@@ -18,6 +18,15 @@ const NUTELLA_PRODUCT = {
   brandName: 'Ferrero',
 };
 
+const BEAUTY_PRODUCT = {
+  barcode: '3600523951970',
+  name: 'Shampoo Test',
+  category: 'Hair care',
+  imageUrl: 'https://images.openbeautyfacts.org/shampoo.jpg',
+  source: ProductSource.OPEN_BEAUTY_FACTS,
+  brandName: 'Ferrero',
+};
+
 const FERRERO_BRAND = { id: 1, name: 'Ferrero', siren: '303543440', status: BrandStatus.ACTIVE };
 
 const FERRERO_COMPANY = {
@@ -39,7 +48,7 @@ const FERRERO_COMPANY_DTO = {
 };
 
 const productServiceMock = {
-  fetchFromOpenFoodFacts: jest.fn(),
+  fetchProduct: jest.fn(),
   saveProduct: jest.fn().mockResolvedValue(undefined),
 };
 
@@ -82,7 +91,7 @@ describe('ScanService', () => {
 
   describe('scanProduct — product not found', () => {
     it('throws NotFoundException when barcode is unknown', async () => {
-      productServiceMock.fetchFromOpenFoodFacts.mockResolvedValue(null);
+      productServiceMock.fetchProduct.mockResolvedValue(null);
 
       await expect(service.scanProduct('0000000000000')).rejects.toThrow(NotFoundException);
       expect(brandServiceMock.findBrandByName).not.toHaveBeenCalled();
@@ -91,7 +100,7 @@ describe('ScanService', () => {
 
   describe('scanProduct — brand not in DB', () => {
     it('returns unavailable result and creates suggestion when discovery is uncertain', async () => {
-      productServiceMock.fetchFromOpenFoodFacts.mockResolvedValue(NUTELLA_PRODUCT);
+      productServiceMock.fetchProduct.mockResolvedValue(NUTELLA_PRODUCT);
       brandServiceMock.findBrandByName.mockResolvedValue(null);
       brandDiscoveryServiceMock.discoverAndPersistBrand.mockResolvedValue({
         resolution: 'needs_user_input',
@@ -113,7 +122,7 @@ describe('ScanService', () => {
 
   describe('scanProduct — no brand name in product', () => {
     it('returns unavailable when product has no brand name', async () => {
-      productServiceMock.fetchFromOpenFoodFacts.mockResolvedValue({
+      productServiceMock.fetchProduct.mockResolvedValue({
         ...NUTELLA_PRODUCT,
         brandName: undefined,
       });
@@ -129,7 +138,7 @@ describe('ScanService', () => {
 
   describe('scanProduct — Pappers quota exhausted', () => {
     it('returns unavailable when company lookup returns null', async () => {
-      productServiceMock.fetchFromOpenFoodFacts.mockResolvedValue(NUTELLA_PRODUCT);
+      productServiceMock.fetchProduct.mockResolvedValue(NUTELLA_PRODUCT);
       brandServiceMock.findBrandByName.mockResolvedValue(FERRERO_BRAND);
       companyServiceMock.getOrCreateCompany.mockResolvedValue(null);
 
@@ -142,7 +151,7 @@ describe('ScanService', () => {
 
   describe('scanProduct — happy path', () => {
     it('returns product and company data for valid barcode', async () => {
-      productServiceMock.fetchFromOpenFoodFacts.mockResolvedValue(NUTELLA_PRODUCT);
+      productServiceMock.fetchProduct.mockResolvedValue(NUTELLA_PRODUCT);
       brandServiceMock.findBrandByName.mockResolvedValue(FERRERO_BRAND);
       companyServiceMock.getOrCreateCompany.mockResolvedValue(FERRERO_COMPANY);
       companyServiceMock.toDto.mockReturnValue(FERRERO_COMPANY_DTO);
@@ -157,6 +166,18 @@ describe('ScanService', () => {
       expect(productServiceMock.saveProduct).toHaveBeenCalledWith(NUTELLA_PRODUCT);
       expect(brandServiceMock.findBrandByName).toHaveBeenCalledWith('Ferrero');
       expect(companyServiceMock.getOrCreateCompany).toHaveBeenCalledWith('303543440');
+    });
+
+    it('keeps product source when product comes from OBF', async () => {
+      productServiceMock.fetchProduct.mockResolvedValue(BEAUTY_PRODUCT);
+      brandServiceMock.findBrandByName.mockResolvedValue(FERRERO_BRAND);
+      companyServiceMock.getOrCreateCompany.mockResolvedValue(FERRERO_COMPANY);
+      companyServiceMock.toDto.mockReturnValue(FERRERO_COMPANY_DTO);
+
+      const result = await service.scanProduct('3600523951970');
+
+      expect(result.product.source).toBe(ProductSource.OPEN_BEAUTY_FACTS);
+      expect(productServiceMock.saveProduct).toHaveBeenCalledWith(BEAUTY_PRODUCT);
     });
   });
 });

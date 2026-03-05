@@ -37,6 +37,10 @@ describe('ProductService', () => {
     service = module.get<ProductService>(ProductService);
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   describe('fetchFromOpenFoodFacts', () => {
     it('returns null when fetch fails', async () => {
       jest.spyOn(global, 'fetch').mockRejectedValueOnce(new Error('Network error'));
@@ -143,6 +147,84 @@ describe('ProductService', () => {
       expect(productRepoMock.create).toHaveBeenCalledWith(
         expect.objectContaining({ brand: undefined }),
       );
+    });
+  });
+
+  describe('fetchProduct', () => {
+    it('returns OFF product when found in OFF and does not call OBF', async () => {
+      const fetchSpy = jest.spyOn(global, 'fetch').mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          status: 1,
+          product: {
+            product_name: 'Nutella',
+            brands: 'Nutella,Ferrero',
+            categories: 'Spreads',
+            image_url: 'https://images.openfoodfacts.org/nutella.jpg',
+          },
+        }),
+      } as Response);
+
+      const result = await service.fetchProduct('3017620422003');
+
+      expect(result).not.toBeNull();
+      expect(result!.source).toBe(ProductSource.OPEN_FOOD_FACTS);
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('falls back to OBF when OFF returns not found', async () => {
+      jest.spyOn(global, 'fetch')
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ status: 0 }),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            status: 1,
+            product: {
+              product_name: 'Shampoo Test',
+              brands: 'Brand Beauty',
+              categories: 'Hair care',
+              image_url: 'https://images.openbeautyfacts.org/shampoo.jpg',
+            },
+          }),
+        } as Response);
+
+      const result = await service.fetchProduct('3600523951970');
+
+      expect(result).not.toBeNull();
+      expect(result!.source).toBe(ProductSource.OPEN_BEAUTY_FACTS);
+      expect(result!.name).toBe('Shampoo Test');
+      expect(result!.brandName).toBe('Brand Beauty');
+      expect(result!.category).toBe('Hair care');
+    });
+
+    it('returns null when OFF and OBF both return not found', async () => {
+      jest.spyOn(global, 'fetch')
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ status: 0 }),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ status: 0 }),
+        } as Response);
+
+      const result = await service.fetchProduct('0000000000000');
+
+      expect(result).toBeNull();
+    });
+
+    it('returns null and does not fallback to OBF when OFF fails technically', async () => {
+      const fetchSpy = jest.spyOn(global, 'fetch').mockRejectedValueOnce(
+        new Error('OFF network error'),
+      );
+
+      const result = await service.fetchProduct('3017620422003');
+
+      expect(result).toBeNull();
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
     });
   });
 });
