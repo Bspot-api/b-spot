@@ -17,6 +17,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.bspot.mobile",
+      "buildNumber": "1",
       "infoPlist": {
         "NSCameraUsageDescription": "B-Spot needs access to your camera to scan product barcodes."
       }
@@ -27,6 +28,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.bspot.mobile",
+      "versionCode": 1,
       "permissions": [
         "CAMERA",
         "android.permission.CAMERA",

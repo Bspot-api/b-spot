@@ -1,11 +1,8 @@
 import { Stack } from 'expo-router';
-import { Platform, View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ToastProviderWithViewport } from '../src/components/reacticx/Toast';
 import '../global.css';
-
-const appEnv = process.env.EXPO_PUBLIC_APP_ENV ?? 'development';
-const isStaging = appEnv === 'staging';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,10 +14,10 @@ const queryClient = new QueryClient({
 });
 
 function StagingBadge() {
-  if (!isStaging || Platform.OS !== 'web') return null;
+  // if (!isStaging || Platform.OS !== 'web') return null;
   return (
     <View style={styles.stagingBadge}>
-      <Text style={styles.stagingText}>STAGING</Text>
+      <Text style={styles.stagingText}>En cours de développement</Text>
     </View>
   );
 }

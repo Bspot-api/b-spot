@@ -17,7 +17,10 @@
     "lint": "eslint . --ext .ts,.tsx",
     "test": "jest",
     "generate:types": "openapi-typescript http://localhost:3001/api-json -o ./src/api/generated.ts",
-    "clean": "rm -rf .expo node_modules"
+    "clean": "rm -rf .expo node_modules",
+    "version:patch": "npm version patch --no-git-tag-version && node -e \"const fs=require('fs');const app=JSON.parse(fs.readFileSync('app.json'));app.expo.version=require('./package.json').version;fs.writeFileSync('app.json',JSON.stringify(app,null,2)+'\\n')\"",
+    "version:minor": "npm version minor --no-git-tag-version && node -e \"const fs=require('fs');const app=JSON.parse(fs.readFileSync('app.json'));app.expo.version=require('./package.json').version;fs.writeFileSync('app.json',JSON.stringify(app,null,2)+'\\n')\"",
+    "version:major": "npm version major --no-git-tag-version && node -e \"const fs=require('fs');const app=JSON.parse(fs.readFileSync('app.json'));app.expo.version=require('./package.json').version;fs.writeFileSync('app.json',JSON.stringify(app,null,2)+'\\n')\""
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
