@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
@@ -8,6 +9,8 @@ import {
 } from 'react-native';
 import { useBarcodeScanner } from '../../src/features/scanner/hooks/useBarcodeScanner';
 import { useBrandSearch } from '../../src/features/scanner/hooks/useBrandSearch';
+
+const appVersion = Constants.expoConfig?.version ?? '0.0.0';
 
 type SearchMode = 'barcode' | 'brand';
 
@@ -128,6 +131,8 @@ export default function WebSearchScreen() {
           ? 'Saisissez le code EAN-8, EAN-13 ou UPC imprimé sur l\'emballage'
           : 'Saisissez le nom exact ou approché de la marque'}
       </Text>
+
+      <Text className="mt-6 text-xs text-zinc-300">v{appVersion}</Text>
     </View>
   );
 }

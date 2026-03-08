@@ -28,6 +28,9 @@
       "distribution": "internal",
       "channel": "preview",
       "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.b-spot.org"
+      },
       "ios": {
         "simulator": false
       },
@@ -39,7 +42,8 @@
       "channel": "production",
       "autoIncrement": true,
       "env": {
-        "APP_VARIANT": "production"
+        "APP_VARIANT": "production",
+        "EXPO_PUBLIC_API_URL": "https://api.b-spot.org"
       },
       "android": {
         "buildType": "app-bundle"

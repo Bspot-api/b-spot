@@ -1,6 +1,6 @@
 {
   "name": "@b-spot/mobile",
-  "version": "2.0.0-alpha.1",
+  "version": "0.1.0",
   "description": "B-Spot Mobile - Expo React Native barcode scanner app",
   "main": "expo-router/entry",
   "private": true,
@@ -18,9 +18,9 @@
     "test": "jest",
     "generate:types": "openapi-typescript http://localhost:3001/api-json -o ./src/api/generated.ts",
     "clean": "rm -rf .expo node_modules",
-    "version:patch": "npm version patch --no-git-tag-version && node -e \"const fs=require('fs');const app=JSON.parse(fs.readFileSync('app.json'));app.expo.version=require('./package.json').version;fs.writeFileSync('app.json',JSON.stringify(app,null,2)+'\\n')\"",
-    "version:minor": "npm version minor --no-git-tag-version && node -e \"const fs=require('fs');const app=JSON.parse(fs.readFileSync('app.json'));app.expo.version=require('./package.json').version;fs.writeFileSync('app.json',JSON.stringify(app,null,2)+'\\n')\"",
-    "version:major": "npm version major --no-git-tag-version && node -e \"const fs=require('fs');const app=JSON.parse(fs.readFileSync('app.json'));app.expo.version=require('./package.json').version;fs.writeFileSync('app.json',JSON.stringify(app,null,2)+'\\n')\""
+    "version:patch": "npm version patch --no-git-tag-version && node -e \"const fs=require('fs');const p=require('./package.json');const app=JSON.parse(fs.readFileSync('app.json'));app.expo.version=p.version;fs.writeFileSync('app.json',JSON.stringify(app,null,2)+'\\n');const{execSync}=require('child_process');execSync('git add package.json app.json');execSync('git commit -m \\\"🔖 v'+p.version+'\\\"')\"",
+    "version:minor": "npm version minor --no-git-tag-version && node -e \"const fs=require('fs');const p=require('./package.json');const app=JSON.parse(fs.readFileSync('app.json'));app.expo.version=p.version;fs.writeFileSync('app.json',JSON.stringify(app,null,2)+'\\n');const{execSync}=require('child_process');execSync('git add package.json app.json');execSync('git commit -m \\\"🔖 v'+p.version+'\\\"')\"",
+    "version:major": "npm version major --no-git-tag-version && node -e \"const fs=require('fs');const p=require('./package.json');const app=JSON.parse(fs.readFileSync('app.json'));app.expo.version=p.version;fs.writeFileSync('app.json',JSON.stringify(app,null,2)+'\\n');const{execSync}=require('child_process');execSync('git add package.json app.json');execSync('git commit -m \\\"🔖 v'+p.version+'\\\"')\""
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
