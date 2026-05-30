@@ -53,14 +53,17 @@ export function useBarcodeScanner(): UseBarcodeScanner {
 
         if (result.company) {
           setState('success');
+          const productSource = result.product.source === 'OPEN_BEAUTY_FACTS' ? 'OBF' : 'OFF';
           await addEntry({
             barcode: result.product.barcode,
             productName: result.product.name,
             brandName: result.product.brandName ?? '',
             companyName: result.company.legalName,
             companySiren: result.company.siren,
-            productSource: result.product.source === 'OPEN_BEAUTY_FACTS' ? 'OBF' : 'OFF',
+            productSource,
             scannedAt: new Date().toISOString(),
+            brandStatus: result.brandStatus,
+            brandResolution: result.brandResolution,
           });
           router.push({
             pathname: '/company/[id]',
@@ -68,7 +71,7 @@ export function useBarcodeScanner(): UseBarcodeScanner {
               id: result.company.siren,
               brandStatus: result.brandStatus,
               brandResolution: result.brandResolution,
-              productSource: result.product.source,
+              productSource,
             },
           });
         } else {

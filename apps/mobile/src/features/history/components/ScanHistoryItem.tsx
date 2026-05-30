@@ -32,8 +32,8 @@ export function ScanHistoryItem({ entry, onPress }: ScanHistoryItemProps) {
 function formatDate(isoString: string): string {
   const date = new Date(isoString);
   const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const toDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const diffDays = Math.round((toDay(now) - toDay(date)) / (1000 * 60 * 60 * 24));
 
   if (diffDays === 0) return "Aujourd'hui";
   if (diffDays === 1) return 'Hier';

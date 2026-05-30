@@ -20,7 +20,7 @@ export class ScanController {
     @Query('limit') limit = 50,
     @Query('offset') offset = 0,
   ): ScanHistoryResponseDto {
-    const parsedLimit = Math.min(Number(limit) || 50, 100);
+    const parsedLimit = Math.min(Math.max(Number(limit) || 50, 1), 100);
     const parsedOffset = Math.max(Number(offset) || 0, 0);
     return this.scanService.getHistory(parsedLimit, parsedOffset);
   }
