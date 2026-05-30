@@ -12,6 +12,37 @@ Format: [Keep a Changelog](https://keepachangelog.com/)
 - **Author**: AI (Claude)
 - **Files**: spec.md, checklists/requirements.md
 
+## [2026-05-30 13:00] - correction plan (pattern e-enfance-3018)
+
+### Changed
+
+- research.md — corrigé : `toNodeHandler` + `MiddlewareConsumer` au lieu de `@thallesp/nestjs-better-auth` ; `new Pool()` au lieu de `better-auth-mikro-orm` ; entités MikroORM standard miroir
+- plan.md — corrigé en conséquence : un seul package (`better-auth`), pas de `bodyParser: false`, `AuthService` injectable lazy-init, `AuthGuard` via `fromNodeHeaders` + `api.getSession()`
+- **Author**: AI (Claude) sur instruction utilisateur
+- **Files**: research.md, plan.md
+
+## [2026-05-30 15:30] - /speckit.tasks
+
+### Added
+
+- Task list generated with 32 tasks across 7 phases
+- User stories covered: US1 (magic link), US2 (admin guards), US3 (default admin seeder), US4 (promote/revoke)
+- **Author**: AI (Claude)
+- **Files**: tasks.md
+
+## [2026-05-30 12:00] - /speckit.plan
+
+### Added
+
+- Technical implementation plan with 12 implementation steps
+- research.md — 6 architecture decisions (NestJS integration, MikroORM adapter, magic link, guard, seeder, last-admin protection)
+- data-model.md — 5 entities (4 Better-Auth tables + admins custom table) with state transitions
+- contracts/auth.yaml — Better-Auth proxied auth endpoints
+- contracts/admin.yaml — Custom admin management endpoints (promote/revoke)
+- quickstart.md — Local setup and test commands
+- **Author**: AI (Claude)
+- **Files**: plan.md, research.md, data-model.md, quickstart.md, contracts/auth.yaml, contracts/admin.yaml
+
 ---
 
 <!--
