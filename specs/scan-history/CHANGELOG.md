@@ -4,6 +4,19 @@ All notable changes to this feature specification are documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/)
 
+## [2026-05-30 04:00] - /speckit.implement — Phase 2 Foundational
+
+### Changed
+
+- Tâches complétées : T004, T005, T007 (T006 différé : nécessite serveur API)
+- T004 : Ajout de `GET /api/scan/history` dans `scan.controller.ts` (limit/offset, clamping, ScanHistoryResponseDto)
+- T005 : Test contrôleur `scan.controller.history.spec.ts` (réponse vide, clamping limit, clamping offset)
+- T007 : Interface `ScanHistoryEntry` dans `apps/mobile/src/features/history/types.ts`
+- **Author**: AI (Claude)
+- **Files**: `scan.controller.ts`, `scan.controller.history.spec.ts`, `history/types.ts`
+
+---
+
 ## [2026-05-30 03:00] - /speckit.implement — Phase 1 Setup
 
 ### Changed

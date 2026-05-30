@@ -29,10 +29,10 @@
 
 **⚠️ CRITICAL**: Aucune tâche US ne peut commencer avant la fin de cette phase.
 
-- [ ] T004 Ajouter l'endpoint `GET /api/scan/history` dans `apps/api/src/modules/scan/scan.controller.ts` avec paramètres de requête `limit` (default 50, max 100) et `offset` (default 0), réponse `ScanHistoryResponseDto` — appelle `scanService.getHistory(limit, offset)` (dépend de T002 + T003)
-- [ ] T005 [P] Écrire un test d'intégration pour `GET /api/scan/history` dans `apps/api/src/modules/scan/__tests__/scan.controller.history.spec.ts` — vérifier 200 OK + corps `{ items: [], total: 0, limit: 50, offset: 0 }` (peut s'écrire en parallèle de T004, s'exécute après)
-- [ ] T006 Régénérer les types OpenAPI côté mobile avec `pnpm generate:types` depuis la racine (dépend de T004)
-- [ ] T007 [P] Définir l'interface TypeScript `ScanHistoryEntry` dans `apps/mobile/src/features/history/types.ts` — champs : barcode, productName, brandName, companyName, companySiren, productSource `'OFF' | 'OBF'`, scannedAt string ISO 8601
+- [x] T004 Ajouter l'endpoint `GET /api/scan/history` dans `apps/api/src/modules/scan/scan.controller.ts` avec paramètres de requête `limit` (default 50, max 100) et `offset` (default 0), réponse `ScanHistoryResponseDto` — appelle `scanService.getHistory(limit, offset)` (dépend de T002 + T003)
+- [x] T005 [P] Écrire un test d'intégration pour `GET /api/scan/history` dans `apps/api/src/modules/scan/__tests__/scan.controller.history.spec.ts` — vérifier 200 OK + corps `{ items: [], total: 0, limit: 50, offset: 0 }` (peut s'écrire en parallèle de T004, s'exécute après)
+- [ ] T006 Régénérer les types OpenAPI côté mobile avec `pnpm generate:types` depuis la racine (dépend de T004) ⚠️ À exécuter manuellement quand le serveur API tourne (`pnpm db:up && pnpm dev:api` puis `pnpm generate:types`) — non bloquant pour cette phase car le mobile n'appelle pas cet endpoint
+- [x] T007 [P] Définir l'interface TypeScript `ScanHistoryEntry` dans `apps/mobile/src/features/history/types.ts` — champs : barcode, productName, brandName, companyName, companySiren, productSource `'OFF' | 'OBF'`, scannedAt string ISO 8601
 
 **Checkpoint**: API disponible, types régénérés, interface mobile définie — le travail sur les user stories peut commencer.
 
