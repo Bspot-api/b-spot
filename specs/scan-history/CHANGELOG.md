@@ -4,6 +4,23 @@ All notable changes to this feature specification are documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/)
 
+## [2026-05-30 05:00] - /speckit.implement — Phase 3 US1 + Phase 4 US2
+
+### Changed
+
+- Tâches complétées : T008, T009, T010, T011, T012, T013, T014, T015
+- T008 : `useScanHistory` hook (AsyncStorage, addEntry avec dedup + rotation 50)
+- T009 : Injection `addEntry` dans `useBarcodeScanner.ts` après scan réussi
+- T010 : Composant `ScanHistoryEmpty` (état vide + Ionicons)
+- T011 : Composant `ScanHistoryItem` (affichage + formatDate + prop onPress)
+- T012 : Composant `ScanHistoryList` (FlatList + keyExtractor + séparateur)
+- T013 : Screen `history.tsx` remplacé (loading/empty/list states)
+- T014+T015 : Navigation US2 intégrée dans T011+T013 (inséparable de l'affichage)
+- **Author**: AI (Claude)
+- **Files**: `useScanHistory.ts`, `useBarcodeScanner.ts`, `ScanHistoryEmpty.tsx`, `ScanHistoryItem.tsx`, `ScanHistoryList.tsx`, `history.tsx`
+
+---
+
 ## [2026-05-30 04:00] - /speckit.implement — Phase 2 Foundational
 
 ### Changed

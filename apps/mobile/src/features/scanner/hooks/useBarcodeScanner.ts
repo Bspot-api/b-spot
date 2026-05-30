@@ -5,6 +5,7 @@ import { useScanProduct } from '../../../api/hooks';
 import type { ScanResultDto } from '../../../api/types';
 import { Toast } from '../../../components/reacticx/Toast';
 import type { ScanState } from '../components/ScanOverlay';
+import { useScanHistory } from '../../history/hooks/useScanHistory';
 
 interface UseBarcodeScanner {
   state: ScanState;
@@ -18,6 +19,7 @@ export function useBarcodeScanner(): UseBarcodeScanner {
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
   const router = useRouter();
   const { mutateAsync: scan } = useScanProduct();
+  const { addEntry } = useScanHistory();
 
   const navigateToBrandSuggestion = useCallback(
     (result: ScanResultDto) => {
@@ -51,6 +53,15 @@ export function useBarcodeScanner(): UseBarcodeScanner {
 
         if (result.company) {
           setState('success');
+          await addEntry({
+            barcode: result.product.barcode,
+            productName: result.product.name,
+            brandName: result.product.brandName ?? '',
+            companyName: result.company.legalName,
+            companySiren: result.company.siren,
+            productSource: result.product.source === 'OPEN_BEAUTY_FACTS' ? 'OBF' : 'OFF',
+            scannedAt: new Date().toISOString(),
+          });
           router.push({
             pathname: '/company/[id]',
             params: {
@@ -91,7 +102,7 @@ export function useBarcodeScanner(): UseBarcodeScanner {
         setTimeout(() => setState('idle'), 3000);
       }
     },
-    [scan, router, navigateToBrandSuggestion],
+    [scan, router, navigateToBrandSuggestion, addEntry],
   );
 
   return {

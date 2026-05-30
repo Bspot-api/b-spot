@@ -17,9 +17,9 @@
 
 **Purpose**: Créer la structure de fichiers et scaffolding API avant tout travail mobile.
 
-- [ ] T001 Créer la structure de répertoires `apps/mobile/src/features/history/` avec sous-dossiers `hooks/` et `components/`
-- [ ] T002 [P] Créer `apps/api/src/modules/scan/dto/scan-history.dto.ts` avec les classes `ScanHistoryItemDto` et `ScanHistoryResponseDto` (décorateurs `@ApiProperty`, champs : barcode, productName, brandName, companyName, companySiren, productSource enum OFF|OBF, scannedAt ISO string)
-- [ ] T003 [P] Ajouter la méthode stub `getHistory(limit: number, offset: number): ScanHistoryResponseDto` dans `apps/api/src/modules/scan/scan.service.ts` — retourne `{ items: [], total: 0, limit, offset }`
+- [x] T001 Créer la structure de répertoires `apps/mobile/src/features/history/` avec sous-dossiers `hooks/` et `components/`
+- [x] T002 [P] Créer `apps/api/src/modules/scan/dto/scan-history.dto.ts` avec les classes `ScanHistoryItemDto` et `ScanHistoryResponseDto` (décorateurs `@ApiProperty`, champs : barcode, productName, brandName, companyName, companySiren, productSource enum OFF|OBF, scannedAt ISO string)
+- [x] T003 [P] Ajouter la méthode stub `getHistory(limit: number, offset: number): ScanHistoryResponseDto` dans `apps/api/src/modules/scan/scan.service.ts` — retourne `{ items: [], total: 0, limit, offset }`
 
 ---
 
@@ -46,12 +46,12 @@
 
 ### Implementation
 
-- [ ] T008 [US1] Implémenter le hook `useScanHistory` dans `apps/mobile/src/features/history/hooks/useScanHistory.ts` — lecture initiale depuis AsyncStorage (clé `@b-spot/scan-history`), fonction `addEntry(entry: ScanHistoryEntry)` avec déduplication par barcode (met à jour scannedAt si barcode existant, sinon insère en tête) et rotation automatique à 50 entrées max, export de `entries: ScanHistoryEntry[]` et `addEntry` (dépend de T007)
-- [ ] T009 [US1] Injecter `useScanHistory.addEntry` dans `apps/mobile/src/features/scanner/hooks/useBarcodeScanner.ts` — appeler `addEntry` avec les données produit et entreprise immédiatement après que `result.company` est confirmé, avant `router.push` (dépend de T008)
-- [ ] T010 [P] [US1] Créer le composant `ScanHistoryEmpty` dans `apps/mobile/src/features/history/components/ScanHistoryEmpty.tsx` — affiche icône, message "Aucun scan pour l'instant" et CTA "Scanner ton premier produit" (bouton désactivé, rôle informatif uniquement)
-- [ ] T011 [P] [US1] Créer le composant `ScanHistoryItem` dans `apps/mobile/src/features/history/components/ScanHistoryItem.tsx` — affiche nom produit, marque, nom entreprise, date formatée (today/yesterday/DD MMM/DD/MM/YYYY), reçoit une prop `onPress?: (entry: ScanHistoryEntry) => void` (prête pour US2, inactive ici)
-- [ ] T012 [US1] Créer le composant `ScanHistoryList` dans `apps/mobile/src/features/history/components/ScanHistoryList.tsx` — FlatList sur `entries`, reçoit une prop `onItemPress?: (entry: ScanHistoryEntry) => void` qu'elle passe à chaque `ScanHistoryItem`, séparateur entre items (dépend de T010 + T011)
-- [ ] T013 [US1] Remplacer le placeholder dans `apps/mobile/app/(tabs)/history.tsx` — appeler `useScanHistory`, rendre `<ScanHistoryList>` si `entries.length > 0`, sinon `<ScanHistoryEmpty>`, ajouter un état de chargement (ActivityIndicator) pendant la lecture AsyncStorage (dépend de T008 + T012)
+- [x] T008 [US1] Implémenter le hook `useScanHistory` dans `apps/mobile/src/features/history/hooks/useScanHistory.ts` — lecture initiale depuis AsyncStorage (clé `@b-spot/scan-history`), fonction `addEntry(entry: ScanHistoryEntry)` avec déduplication par barcode (met à jour scannedAt si barcode existant, sinon insère en tête) et rotation automatique à 50 entrées max, export de `entries: ScanHistoryEntry[]` et `addEntry` (dépend de T007)
+- [x] T009 [US1] Injecter `useScanHistory.addEntry` dans `apps/mobile/src/features/scanner/hooks/useBarcodeScanner.ts` — appeler `addEntry` avec les données produit et entreprise immédiatement après que `result.company` est confirmé, avant `router.push` (dépend de T008)
+- [x] T010 [P] [US1] Créer le composant `ScanHistoryEmpty` dans `apps/mobile/src/features/history/components/ScanHistoryEmpty.tsx` — affiche icône, message "Aucun scan pour l'instant" et CTA "Scanner ton premier produit" (bouton désactivé, rôle informatif uniquement)
+- [x] T011 [P] [US1] Créer le composant `ScanHistoryItem` dans `apps/mobile/src/features/history/components/ScanHistoryItem.tsx` — affiche nom produit, marque, nom entreprise, date formatée (today/yesterday/DD MMM/DD/MM/YYYY), reçoit une prop `onPress?: (entry: ScanHistoryEntry) => void` (prête pour US2, inactive ici)
+- [x] T012 [US1] Créer le composant `ScanHistoryList` dans `apps/mobile/src/features/history/components/ScanHistoryList.tsx` — FlatList sur `entries`, reçoit une prop `onItemPress?: (entry: ScanHistoryEntry) => void` qu'elle passe à chaque `ScanHistoryItem`, séparateur entre items (dépend de T010 + T011)
+- [x] T013 [US1] Remplacer le placeholder dans `apps/mobile/app/(tabs)/history.tsx` — appeler `useScanHistory`, rendre `<ScanHistoryList>` si `entries.length > 0`, sinon `<ScanHistoryEmpty>`, ajouter un état de chargement (ActivityIndicator) pendant la lecture AsyncStorage (dépend de T008 + T012)
 
 **Checkpoint**: Scan → l'entrée apparaît dans l'onglet Historique, persistée entre sessions. US1 est livrable seul.
 
@@ -65,8 +65,8 @@
 
 ### Implementation
 
-- [ ] T014 [US2] Activer la prop `onPress` dans `apps/mobile/src/features/history/components/ScanHistoryItem.tsx` — wrapper le contenu dans un `Pressable`, appeler `onPress(entry)` au tap, `activeOpacity` cohérent avec le design existant
-- [ ] T015 [US2] Implémenter le handler de navigation dans `apps/mobile/app/(tabs)/history.tsx` — créer `handleItemPress(entry: ScanHistoryEntry)` qui appelle `router.push({ pathname: '/company/[id]', params: { id: entry.companySiren, productSource: entry.productSource } })`, passer ce handler à `<ScanHistoryList onItemPress={handleItemPress} />`
+- [x] T014 [US2] Activer la prop `onPress` dans `apps/mobile/src/features/history/components/ScanHistoryItem.tsx` — wrapper le contenu dans un `Pressable`, appeler `onPress(entry)` au tap, `activeOpacity` cohérent avec le design existant
+- [x] T015 [US2] Implémenter le handler de navigation dans `apps/mobile/app/(tabs)/history.tsx` — créer `handleItemPress(entry: ScanHistoryEntry)` qui appelle `router.push({ pathname: '/company/[id]', params: { id: entry.companySiren, productSource: entry.productSource } })`, passer ce handler à `<ScanHistoryList onItemPress={handleItemPress} />`
 
 **Checkpoint**: Tap sur entrée → fiche entreprise ouverte. Retour → retour à l'historique. US2 livrable indépendamment.
 
