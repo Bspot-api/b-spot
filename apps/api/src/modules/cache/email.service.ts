@@ -19,6 +19,33 @@ export class EmailService {
     });
   }
 
+  async sendMagicLink(params: { to: string; url: string }): Promise<void> {
+    const transporter = this.createTransport();
+    const from = process.env.SMTP_FROM || process.env.SMTP_USER;
+
+    await transporter.sendMail({
+      from,
+      to: params.to,
+      subject: '[B-Spot] Lien de connexion admin',
+      text: [
+        'Bonjour,',
+        '',
+        "Cliquez sur le lien ci-dessous pour vous connecter à l'administration B-Spot :",
+        params.url,
+        '',
+        "Ce lien expire dans 24 heures et ne peut être utilisé qu'une seule fois.",
+      ].join('\n'),
+      html: [
+        '<p>Bonjour,</p>',
+        "<p>Cliquez sur le lien ci-dessous pour vous connecter à l'administration B-Spot :</p>",
+        `<p><a href="${params.url}">${params.url}</a></p>`,
+        "<p>Ce lien expire dans 24 heures et ne peut être utilisé qu'une seule fois.</p>",
+      ].join(''),
+    });
+
+    this.logger.log(`Magic link sent to ${params.to}`);
+  }
+
   async sendQuotaAlert(usage: number): Promise<void> {
     const adminEmail = process.env.ADMIN_EMAIL;
     if (!adminEmail) {

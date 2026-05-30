@@ -8,6 +8,6 @@ import { EmailService } from './email.service';
 @Module({
   imports: [MikroOrmModule.forFeature([PappersCache, ApiUsageLog])],
   providers: [CacheService, EmailService],
-  exports: [CacheService],
+  exports: [CacheService, EmailService],
 })
 export class CacheModule {}

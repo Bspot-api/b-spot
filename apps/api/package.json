@@ -87,7 +87,13 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "moduleNameMapper": {
+      "^better-auth/node$": "<rootDir>/modules/auth/__tests__/mocks/better-auth-node.mock.ts"
+    },
+    "testEnvironment": "node",
+    "transformIgnorePatterns": [
+      "node_modules/(?!(better-auth|better-call)/)"
+    ]
   },
   "mikro-orm": {
     "useTsNode": true,

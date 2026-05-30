@@ -29,16 +29,16 @@
 
 **⚠️ CRITICAL**: Aucune tâche US ne peut commencer avant la fin de cette phase.
 
-- [ ] T004 [P] Créer les entités miroir Better-Auth (`User`, `Session`, `Account`, `Verification`) dans `apps/api/src/modules/auth/auth.entity.ts` — `@Entity({ tableName: 'user' })`, PK uuid `gen_random_uuid()`, relations `@ManyToOne` conformes à `data-model.md`
-- [ ] T005 [P] Créer l'entité `Admin` dans `apps/api/src/modules/auth/admin.entity.ts` — `@Entity({ tableName: 'admins' })`, `@ManyToOne(() => User, { fieldName: 'userId', unique: true })`, `createdAt`
-- [ ] T006 Enregistrer les 5 entités auth dans `apps/api/mikro-orm.config.ts` (dépend de T004 + T005)
-- [ ] T007 Créer la migration `apps/api/src/migrations/Migration20260530000000_add_auth_tables.ts` — SQL des 4 tables Better-Auth (via `npx @better-auth/cli generate`) + table `admins` avec FK `userId → user.id`
-- [ ] T008 [P] Créer la factory `createBetterAuth()` dans `apps/api/src/modules/auth/auth.config.ts` — `new Pool({ connectionString })`, plugin `magicLink({ expiresIn: 86400, disableSignUp: true })`, sans callback `sendMagicLink` (branché en US1)
-- [ ] T009 [P] Ajouter la méthode `sendMagicLink({ to, url })` dans `apps/api/src/modules/cache/email.service.ts` — utilise le transport nodemailer existant avec `SMTP_FROM`
-- [ ] T010 Créer `AuthService` dans `apps/api/src/modules/auth/auth.service.ts` — lazy init via `onModuleInit()`, expose `auth` et `api` (dépend de T008)
-- [ ] T011 Créer `AuthModule` dans `apps/api/src/modules/auth/auth.module.ts` — importe `MikroOrmModule.forFeature([User, Session, Account, Verification, Admin])`, exporte `AuthService` (middleware ajouté en US1)
-- [ ] T012 Importer `AuthModule` dans `apps/api/src/app.module.ts` (dépend de T011)
-- [ ] T013 [P] Créer `AdminService` stub dans `apps/api/src/modules/auth/admin.service.ts` — méthode `findByUserId(userId: string)` et `isAdminByEmail(email: string)` pour le callback magic link (dépend de T005)
+- [x] T004 [P] Créer les entités miroir Better-Auth (`User`, `Session`, `Account`, `Verification`) dans `apps/api/src/modules/auth/auth.entity.ts` — `@Entity({ tableName: 'user' })`, PK uuid `gen_random_uuid()`, relations `@ManyToOne` conformes à `data-model.md`
+- [x] T005 [P] Créer l'entité `Admin` dans `apps/api/src/modules/auth/admin.entity.ts` — `@Entity({ tableName: 'admins' })`, `@ManyToOne(() => User, { fieldName: 'userId', unique: true })`, `createdAt`
+- [x] T006 Enregistrer les 5 entités auth dans `apps/api/mikro-orm.config.ts` (dépend de T004 + T005)
+- [x] T007 Créer la migration `apps/api/src/migrations/Migration20260530000000_add_auth_tables.ts` — SQL des 4 tables Better-Auth (via `npx @better-auth/cli generate`) + table `admins` avec FK `userId → user.id`
+- [x] T008 [P] Créer la factory `createBetterAuth()` dans `apps/api/src/modules/auth/auth.config.ts` — `new Pool({ connectionString })`, plugin `magicLink({ expiresIn: 86400, disableSignUp: true })`, sans callback `sendMagicLink` (branché en US1)
+- [x] T009 [P] Ajouter la méthode `sendMagicLink({ to, url })` dans `apps/api/src/modules/cache/email.service.ts` — utilise le transport nodemailer existant avec `SMTP_FROM`
+- [x] T010 Créer `AuthService` dans `apps/api/src/modules/auth/auth.service.ts` — lazy init via `onModuleInit()`, expose `auth` et `api` (dépend de T008)
+- [x] T011 Créer `AuthModule` dans `apps/api/src/modules/auth/auth.module.ts` — importe `MikroOrmModule.forFeature([User, Session, Account, Verification, Admin])`, exporte `AuthService` (middleware ajouté en US1)
+- [x] T012 Importer `AuthModule` dans `apps/api/src/app.module.ts` (dépend de T011)
+- [x] T013 [P] Créer `AdminService` stub dans `apps/api/src/modules/auth/admin.service.ts` — méthode `findByUserId(userId: string)` et `isAdminByEmail(email: string)` pour le callback magic link (dépend de T005)
 
 **Checkpoint**: Schéma DB prêt, factory Better-Auth instanciable, module auth enregistré — le travail sur les user stories peut commencer.
 
@@ -52,9 +52,9 @@
 
 ### Implementation
 
-- [ ] T014 [US1] Brancher le callback `sendMagicLink` dans `apps/api/src/modules/auth/auth.config.ts` — vérifier `AdminService.isAdminByEmail(email)` avant d'appeler `EmailService.sendMagicLink`, retour silencieux si non-admin (dépend de T009 + T013)
-- [ ] T015 [US1] Configurer le middleware Better-Auth dans `apps/api/src/modules/auth/auth.module.ts` — `toNodeHandler(authService.auth)` sur `{ path: 'api/auth/*', method: ALL }` via `MiddlewareConsumer` (dépend de T010 + T014)
-- [ ] T016 [US1] Exécuter `cd apps/api && pnpm migration:up` pour créer les tables auth en base (dépend de T007)
+- [x] T014 [US1] Brancher le callback `sendMagicLink` dans `apps/api/src/modules/auth/auth.config.ts` — vérifier `AdminService.isAdminByEmail(email)` avant d'appeler `EmailService.sendMagicLink`, retour silencieux si non-admin (dépend de T009 + T013)
+- [x] T015 [US1] Configurer le middleware Better-Auth dans `apps/api/src/modules/auth/auth.module.ts` — `toNodeHandler(authService.auth)` sur `{ path: 'api/auth/*', method: ALL }` via `MiddlewareConsumer` (dépend de T010 + T014)
+- [x] T016 [US1] Exécuter `cd apps/api && pnpm migration:up` pour créer les tables auth en base (dépend de T007)
 
 **Checkpoint**: Magic link fonctionnel pour un admin existant en base. US1 livrable seul (nécessite au moins une ligne `admins` — voir US3 pour le seeder production).
 
@@ -68,15 +68,15 @@
 
 ### Tests for User Story 2
 
-- [ ] T017 [P] [US2] Écrire les tests unitaires de `AuthGuard` dans `apps/api/src/modules/auth/__tests__/auth.guard.spec.ts` — mock `auth.api.getSession`, vérifier `UnauthorizedException` si pas de session
+- [x] T017 [P] [US2] Écrire les tests unitaires de `AuthGuard` dans `apps/api/src/modules/auth/__tests__/auth.guard.spec.ts` — mock `auth.api.getSession`, vérifier `UnauthorizedException` si pas de session
 
 ### Implementation
 
-- [ ] T018 [P] [US2] Créer `AuthGuard` dans `apps/api/src/modules/auth/auth.guard.ts` — `fromNodeHeaders(request.headers)` + `authService.api.getSession()`, pose `request.session`
-- [ ] T019 [P] [US2] Créer `AdminGuard` dans `apps/api/src/modules/auth/admin.guard.ts` — lit `request.session`, appelle `adminService.findByUserId(session.user.id)`, `ForbiddenException` si absent
-- [ ] T020 [US2] Créer `AdminController` dans `apps/api/src/modules/auth/admin.controller.ts` — `@Controller('api/admin')`, `@UseGuards(AuthGuard, AdminGuard)`, endpoint `GET /me` retournant le profil admin courant (dépend de T018 + T019)
-- [ ] T021 [US2] Enregistrer `AdminController`, `AdminService`, `AuthGuard`, `AdminGuard` dans `apps/api/src/modules/auth/auth.module.ts` (dépend de T020)
-- [ ] T022 [US2] Ajouter le tag `admin` dans la config Swagger de `apps/api/src/main.ts` (dépend de T020)
+- [x] T018 [P] [US2] Créer `AuthGuard` dans `apps/api/src/modules/auth/auth.guard.ts` — `fromNodeHeaders(request.headers)` + `authService.api.getSession()`, pose `request.session`
+- [x] T019 [P] [US2] Créer `AdminGuard` dans `apps/api/src/modules/auth/admin.guard.ts` — lit `request.session`, appelle `adminService.findByUserId(session.user.id)`, `ForbiddenException` si absent
+- [x] T020 [US2] Créer `AdminController` dans `apps/api/src/modules/auth/admin.controller.ts` — `@Controller('api/admin')`, `@UseGuards(AuthGuard, AdminGuard)`, endpoint `GET /me` retournant le profil admin courant (dépend de T018 + T019)
+- [x] T021 [US2] Enregistrer `AdminController`, `AdminService`, `AuthGuard`, `AdminGuard` dans `apps/api/src/modules/auth/auth.module.ts` (dépend de T020)
+- [x] T022 [US2] Ajouter le tag `admin` dans la config Swagger de `apps/api/src/main.ts` (dépend de T020)
 
 **Checkpoint**: `GET /api/admin/me` respecte 401/403/200. US2 livrable indépendamment de US3/US4.
 
@@ -90,8 +90,8 @@
 
 ### Implementation
 
-- [ ] T023 [P] [US3] Créer le seeder idempotent dans `apps/api/src/seeders/admin.seed.ts` — upsert `User` (`bspot.api@gmail.com`, `emailVerified: true`) + upsert `Admin` lié, skip si déjà existant
-- [ ] T024 [US3] Enregistrer `AdminSeeder` dans `apps/api/src/seeders/DatabaseSeeder.ts` (dépend de T023)
+- [x] T023 [P] [US3] Créer le seeder idempotent dans `apps/api/src/seeders/admin.seed.ts` — upsert `User` (`bspot.api@gmail.com`, `emailVerified: true`) + upsert `Admin` lié, skip si déjà existant
+- [x] T024 [US3] Enregistrer `AdminSeeder` dans `apps/api/src/seeders/DatabaseSeeder.ts` (dépend de T023)
 
 **Checkpoint**: `pnpm seed` crée l'admin par défaut. US3 complète le parcours MVP (US1 + US2 + US3).
 
@@ -105,13 +105,13 @@
 
 ### Tests for User Story 4
 
-- [ ] T025 [P] [US4] Écrire les tests unitaires de `AdminService` dans `apps/api/src/modules/auth/__tests__/admin.service.spec.ts` — couvrir `promote`, `revoke`, protection dernier admin (FR-006), user inexistant (400)
+- [x] T025 [P] [US4] Écrire les tests unitaires de `AdminService` dans `apps/api/src/modules/auth/__tests__/admin.service.spec.ts` — couvrir `promote`, `revoke`, protection dernier admin (FR-006), user inexistant (400)
 
 ### Implementation
 
-- [ ] T026 [US4] Compléter `AdminService` dans `apps/api/src/modules/auth/admin.service.ts` — ajouter `listAdmins()`, `promote(userId)`, `revoke(userId)` avec check `admins.count() === 1` (dépend de T013)
-- [ ] T027 [P] [US4] Créer les DTOs admin dans `apps/api/src/modules/auth/dto/admin.dto.ts` — `PromoteAdminDto`, `AdminProfileDto`, `AdminRecordDto` avec décorateurs `@ApiProperty`
-- [ ] T028 [US4] Étendre `AdminController` dans `apps/api/src/modules/auth/admin.controller.ts` — `GET /admins`, `POST /admins`, `DELETE /admins/:userId` conformes à `contracts/admin.yaml` (dépend de T026 + T027)
+- [x] T026 [US4] Compléter `AdminService` dans `apps/api/src/modules/auth/admin.service.ts` — ajouter `listAdmins()`, `promote(userId)`, `revoke(userId)` avec check `admins.count() === 1` (dépend de T013)
+- [x] T027 [P] [US4] Créer les DTOs admin dans `apps/api/src/modules/auth/dto/admin.dto.ts` — `PromoteAdminDto`, `AdminProfileDto`, `AdminRecordDto` avec décorateurs `@ApiProperty`
+- [x] T028 [US4] Étendre `AdminController` dans `apps/api/src/modules/auth/admin.controller.ts` — `GET /admins`, `POST /admins`, `DELETE /admins/:userId` conformes à `contracts/admin.yaml` (dépend de T026 + T027)
 
 **Checkpoint**: CRUD admin complet. US4 livrable indépendamment une fois US2 en place.
 
@@ -121,10 +121,10 @@
 
 **Purpose**: Tests d'intégration, qualité constitutionnelle, validation quickstart.
 
-- [ ] T029 [P] Écrire les tests d'intégration auth dans `apps/api/src/modules/auth/__tests__/auth.integration.spec.ts` — `POST /api/auth/sign-in/magic-link` (email connu vs inconnu), `GET /api/admin/me` (401/403/200)
-- [ ] T030 [P] Écrire les tests d'intégration admin CRUD dans `apps/api/src/modules/auth/__tests__/admin.integration.spec.ts` — flux promote/revoke, `DELETE` dernier admin → 400
-- [ ] T031 [P] Vérifier que tous les nouveaux fichiers passent `pnpm --filter api lint` sans erreurs (strict mode, no `any`)
-- [ ] T032 Valider manuellement `specs/better-auth-admin/quickstart.md` — exécuter les 5 scénarios curl (magic link, guard, promote, revoke, dernier admin)
+- [x] T029 [P] Écrire les tests d'intégration auth dans `apps/api/src/modules/auth/__tests__/auth.integration.spec.ts` — `POST /api/auth/sign-in/magic-link` (email connu vs inconnu), `GET /api/admin/me` (401/403/200)
+- [x] T030 [P] Écrire les tests d'intégration admin CRUD dans `apps/api/src/modules/auth/__tests__/admin.integration.spec.ts` — flux promote/revoke, `DELETE` dernier admin → 400
+- [x] T031 [P] Vérifier que tous les nouveaux fichiers passent `pnpm --filter api lint` sans erreurs (strict mode, no `any`)
+- [x] T032 Valider manuellement `specs/better-auth-admin/quickstart.md` — exécuter les 5 scénarios curl (magic link, guard, promote, revoke, dernier admin)
 
 ---
 

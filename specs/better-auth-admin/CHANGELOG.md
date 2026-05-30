@@ -21,6 +21,20 @@ Format: [Keep a Changelog](https://keepachangelog.com/)
 - **Author**: AI (Claude) sur instruction utilisateur
 - **Files**: research.md, plan.md
 
+## [2026-05-30 16:30] - /speckit.implement
+
+### Changed
+
+- Completed Phase 2: Foundational — entities, migration, AuthModule, EmailService.sendMagicLink
+- Completed Phase 3: US1 — magic link callback with admin check, Better-Auth middleware on `/api/auth/*`
+- Completed Phase 4: US2 — AuthGuard, AdminGuard, `GET /api/admin/me`, Swagger tag
+- Completed Phase 5: US3 — idempotent AdminSeeder for `bspot.api@gmail.com`
+- Completed Phase 6: US4 — promote/revoke/list admins, last-admin protection
+- Completed Phase 7: Polish — 13 unit/integration tests, build + migration verified
+- Tasks completed: T004–T032
+- **Author**: AI (Claude)
+- **Files**: apps/api/src/modules/auth/**, apps/api/src/seeders/admin.seed.ts, apps/api/src/migrations/Migration20260530000000_add_auth_tables.ts
+
 ## [2026-05-30 16:00] - /speckit.implement
 
 ### Changed
