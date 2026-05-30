@@ -39,6 +39,16 @@ cd apps/api && pnpm seed
 pnpm dev:api
 ```
 
+## Format de l'email magic link
+
+L'email envoyé par `EmailService.sendMagicLink` a la structure suivante :
+
+- **Sujet** : `Votre lien de connexion B-Spot`
+- **Corps** : lien cliquable valable 24h, à usage unique
+- **Expéditeur** : valeur de `SMTP_FROM` (ex: `B-Spot <noreply@localhost>`)
+
+En développement, les emails sont visibles dans MailDev à `http://localhost:1080`.
+
 ## Request a Magic Link (test)
 
 ```bash

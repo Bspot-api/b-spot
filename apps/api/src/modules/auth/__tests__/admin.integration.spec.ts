@@ -62,6 +62,17 @@ describe('AdminController — admin CRUD integration', () => {
     await app.close();
   });
 
+  it('GET /api/admin/admins returns list of admins', async () => {
+    mockAdminService.listAdmins.mockResolvedValue([adminRecord]);
+
+    const response = await request(app.getHttpServer())
+      .get('/api/admin/admins')
+      .expect(200);
+
+    expect(response.body).toHaveLength(1);
+    expect(response.body[0].userId).toBe('admin-user');
+  });
+
   it('POST /api/admin/admins promotes a user', async () => {
     const promoted = {
       id: 'admin-2',

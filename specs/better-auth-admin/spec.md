@@ -2,7 +2,7 @@
 
 **Feature Branch**: `feat/better-auth-admin`
 **Created**: 2026-05-30
-**Status**: Draft
+**Status**: Implemented
 **Input**: User description: "Authentification avec Better-Auth dans NestJS avec table admins dédiée et guard"
 
 ## User Scenarios & Testing *(mandatory)*
@@ -74,9 +74,10 @@ Un admin existant peut promouvoir un utilisateur au rang d'admin ou révoquer ce
 
 ### Edge Cases
 
-- Que se passe-t-il si l'email du magic link n'est pas délivré (provider indisponible) ? Le système doit pouvoir informer l'utilisateur.
-- Que se passe-t-il si le dernier admin révoque son propre accès ? Le système doit empêcher de se retrouver sans aucun admin.
-- Un magic link cliqué depuis un appareil différent de celui qui l'a demandé est-il valide ? (comportement par défaut : oui)
+- Que se passe-t-il si l'email du magic link n'est pas délivré (provider SMTP indisponible) ? Le callback `sendMagicLink` doit logger l'erreur et propager une exception — l'API retourne 500 à l'appelant.
+- Que se passe-t-il si le dernier admin révoque son propre accès ? Le système doit empêcher de se retrouver sans aucun admin (retourne 400).
+- Un magic link déjà utilisé ou expiré retourne une erreur explicite de Better-Auth — aucune session n'est créée.
+- Un magic link cliqué depuis un appareil différent de celui qui l'a demandé est-il valide ? Oui, c'est le comportement par défaut de Better-Auth.
 - Que se passe-t-il si une session admin expire en cours d'utilisation d'une route protégée ? La prochaine requête doit retourner 401.
 
 ## Requirements *(mandatory)*
@@ -91,6 +92,7 @@ Un admin existant peut promouvoir un utilisateur au rang d'admin ou révoquer ce
 - **FR-006**: Le système DOIT empêcher la révocation du dernier admin actif
 - **FR-007**: La promotion et la révocation d'un admin DOIT être possible sans supprimer le compte utilisateur associé
 - **FR-008**: Un magic link DOIT expirer après usage ou après 24 heures, selon ce qui arrive en premier
+- **FR-009**: Le système NE DOIT PAS révéler si une adresse email est connue — la réponse à une demande de magic link est toujours HTTP 200 identique, qu'un email soit envoyé ou non (protection contre l'énumération)
 
 ### Key Entities
 
@@ -101,7 +103,7 @@ Un admin existant peut promouvoir un utilisateur au rang d'admin ou révoquer ce
 
 ### Measurable Outcomes
 
-- **SC-001**: Un admin peut se connecter via magic link en moins de 60 secondes (de la demande du lien à la session active)
+- **SC-001**: Un admin peut se connecter via magic link en moins de 60 secondes, hors délai de livraison email (mesuré entre l'appel API de demande et la création de session après clic)
 - **SC-002**: 100% des routes admin retournent 401/403 en l'absence de session ou de statut admin valide
 - **SC-003**: L'initialisation du système crée le compte admin par défaut sans intervention manuelle dans 100% des cas
 - **SC-004**: La révocation d'un admin prend effet immédiatement sur les requêtes suivantes, sans délai de propagation
@@ -113,4 +115,5 @@ Un admin existant peut promouvoir un utilisateur au rang d'admin ou révoquer ce
 - Les utilisateurs non-admin n'ont pas de mode de connexion dans le périmètre de cette feature (scope limité à l'admin).
 - Un admin révoqué conserve son compte utilisateur et peut être re-promu sans recréer de compte.
 - La durée de validité d'un magic link est de 24h.
+- La durée de vie d'une session après authentification est gérée par Better-Auth (défaut : 7 jours, configurable via `BETTER_AUTH_SESSION_TTL`).
 - L'envoi d'emails pour les magic links nécessite une configuration SMTP ou un provider email dans les variables d'environnement.

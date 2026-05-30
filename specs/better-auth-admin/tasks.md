@@ -126,6 +126,8 @@
 - [x] T031 [P] Vérifier que tous les nouveaux fichiers passent `pnpm --filter api lint` sans erreurs (strict mode, no `any`)
 - [x] T032 Valider manuellement `specs/better-auth-admin/quickstart.md` — exécuter les 5 scénarios curl (magic link, guard, promote, revoke, dernier admin)
 
+> **SC-001 performance (60s SLA) — déféré MVP** : Aucun test automatisé de performance n'est prévu pour SC-001. Le critère (hors délai SMTP) est validé manuellement via quickstart. Un test de perf automatisé pourra être ajouté en Phase 2 si nécessaire.
+
 ---
 
 ## Dependencies & Execution Order
