@@ -7,6 +7,7 @@ import { BrandStatus } from '../brand/brand.entity';
 import { BrandSuggestionService } from '../brand-suggestion/brand-suggestion.service';
 import { BrandMatchSource } from '../brand/brand.entity';
 import type { BrandScanResultDto, ScanResultDto } from './dto/scan.dto';
+import type { ScanHistoryResponseDto } from './dto/scan-history.dto';
 
 @Injectable()
 export class ScanService {
@@ -122,6 +123,10 @@ export class ScanService {
       brandResolution: 'existing',
       brandStatus: BrandStatus.ACTIVE,
     };
+  }
+
+  getHistory(limit: number, offset: number): ScanHistoryResponseDto {
+    return { items: [], total: 0, limit, offset };
   }
 
   async scanByBrandName(brandName: string): Promise<BrandScanResultDto> {
