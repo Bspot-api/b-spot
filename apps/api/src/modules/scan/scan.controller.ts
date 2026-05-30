@@ -1,12 +1,29 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags, ApiBody } from '@nestjs/swagger';
 import { ScanService } from './scan.service';
 import { BrandScanRequestDto, BrandScanResultDto, ScanRequestDto, ScanResultDto, SirenScanRequestDto } from './dto/scan.dto';
+import { ScanHistoryResponseDto } from './dto/scan-history.dto';
 
 @ApiTags('scan')
 @Controller('api/scan')
 export class ScanController {
   constructor(private readonly scanService: ScanService) {}
+
+  @Get('history')
+  @ApiOperation({
+    summary: 'Get scan history (scaffolded — returns empty list until auth is implemented)',
+  })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 50 })
+  @ApiQuery({ name: 'offset', required: false, type: Number, example: 0 })
+  @ApiResponse({ status: 200, type: ScanHistoryResponseDto })
+  getHistory(
+    @Query('limit') limit = 50,
+    @Query('offset') offset = 0,
+  ): ScanHistoryResponseDto {
+    const parsedLimit = Math.min(Math.max(Number(limit) || 50, 1), 100);
+    const parsedOffset = Math.max(Number(offset) || 0, 0);
+    return this.scanService.getHistory(parsedLimit, parsedOffset);
+  }
 
   @Post()
   @ApiOperation({ summary: 'Scan a product barcode and return company ownership data' })

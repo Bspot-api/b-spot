@@ -222,6 +222,8 @@ Mobile types are auto-generated from the API's OpenAPI schema:
 ## Active Technologies
 - TypeScript strict (`strict: true`, `noImplicitAny`, `strictNullChecks`) + Expo ~52.0 (Metro bundler), NestJS 10, MikroORM 6, NativeWind 4, TanStack Query 5, Expo Router 6 (refactor/mobile-app-rewrite)
 - PostgreSQL 15 (MikroORM) côté API ; TanStack Query + AsyncStorage côté mobile (refactor/mobile-app-rewrite)
+- TypeScript strict (strict: true, noImplicitAny, strictNullChecks) (feat/scan-history)
+- Mobile — AsyncStorage local (clé `@b-spot/scan-history`). API — aucun stockage DB en phase 1. (feat/scan-history)
 
 ## Recent Changes
 - refactor/mobile-app-rewrite: Added TypeScript strict (`strict: true`, `noImplicitAny`, `strictNullChecks`) + Expo ~52.0 (Metro bundler), NestJS 10, MikroORM 6, NativeWind 4, TanStack Query 5, Expo Router 6
