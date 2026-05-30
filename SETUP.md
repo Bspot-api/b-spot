@@ -4,7 +4,7 @@
 
 - Node.js >= 18.0.0
 - pnpm >= 8.0.0
-- Docker (for PostgreSQL)
+- Docker (for PostgreSQL and MailDev)
 - Expo CLI (installed automatically with dependencies)
 
 ## Phase 1: Initial Setup
@@ -27,7 +27,12 @@ cp apps/api/.env.example apps/api/.env
 Edit `apps/api/.env` and configure:
 - Database credentials
 - Pappers API key (get 250 free calls/month at pappers.fr)
-- SMTP credentials for admin alerts
+- Email — en local, les valeurs par défaut de `.env.example` pointent vers MailDev (aucune auth SMTP requise)
+
+**Local email (MailDev)** — same pattern as e-enfance-3018:
+- `pnpm db:up` démarre PostgreSQL **et** MailDev
+- Interface web : http://localhost:1080
+- SMTP : `localhost:1025` (magic links admin, alertes quota)
 
 **Mobile Environment:**
 ```bash
@@ -37,16 +42,19 @@ cp apps/mobile/.env.example apps/mobile/.env
 Edit `apps/mobile/.env` and configure:
 - API URL (default: http://localhost:3001)
 
-### 3. Start PostgreSQL Database
+### 3. Start Local Infrastructure
 
 ```bash
 pnpm db:up
 ```
 
-Verify database is running:
+Starts PostgreSQL and MailDev. Verify:
 ```bash
-pnpm db:logs
+pnpm db:logs      # PostgreSQL
+pnpm mail:logs    # MailDev (optional)
 ```
+
+Open http://localhost:1080 to inspect outgoing emails during development.
 
 ### 4. Run Database Migrations
 

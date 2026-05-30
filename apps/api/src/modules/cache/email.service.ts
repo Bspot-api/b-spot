@@ -3,28 +3,45 @@ import * as nodemailer from 'nodemailer';
 
 const QUOTA_LIMIT = 250;
 
+interface SmtpTransportOptions {
+  host: string;
+  port: number;
+  secure: boolean;
+  auth?: {
+    user: string;
+    pass: string;
+  };
+}
+
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
 
   private createTransport(): nodemailer.Transporter {
-    return nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT) || 587,
+    const config: SmtpTransportOptions = {
+      host: process.env.SMTP_HOST || 'localhost',
+      port: Number(process.env.SMTP_PORT) || 1025,
       secure: process.env.SMTP_SECURE === 'true',
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD,
-      },
-    });
+    };
+
+    const user = process.env.SMTP_USER?.trim();
+    const pass = process.env.SMTP_PASSWORD?.trim();
+    if (user && pass) {
+      config.auth = { user, pass };
+    }
+
+    return nodemailer.createTransport(config);
+  }
+
+  private getFromAddress(): string {
+    return process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@localhost';
   }
 
   async sendMagicLink(params: { to: string; url: string }): Promise<void> {
     const transporter = this.createTransport();
-    const from = process.env.SMTP_FROM || process.env.SMTP_USER;
 
     await transporter.sendMail({
-      from,
+      from: this.getFromAddress(),
       to: params.to,
       subject: '[B-Spot] Lien de connexion admin',
       text: [
@@ -57,7 +74,7 @@ export class EmailService {
     const remaining = QUOTA_LIMIT - usage;
 
     await transporter.sendMail({
-      from: process.env.SMTP_USER,
+      from: this.getFromAddress(),
       to: adminEmail,
       subject: `[B-Spot] Alerte quota Pappers API — ${usage}/${QUOTA_LIMIT} appels`,
       text: [
