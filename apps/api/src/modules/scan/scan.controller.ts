@@ -1,7 +1,13 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags, ApiBody } from '@nestjs/swagger';
 import { ScanService } from './scan.service';
-import { BrandScanRequestDto, BrandScanResultDto, ScanRequestDto, ScanResultDto, SirenScanRequestDto } from './dto/scan.dto';
+import {
+  BrandScanRequestDto,
+  BrandScanResultDto,
+  ScanRequestDto,
+  ScanResultDto,
+  SirenScanRequestDto,
+} from './dto/scan.dto';
 import { ScanHistoryResponseDto } from './dto/scan-history.dto';
 
 @ApiTags('scan')
@@ -20,8 +26,12 @@ export class ScanController {
     @Query('limit') limit = 50,
     @Query('offset') offset = 0,
   ): ScanHistoryResponseDto {
-    const parsedLimit = Math.min(Math.max(Number(limit) || 50, 1), 100);
-    const parsedOffset = Math.max(Number(offset) || 0, 0);
+    const rawLimit = String(limit).trim();
+    const rawOffset = String(offset).trim();
+    const limitNum = rawLimit === '' || Number.isNaN(Number(rawLimit)) ? 50 : Number(rawLimit);
+    const offsetNum = rawOffset === '' || Number.isNaN(Number(rawOffset)) ? 0 : Number(rawOffset);
+    const parsedLimit = Math.min(Math.max(limitNum, 1), 100);
+    const parsedOffset = Math.max(offsetNum, 0);
     return this.scanService.getHistory(parsedLimit, parsedOffset);
   }
 

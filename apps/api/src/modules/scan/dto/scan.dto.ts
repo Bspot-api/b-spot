@@ -25,7 +25,10 @@ export class SirenScanRequestDto {
   @Length(9, 9)
   siren!: string;
 
-  @ApiPropertyOptional({ example: 'Danone', description: 'Brand name to associate with this SIREN' })
+  @ApiPropertyOptional({
+    example: 'Danone',
+    description: 'Brand name to associate with this SIREN',
+  })
   @IsOptional()
   @IsString()
   @MinLength(2)

@@ -67,7 +67,13 @@ export class PappersService {
 
       if (!success) {
         const errorText = await response.text();
-        await this.cacheService.logApiCall(ExternalApi.PAPPERS, endpoint, `siren=${siren}`, false, errorText);
+        await this.cacheService.logApiCall(
+          ExternalApi.PAPPERS,
+          endpoint,
+          `siren=${siren}`,
+          false,
+          errorText,
+        );
         this.logger.error(`Pappers API error for SIREN ${siren}: ${response.status}`);
         return null;
       }
@@ -79,7 +85,13 @@ export class PappersService {
 
       return this.parseResponse(siren, data);
     } catch (err) {
-      await this.cacheService.logApiCall(ExternalApi.PAPPERS, '/v2/entreprise', `siren=${siren}`, false, String(err));
+      await this.cacheService.logApiCall(
+        ExternalApi.PAPPERS,
+        '/v2/entreprise',
+        `siren=${siren}`,
+        false,
+        String(err),
+      );
       this.logger.error(`Pappers fetch failed for SIREN ${siren}`, err);
       return null;
     }

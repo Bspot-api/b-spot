@@ -59,10 +59,7 @@ export class ProductService {
     return null;
   }
 
-  async fetchFromFactsApi(
-    barcode: string,
-    source: ProductSource,
-  ): Promise<ProductDto | null> {
+  async fetchFromFactsApi(barcode: string, source: ProductSource): Promise<ProductDto | null> {
     const result = await this.fetchFromFactsApiWithOutcome(barcode, source);
     return result.product;
   }
@@ -115,9 +112,7 @@ export class ProductService {
     try {
       const response = await fetch(`${endpoint}/${barcode}`);
       if (!response.ok) {
-        this.logger.warn(
-          `${sourceLabel} API returned ${response.status} for barcode ${barcode}`,
-        );
+        this.logger.warn(`${sourceLabel} API returned ${response.status} for barcode ${barcode}`);
         return { outcome: 'technical_error', product: null };
       }
 

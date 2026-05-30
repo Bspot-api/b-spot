@@ -24,7 +24,9 @@ export class Migration20260225000000_add_cache_tables extends Migration {
       );
     `);
 
-    this.addSql(`CREATE INDEX "api_usage_log_api_timestamp_idx" ON "api_usage_log" ("api", "timestamp");`);
+    this.addSql(
+      `CREATE INDEX "api_usage_log_api_timestamp_idx" ON "api_usage_log" ("api", "timestamp");`,
+    );
   }
 
   async down(): Promise<void> {

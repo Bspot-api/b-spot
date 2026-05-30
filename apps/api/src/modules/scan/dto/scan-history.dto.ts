@@ -16,7 +16,10 @@ export class ScanHistoryItemDto {
   @ApiProperty({ example: '552032534', description: 'SIREN 9 digits' })
   companySiren!: string;
 
-  @ApiProperty({ enum: ['OFF', 'OBF'], description: 'OFF = Open Food Facts, OBF = Open Beauty Facts' })
+  @ApiProperty({
+    enum: ['OFF', 'OBF'],
+    description: 'OFF = Open Food Facts, OBF = Open Beauty Facts',
+  })
   productSource!: 'OFF' | 'OBF';
 
   @ApiProperty({ example: '2026-05-30T14:22:00.000Z', description: 'ISO 8601 scan timestamp' })
