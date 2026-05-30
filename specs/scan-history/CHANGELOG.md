@@ -4,6 +4,20 @@ All notable changes to this feature specification are documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/)
 
+## [2026-05-30 06:00] - /speckit.implement — Phase 5 US3
+
+### Changed
+
+- Tâche complétée : T016
+- Extraction de `buildUpdatedHistory` dans `history-utils.ts` (fonction pure, sans dépendances natives)
+- Mise à jour `transformIgnorePatterns` dans `apps/mobile/package.json` pour compatibilité pnpm + Jest
+- 6 tests unitaires `buildUpdatedHistory` passent (insert, dedup, rotation 50, persistance, corruption)
+- 3 tests API `scan.controller.history.spec.ts` passent (réponse vide, clamping limit/offset)
+- **Author**: AI (Claude)
+- **Files**: `history-utils.ts`, `useScanHistory.ts`, `useScanHistory.test.ts`, `package.json`
+
+---
+
 ## [2026-05-30 05:00] - /speckit.implement — Phase 3 US1 + Phase 4 US2
 
 ### Changed

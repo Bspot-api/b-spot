@@ -82,7 +82,7 @@
 
 ### Implementation
 
-- [ ] T016 [P] [US3] Écrire les tests unitaires pour `useScanHistory` dans `apps/mobile/src/features/history/hooks/__tests__/useScanHistory.test.ts` — couvrir : (a) addEntry crée une entrée, (b) rescan même barcode met à jour scannedAt et remonte en tête, (c) max 50 entrées — la 51e pousse la dernière hors de la liste, (d) persistance : mock AsyncStorage, vérifier getItem/setItem appelés correctement
+- [x] T016 [P] [US3] Écrire les tests unitaires pour `useScanHistory` dans `apps/mobile/src/features/history/hooks/__tests__/useScanHistory.test.ts` — couvrir : (a) addEntry crée une entrée, (b) rescan même barcode met à jour scannedAt et remonte en tête, (c) max 50 entrées — la 51e pousse la dernière hors de la liste, (d) persistance : mock AsyncStorage, vérifier getItem/setItem appelés correctement
 
 **Checkpoint**: Tests verts. Comportement de déduplication et rotation validé automatiquement.
 

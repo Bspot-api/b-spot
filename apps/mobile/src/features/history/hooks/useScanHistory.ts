@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { buildUpdatedHistory, STORAGE_KEY } from '../history-utils';
 import type { ScanHistoryEntry } from '../types';
-
-const STORAGE_KEY = '@b-spot/scan-history';
-const MAX_ENTRIES = 50;
 
 export interface UseScanHistory {
   entries: ScanHistoryEntry[];
@@ -31,8 +29,7 @@ export function useScanHistory(): UseScanHistory {
 
   const addEntry = useCallback(async (entry: ScanHistoryEntry): Promise<void> => {
     setEntries((prev) => {
-      const withoutDupe = prev.filter((e) => e.barcode !== entry.barcode);
-      const updated = [entry, ...withoutDupe].slice(0, MAX_ENTRIES);
+      const updated = buildUpdatedHistory(prev, entry);
       AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated)).catch(() => undefined);
       return updated;
     });
