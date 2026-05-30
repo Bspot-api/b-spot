@@ -17,9 +17,9 @@
 
 **Purpose**: Dépendances, variables d'environnement et scaffolding du module auth.
 
-- [ ] T001 Installer `better-auth` dans l'API avec `pnpm --filter api add better-auth`
-- [ ] T002 [P] Ajouter `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` et `SMTP_FROM` dans `apps/api/.env.example`
-- [ ] T003 [P] Créer la structure du module `apps/api/src/modules/auth/` avec sous-dossier `__tests__/`
+- [x] T001 Installer `better-auth` dans l'API avec `pnpm --filter api add better-auth`
+- [x] T002 [P] Ajouter `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` et `SMTP_FROM` dans `apps/api/.env.example`
+- [x] T003 [P] Créer la structure du module `apps/api/src/modules/auth/` avec sous-dossier `__tests__/`
 
 ---
 

@@ -21,6 +21,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/)
 - **Author**: AI (Claude) sur instruction utilisateur
 - **Files**: research.md, plan.md
 
+## [2026-05-30 16:00] - /speckit.implement
+
+### Changed
+
+- Completed Phase 1: Setup (Infrastructure partagée)
+- Tasks completed: T001, T002, T003
+- **Author**: AI (Claude)
+- **Files**: apps/api/package.json, pnpm-lock.yaml, apps/api/.env.example, apps/api/src/modules/auth/__tests__/
+
 ## [2026-05-30 15:30] - /speckit.tasks
 
 ### Added
