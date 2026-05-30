@@ -92,8 +92,8 @@
 
 **Purpose**: Vérifications Constitution + qualité avant merge.
 
-- [ ] T017 [P] Vérifier que tous les nouveaux fichiers TypeScript passent `pnpm lint` sans erreurs (strict mode, no `any`, no implicit returns)
-- [ ] T018 Valider manuellement le quickstart.md dans `specs/scan-history/quickstart.md` — exécuter les 5 étapes de test manuel et confirmer que tous les scénarios passent
+- [x] T017 [P] Vérifier que tous les nouveaux fichiers TypeScript passent `pnpm lint` sans erreurs (strict mode, no `any`, no implicit returns)
+- [x] T018 Valider manuellement le quickstart.md dans `specs/scan-history/quickstart.md` — exécuter les 5 étapes de test manuel et confirmer que tous les scénarios passent
 
 ---
 

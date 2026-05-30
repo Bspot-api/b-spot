@@ -35,7 +35,7 @@ export function useBarcodeScanner(): UseBarcodeScanner {
         },
       });
     },
-    [router],
+    [router]
   );
 
   const handleBarcodeScan = useCallback(
@@ -73,16 +73,22 @@ export function useBarcodeScanner(): UseBarcodeScanner {
           });
         } else {
           if (result.brandResolution === 'needs_user_input') {
-            Toast.show("La marque n'existe pas encore, on va essayer de la retrouver depuis le code-barres.", {
-              type: 'info',
-              position: 'top',
-              duration: 3200,
-            });
-            Toast.show("Arf, on n'est pas sûrs de la marque, tu veux bien nous donner plus d'infos ?", {
-              type: 'warning',
-              position: 'top',
-              duration: 5200,
-            });
+            Toast.show(
+              "La marque n'existe pas encore, on va essayer de la retrouver depuis le code-barres.",
+              {
+                type: 'info',
+                position: 'top',
+                duration: 3200,
+              }
+            );
+            Toast.show(
+              "Arf, on n'est pas sûrs de la marque, tu veux bien nous donner plus d'infos ?",
+              {
+                type: 'warning',
+                position: 'top',
+                duration: 5200,
+              }
+            );
             setState('idle');
             navigateToBrandSuggestion(result);
             return;
@@ -102,7 +108,7 @@ export function useBarcodeScanner(): UseBarcodeScanner {
         setTimeout(() => setState('idle'), 3000);
       }
     },
-    [scan, router, navigateToBrandSuggestion, addEntry],
+    [scan, router, navigateToBrandSuggestion, addEntry]
   );
 
   return {

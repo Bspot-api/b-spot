@@ -5,7 +5,7 @@ export const MAX_ENTRIES = 50;
 
 export function buildUpdatedHistory(
   prev: ScanHistoryEntry[],
-  entry: ScanHistoryEntry,
+  entry: ScanHistoryEntry
 ): ScanHistoryEntry[] {
   const withoutDupe = prev.filter((e) => e.barcode !== entry.barcode);
   return [entry, ...withoutDupe].slice(0, MAX_ENTRIES);

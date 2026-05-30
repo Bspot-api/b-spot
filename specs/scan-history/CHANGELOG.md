@@ -4,6 +4,17 @@ All notable changes to this feature specification are documented here.
 
 Format: [Keep a Changelog](https://keepachangelog.com/)
 
+## [2026-05-30 07:00] - /speckit.implement — Phase 6 Polish
+
+### Changed
+
+- T017 : `eslint --fix` sur les fichiers modifiés — formatting corrigé dans `useBarcodeScanner.ts` et `history-utils.ts`
+- T018 : Erreurs pre-existantes (`@typescript-eslint/no-empty-object-type`) non régressées — aucune nouvelle erreur introduite
+- **Author**: AI (Claude)
+- **Files**: `useBarcodeScanner.ts`, `history-utils.ts`
+
+---
+
 ## [2026-05-30 06:00] - /speckit.implement — Phase 5 US3
 
 ### Changed
