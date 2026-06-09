@@ -8,11 +8,14 @@ import { CompanyModule } from './modules/company/company.module';
 import { BrandSuggestionModule } from './modules/brand-suggestion/brand-suggestion.module';
 import { ScanModule } from './modules/scan/scan.module';
 
+import { AuthModule } from './modules/auth/auth.module';
+
 @Module({
   imports: [
     MikroOrmModule.forRoot(mikroOrmConfig),
     HealthModule,
     CacheModule,
+    AuthModule,
     ProductModule,
     CompanyModule,
     BrandSuggestionModule,

@@ -1,0 +1,139 @@
+openapi: "3.0.3"
+info:
+  title: B-Spot Auth API (Better-Auth delegated)
+  description: >
+    Auth endpoints are handled by Better-Auth and proxied via @thallesp/nestjs-better-auth.
+    These routes are NOT defined in NestJS controllers — they are served by Better-Auth's internal handler.
+  version: "1.0.0"
+
+paths:
+  /api/auth/sign-in/magic-link:
+    post:
+      summary: Request a magic link
+      description: >
+        Sends a one-time login link to the provided email address.
+        If the email is not registered (disableSignUp: true), no email is sent and the response is still 200 (no information leakage).
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: bspot.api@gmail.com
+                callbackURL:
+                  type: string
+                  description: URL to redirect to after successful magic link verification
+                  example: "https://admin.bspot.fr/dashboard"
+      responses:
+        "200":
+          description: Request accepted (email sent if address is known)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+        "429":
+          description: Rate limit exceeded (5 requests/minute per IP)
+
+  /api/auth/magic-link/verify:
+    get:
+      summary: Verify a magic link token
+      description: >
+        Called when user clicks the link in their email.
+        Atomically consumes the token, creates a session, sets httpOnly session cookie,
+        and redirects to callbackURL.
+      tags: [auth]
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: callbackURL
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "302":
+          description: Redirect to callbackURL (session cookie set)
+        "302 (error)":
+          description: Redirect to errorCallbackURL?error=INVALID_TOKEN if token is invalid or expired
+
+  /api/auth/get-session:
+    get:
+      summary: Get current session
+      description: Returns the currently authenticated user and session data.
+      tags: [auth]
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Active session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionResponse"
+        "401":
+          description: No active session
+
+  /api/auth/sign-out:
+    post:
+      summary: Sign out
+      description: Invalidates the current session and clears the session cookie.
+      tags: [auth]
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Signed out successfully
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: session_token
+
+  schemas:
+    SessionResponse:
+      type: object
+      properties:
+        session:
+          type: object
+          properties:
+            id:
+              type: string
+            userId:
+              type: string
+            expiresAt:
+              type: string
+              format: date-time
+        user:
+          $ref: "#/components/schemas/User"
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "01970000-0000-7000-8000-000000000001"
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        emailVerified:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time

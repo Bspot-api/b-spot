@@ -8,8 +8,22 @@ import { Product } from './src/modules/product/product.entity';
 import { Brand } from './src/modules/brand/brand.entity';
 import { BrandSuggestion } from './src/modules/brand-suggestion/brand-suggestion.entity';
 import { Company } from './src/modules/company/company.entity';
+import { User, Session, Account, Verification } from './src/modules/auth/auth.entity';
+import { Admin } from './src/modules/auth/admin.entity';
 
-const entities = [PappersCache, ApiUsageLog, Product, Brand, BrandSuggestion, Company];
+const entities = [
+  PappersCache,
+  ApiUsageLog,
+  Product,
+  Brand,
+  BrandSuggestion,
+  Company,
+  User,
+  Session,
+  Account,
+  Verification,
+  Admin,
+];
 
 export default defineConfig({
   entities,

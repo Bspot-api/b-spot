@@ -49,7 +49,9 @@ export class ScanService {
 
     if (!brand) {
       this.logger.warn(`Brand not found in DB: "${productDto.brandName}" — trying auto discovery`);
-      const discovery = await this.brandDiscoveryService.discoverAndPersistBrand(productDto.brandName);
+      const discovery = await this.brandDiscoveryService.discoverAndPersistBrand(
+        productDto.brandName,
+      );
       brand = discovery.brand ?? null;
       discoveryConfidence = discovery.confidence;
       if (discovery.resolution === 'auto_active') brandResolution = 'auto_active';

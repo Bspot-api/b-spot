@@ -16,6 +16,7 @@
     "db:up": "docker-compose up -d",
     "db:down": "docker-compose down",
     "db:logs": "docker-compose logs -f postgres",
+    "mail:logs": "docker-compose logs -f maildev",
     "generate:types": "pnpm --filter mobile generate:types"
   },
   "devDependencies": {

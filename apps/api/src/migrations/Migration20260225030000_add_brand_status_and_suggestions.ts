@@ -35,7 +35,9 @@ export class Migration20260225030000_add_brand_status_and_suggestions extends Mi
     `);
 
     this.addSql(`CREATE INDEX "brand_suggestion_status_idx" ON "brand_suggestion" ("status");`);
-    this.addSql(`CREATE INDEX "brand_suggestion_brand_name_idx" ON "brand_suggestion" ("brand_name");`);
+    this.addSql(
+      `CREATE INDEX "brand_suggestion_brand_name_idx" ON "brand_suggestion" ("brand_name");`,
+    );
     this.addSql(`CREATE INDEX "brand_suggestion_barcode_idx" ON "brand_suggestion" ("barcode");`);
   }
 

@@ -25,11 +25,7 @@ interface EntrepriseSearchResponse {
   results?: EntrepriseSearchResult[];
 }
 
-export type BrandDiscoveryResolution =
-  | 'auto_active'
-  | 'auto_pending'
-  | 'needs_user_input'
-  | 'none';
+export type BrandDiscoveryResolution = 'auto_active' | 'auto_pending' | 'needs_user_input' | 'none';
 
 export interface BrandDiscoveryResult {
   resolution: BrandDiscoveryResolution;
@@ -76,7 +72,9 @@ export class BrandDiscoveryService {
 
     const validated = await this.pappersService.getCompanyBySiren(best.candidate.siren);
     if (!validated) {
-      this.logger.warn(`Discovery candidate rejected (Pappers unavailable): ${best.candidate.siren}`);
+      this.logger.warn(
+        `Discovery candidate rejected (Pappers unavailable): ${best.candidate.siren}`,
+      );
       return {
         resolution: 'needs_user_input',
         confidence: best.confidence,
@@ -94,16 +92,14 @@ export class BrandDiscoveryService {
       };
     }
 
-    const status =
-      best.confidence >= ACTIVE_THRESHOLD ? BrandStatus.ACTIVE : BrandStatus.PENDING;
+    const status = best.confidence >= ACTIVE_THRESHOLD ? BrandStatus.ACTIVE : BrandStatus.PENDING;
 
     const existing = await this.brandRepo.findOne({
       name: { $ilike: query },
     });
     if (existing) {
       return {
-        resolution:
-          existing.status === BrandStatus.PENDING ? 'auto_pending' : 'auto_active',
+        resolution: existing.status === BrandStatus.PENDING ? 'auto_pending' : 'auto_active',
         confidence: existing.confidence,
         brand: existing,
         matchedQuery: query,
@@ -131,7 +127,9 @@ export class BrandDiscoveryService {
     };
   }
 
-  private async searchCompanies(query: string): Promise<Array<{ siren: string; name: string; raw: EntrepriseSearchResult }>> {
+  private async searchCompanies(
+    query: string,
+  ): Promise<Array<{ siren: string; name: string; raw: EntrepriseSearchResult }>> {
     const url = new URL(ENTREPRISE_SEARCH_API);
     url.searchParams.set('q', query);
     url.searchParams.set('per_page', '5');
@@ -154,7 +152,10 @@ export class BrandDiscoveryService {
           if (!/^\d{9}$/.test(siren) || !name) return null;
           return { siren, name, raw: result };
         })
-        .filter((row): row is { siren: string; name: string; raw: EntrepriseSearchResult } => row !== null);
+        .filter(
+          (row): row is { siren: string; name: string; raw: EntrepriseSearchResult } =>
+            row !== null,
+        );
     } catch (error) {
       this.logger.error(`Entreprise search failed for query "${query}"`, error);
       return [];

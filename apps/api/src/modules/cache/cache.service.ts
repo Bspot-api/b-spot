@@ -19,8 +19,7 @@ export interface QuotaStatus {
 @Injectable()
 export class CacheService {
   private readonly logger = new Logger(CacheService.name);
-  private readonly pappersCacheTtlMs =
-    this.getPappersCacheTtlDays() * 24 * 60 * 60 * 1000;
+  private readonly pappersCacheTtlMs = this.getPappersCacheTtlDays() * 24 * 60 * 60 * 1000;
 
   constructor(
     @InjectRepository(PappersCache)

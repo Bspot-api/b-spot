@@ -33,18 +33,13 @@ export class BrandService {
     const all = await this.brandRepo.findAll();
     const normalizedInput = this.normalizeBrandText(input);
 
-    const normalizedExact = all.find(
-      (b) => this.normalizeBrandText(b.name) === normalizedInput,
-    );
+    const normalizedExact = all.find((b) => this.normalizeBrandText(b.name) === normalizedInput);
     if (normalizedExact) return normalizedExact;
 
     // Partial match on normalized labels (handles separators/accents differences).
     const partial = all.find((b) => {
       const normalizedBrand = this.normalizeBrandText(b.name);
-      return (
-        normalizedInput.includes(normalizedBrand) ||
-        normalizedBrand.includes(normalizedInput)
-      );
+      return normalizedInput.includes(normalizedBrand) || normalizedBrand.includes(normalizedInput);
     });
     if (partial) return partial;
 
