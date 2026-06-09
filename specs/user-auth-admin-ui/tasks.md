@@ -118,7 +118,7 @@
 
 **Independent Test**: Simulate expired session (clear cookie manually or wait for expiry) → attempt any API action → toast "Votre session a expiré" appears → user is on login screen within 2 seconds.
 
-- [ ] T019 [US5] Add global 401 interceptor to `apps/mobile/app/_layout.tsx` — move `QueryClient` construction outside `RootLayout` to module scope; pass `queryCache: new QueryCache({ onError: (error) => { if (error instanceof ApiError && error.statusCode === 401) { setTimeout(() => { toast.show('Votre session a expiré'); router.replace('/login'); queryClient.invalidateQueries({ queryKey: ['auth'] }); }, 0); } } })` to `new QueryClient()`; import `ApiError` from `../src/api/client`; use `useToast()` hook or call toast imperatively via a module-level reference (depends on T007)
+- [x] T019 [US5] Add global 401 interceptor to `apps/mobile/app/_layout.tsx` — move `QueryClient` construction outside `RootLayout` to module scope; pass `queryCache: new QueryCache({ onError: (error) => { if (error instanceof ApiError && error.statusCode === 401) { setTimeout(() => { toast.show('Votre session a expiré'); router.replace('/login'); queryClient.invalidateQueries({ queryKey: ['auth'] }); }, 0); } } })` to `new QueryClient()`; import `ApiError` from `../src/api/client`; use `useToast()` hook or call toast imperatively via a module-level reference (depends on T007)
 
 **Checkpoint**: All 5 user stories fully functional
 

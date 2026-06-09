@@ -1,11 +1,22 @@
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ToastProviderWithViewport } from '../src/components/reacticx/Toast';
+import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ApiError } from '../src/api/client';
+import { Toast, ToastProviderWithViewport } from '../src/components/reacticx/Toast';
 import '../global.css';
 
-// QueryClient is module-scoped so the 401 interceptor (added in Phase 7) can reference it
 export const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error) => {
+      if (error instanceof ApiError && error.statusCode === 401) {
+        setTimeout(() => {
+          Toast.show('Votre session a expirée. Reconnectez-vous.');
+          void queryClient.invalidateQueries({ queryKey: ['auth'] });
+          router.replace('/login');
+        }, 0);
+      }
+    },
+  }),
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5,

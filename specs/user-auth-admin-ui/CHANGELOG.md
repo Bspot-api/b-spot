@@ -29,6 +29,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/)
 
 ---
 
+## [2026-06-09 09:00] - /speckit.implement
+
+### Changed
+
+- Completed Phase 7: US5 Session Expiry Handling
+- Tasks completed: T019
+- **Author**: AI (Claude)
+- **Files**: apps/mobile/app/_layout.tsx
+
+---
+
 ## [2026-06-09 08:00] - /speckit.implement
 
 ### Changed
