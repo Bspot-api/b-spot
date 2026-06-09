@@ -62,6 +62,8 @@ export interface CreateBrandSuggestionDto {
   offBrandRaw?: string;
 }
 
+export type SuggestionStatus = 'new' | 'reviewed' | 'approved' | 'rejected';
+
 export interface BrandSuggestionDto {
   id: number;
   brandName: string;
@@ -70,7 +72,32 @@ export interface BrandSuggestionDto {
   productImageUrl?: string;
   notes?: string;
   offBrandRaw?: string;
-  status: 'new' | 'reviewed' | 'approved' | 'rejected';
+  status: SuggestionStatus;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface BrandSuggestionListDto {
+  items: BrandSuggestionDto[];
+  total: number;
+}
+
+export interface UpdateSuggestionStatusDto {
+  status: SuggestionStatus;
+}
+
+export interface SessionDto {
+  user: {
+    id: string;
+    email: string;
+    name: string;
+  };
+}
+
+export interface AdminProfileDto {
+  adminId: string;
+  userId: string;
+  email: string;
+  name: string;
+  promotedAt: string;
 }

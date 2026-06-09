@@ -1,9 +1,13 @@
 import type {
+  AdminProfileDto,
   BrandScanResultDto,
   BrandSuggestionDto,
+  BrandSuggestionListDto,
   CompanyDto,
   CreateBrandSuggestionDto,
   ScanResultDto,
+  SessionDto,
+  SuggestionStatus,
 } from './types';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3001';
@@ -26,6 +30,7 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   try {
     const response = await fetch(`${API_URL}${path}`, {
       ...options,
+      credentials: 'include',
       signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
@@ -70,5 +75,41 @@ export async function createBrandSuggestion(
   return apiFetch<BrandSuggestionDto>('/api/brand-suggestions', {
     method: 'POST',
     body: JSON.stringify(payload),
+  });
+}
+
+export async function getSession(): Promise<SessionDto | null> {
+  return apiFetch<SessionDto | null>('/api/auth/get-session');
+}
+
+export async function signInMagicLink(email: string): Promise<void> {
+  await apiFetch<unknown>('/api/auth/sign-in/magic-link', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function signOut(): Promise<void> {
+  await apiFetch<unknown>('/api/auth/sign-out', { method: 'POST' });
+}
+
+export async function getAdminMe(): Promise<AdminProfileDto> {
+  return apiFetch<AdminProfileDto>('/api/admin/me');
+}
+
+export async function listAdminSuggestions(
+  status?: SuggestionStatus,
+): Promise<BrandSuggestionListDto> {
+  const query = status ? `?status=${status}` : '';
+  return apiFetch<BrandSuggestionListDto>(`/api/admin/brand-suggestions${query}`);
+}
+
+export async function updateSuggestionStatus(
+  id: number,
+  status: SuggestionStatus,
+): Promise<BrandSuggestionDto> {
+  return apiFetch<BrandSuggestionDto>(`/api/admin/brand-suggestions/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status }),
   });
 }

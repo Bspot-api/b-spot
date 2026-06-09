@@ -26,9 +26,9 @@
 
 **Purpose**: Wire in cookie forwarding and add all new types. No business logic. All 3 tasks touch different files and can run in parallel.
 
-- [ ] T001 Modify `apps/mobile/src/api/client.ts` — add `credentials: 'include'` to the `apiFetch` options spread, and add 6 new exported async functions: `getSession(): Promise<SessionDto | null>`, `signInMagicLink(email: string): Promise<void>`, `signOut(): Promise<void>`, `getAdminMe(): Promise<AdminProfileDto>`, `listAdminSuggestions(status?: SuggestionStatus): Promise<BrandSuggestionListDto>`, `updateSuggestionStatus(id: number, status: SuggestionStatus): Promise<BrandSuggestionDto>` — `getAdminMe` must NOT catch 403 (let it propagate as ApiError)
-- [ ] T002 [P] Extend `apps/mobile/src/api/types.ts` — add `SessionDto`, `AdminProfileDto`, `BrandSuggestionListDto`, `UpdateSuggestionStatusDto`, and `SuggestionStatus` (union type `'new' | 'reviewed' | 'approved' | 'rejected'`) per data-model.md
-- [ ] T003 [P] Create `apps/mobile/src/features/auth/types.ts` — export `Session` and `AdminProfile` domain interfaces (mirrors of SessionDto/AdminProfileDto, kept in feature module per constitution Principle 4)
+- [x] T001 Modify `apps/mobile/src/api/client.ts` — add `credentials: 'include'` to the `apiFetch` options spread, and add 6 new exported async functions: `getSession(): Promise<SessionDto | null>`, `signInMagicLink(email: string): Promise<void>`, `signOut(): Promise<void>`, `getAdminMe(): Promise<AdminProfileDto>`, `listAdminSuggestions(status?: SuggestionStatus): Promise<BrandSuggestionListDto>`, `updateSuggestionStatus(id: number, status: SuggestionStatus): Promise<BrandSuggestionDto>` — `getAdminMe` must NOT catch 403 (let it propagate as ApiError)
+- [x] T002 [P] Extend `apps/mobile/src/api/types.ts` — add `SessionDto`, `AdminProfileDto`, `BrandSuggestionListDto`, `UpdateSuggestionStatusDto`, and `SuggestionStatus` (union type `'new' | 'reviewed' | 'approved' | 'rejected'`) per data-model.md
+- [x] T003 [P] Create `apps/mobile/src/features/auth/types.ts` — export `Session` and `AdminProfile` domain interfaces (mirrors of SessionDto/AdminProfileDto, kept in feature module per constitution Principle 4)
 
 ---
 
