@@ -1,13 +1,21 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnApplicationShutdown,
+  OnModuleInit,
+  ServiceUnavailableException,
+} from '@nestjs/common';
+import { Pool } from 'pg';
 import type { BetterAuthInstance } from './auth.config';
 import { AdminService } from './admin.service';
 import { EmailService } from '../cache/email.service';
 
 @Injectable()
-export class AuthService implements OnModuleInit {
+export class AuthService implements OnModuleInit, OnApplicationShutdown {
   private readonly logger = new Logger(AuthService.name);
   private _auth: BetterAuthInstance | null = null;
-  private static initPromise: Promise<void> | null = null;
+  private _pool: Pool | null = null;
+  private _initPromise: Promise<void> | null = null;
 
   constructor(
     private readonly emailService: EmailService,
@@ -15,42 +23,53 @@ export class AuthService implements OnModuleInit {
   ) {}
 
   async onModuleInit(): Promise<void> {
-    if (!AuthService.initPromise) {
-      AuthService.initPromise = this.initialize();
+    if (!this._initPromise) {
+      this._initPromise = this.initialize().catch((err) => {
+        this._initPromise = null;
+        throw err;
+      });
     }
-    await AuthService.initPromise;
+    await this._initPromise;
+  }
+
+  async onApplicationShutdown(): Promise<void> {
+    await this._pool?.end();
   }
 
   private async initialize(): Promise<void> {
-    if (this._auth) {
-      return;
-    }
-
-    const { createBetterAuth, getBetterAuthConfigFromEnv } = await import('./auth.config');
+    const { createBetterAuth, getBetterAuthConfigFromEnv, buildDatabaseConnectionString } =
+      await import('./auth.config');
     const config = getBetterAuthConfigFromEnv();
+    const pool = new Pool({ connectionString: buildDatabaseConnectionString() });
 
-    this._auth = createBetterAuth({
-      ...config,
-      sendMagicLink: async (data) => {
-        const isAdmin = await this.adminService.isAdminByEmail(data.email);
-        if (!isAdmin) {
-          this.logger.warn(
-            `[Magic Link] Blocked request for non-admin or unknown email: ${data.email}`,
-          );
-          return;
-        }
-
-        await this.emailService.sendMagicLink({
-          to: data.email,
-          url: data.url,
-        });
-      },
-    });
+    try {
+      this._auth = createBetterAuth({
+        ...config,
+        pool,
+        sendMagicLink: async (data) => {
+          try {
+            const isAdmin = await this.adminService.isAdminByEmail(data.email);
+            if (!isAdmin) {
+              this.logger.warn(`[Magic Link] Blocked for non-admin email: ${data.email}`);
+              return;
+            }
+            await this.emailService.sendMagicLink({ to: data.email, url: data.url });
+          } catch (err) {
+            this.logger.error(`[Magic Link] Delivery error for ${data.email}`, err);
+            throw err;
+          }
+        },
+      });
+      this._pool = pool;
+    } catch (err) {
+      await pool.end().catch(() => undefined);
+      throw err;
+    }
   }
 
   get auth(): BetterAuthInstance {
     if (!this._auth) {
-      throw new Error('Auth not initialized — call onModuleInit first');
+      throw new ServiceUnavailableException('Auth service not ready');
     }
     return this._auth;
   }

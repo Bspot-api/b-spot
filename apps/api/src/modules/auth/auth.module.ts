@@ -1,10 +1,4 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  OnModuleInit,
-  RequestMethod,
-} from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { toNodeHandler } from 'better-auth/node';
 import { CacheModule } from '../cache/cache.module';
@@ -22,15 +16,11 @@ import { AuthService } from './auth.service';
   providers: [AuthService, AdminService, AuthGuard, AdminGuard],
   exports: [AuthService, AdminService, AuthGuard, AdminGuard],
 })
-export class AuthModule implements NestModule, OnModuleInit {
+export class AuthModule implements NestModule {
   constructor(private readonly authService: AuthService) {}
 
-  async onModuleInit(): Promise<void> {
-    await this.authService.onModuleInit();
-  }
-
   async configure(consumer: MiddlewareConsumer): Promise<void> {
-    await this.onModuleInit();
+    await this.authService.onModuleInit();
     const handler = toNodeHandler(this.authService.auth);
     consumer.apply(handler).forRoutes({
       path: 'api/auth/*',

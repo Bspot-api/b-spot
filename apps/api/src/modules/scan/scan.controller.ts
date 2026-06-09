@@ -22,10 +22,7 @@ export class ScanController {
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 50 })
   @ApiQuery({ name: 'offset', required: false, type: Number, example: 0 })
   @ApiResponse({ status: 200, type: ScanHistoryResponseDto })
-  getHistory(
-    @Query('limit') limit = 50,
-    @Query('offset') offset = 0,
-  ): ScanHistoryResponseDto {
+  getHistory(@Query('limit') limit = 50, @Query('offset') offset = 0): ScanHistoryResponseDto {
     const rawLimit = String(limit).trim();
     const rawOffset = String(offset).trim();
     const limitNum = rawLimit === '' || Number.isNaN(Number(rawLimit)) ? 50 : Number(rawLimit);

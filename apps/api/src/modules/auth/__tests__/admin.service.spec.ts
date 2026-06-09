@@ -12,6 +12,8 @@ describe('AdminService', () => {
     persistAndFlush: jest.fn(),
     populate: jest.fn(),
     removeAndFlush: jest.fn(),
+    remove: jest.fn(),
+    transactional: jest.fn(),
   };
 
   const service = new AdminService(mockEm as never);
@@ -27,7 +29,6 @@ describe('AdminService', () => {
       .mockResolvedValueOnce(null);
     mockEm.create.mockReturnValue(admin);
     mockEm.persistAndFlush.mockResolvedValue(undefined);
-    mockEm.populate.mockResolvedValue(undefined);
 
     const result = await service.promote('user-1');
 
@@ -45,24 +46,33 @@ describe('AdminService', () => {
   });
 
   it('revoke throws when admin record is missing', async () => {
-    mockEm.findOne.mockResolvedValueOnce(null);
+    mockEm.transactional.mockImplementation(
+      (cb: (em: typeof mockEm) => Promise<void>) => cb(mockEm),
+    );
+    mockEm.find.mockResolvedValueOnce([{ id: 'other', user: { id: 'other-user' } }]);
 
     await expect(service.revoke('missing')).rejects.toThrow(NotFoundException);
   });
 
   it('revoke blocks removal of the last admin', async () => {
-    mockEm.findOne.mockResolvedValueOnce({ id: 'admin-1' });
-    mockEm.count.mockResolvedValueOnce(1);
+    const admin = { id: 'admin-1', user: { id: 'user-1' } };
+    mockEm.transactional.mockImplementation(
+      (cb: (em: typeof mockEm) => Promise<void>) => cb(mockEm),
+    );
+    mockEm.find.mockResolvedValueOnce([admin]);
 
     await expect(service.revoke('user-1')).rejects.toThrow(BadRequestException);
   });
 
   it('revoke removes admin when others remain', async () => {
-    mockEm.findOne.mockResolvedValueOnce({ id: 'admin-1' });
-    mockEm.count.mockResolvedValueOnce(2);
-    mockEm.removeAndFlush.mockResolvedValue(undefined);
+    const admin1 = { id: 'admin-1', user: { id: 'user-1' } };
+    const admin2 = { id: 'admin-2', user: { id: 'user-2' } };
+    mockEm.transactional.mockImplementation(
+      (cb: (em: typeof mockEm) => Promise<void>) => cb(mockEm),
+    );
+    mockEm.find.mockResolvedValueOnce([admin1, admin2]);
 
     await expect(service.revoke('user-1')).resolves.toBeUndefined();
-    expect(mockEm.removeAndFlush).toHaveBeenCalled();
+    expect(mockEm.remove).toHaveBeenCalledWith(admin1);
   });
 });

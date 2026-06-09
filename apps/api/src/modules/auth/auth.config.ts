@@ -6,7 +6,7 @@ export interface BetterAuthFactoryOptions {
   secret: string;
   baseURL: string;
   trustedOrigins: string[];
-  connectionString: string;
+  pool: Pool;
   sendMagicLink?: (data: { email: string; url: string; token: string }) => Promise<void>;
 }
 
@@ -19,7 +19,7 @@ export function createBetterAuth(options: BetterAuthFactoryOptions): BetterAuthI
     secret: options.secret,
     baseURL: options.baseURL,
     trustedOrigins: options.trustedOrigins,
-    database: new Pool({ connectionString: options.connectionString }),
+    database: options.pool,
     emailAndPassword: {
       enabled: false,
     },
@@ -46,8 +46,8 @@ export function createBetterAuth(options: BetterAuthFactoryOptions): BetterAuthI
 export function buildDatabaseConnectionString(): string {
   const host = process.env.DATABASE_HOST || 'localhost';
   const port = process.env.DATABASE_PORT || '5432';
-  const user = process.env.DATABASE_USER || 'postgres';
-  const password = process.env.DATABASE_PASSWORD || 'postgres';
+  const user = encodeURIComponent(process.env.DATABASE_USER || 'postgres');
+  const password = encodeURIComponent(process.env.DATABASE_PASSWORD || 'postgres');
   const dbName = process.env.DATABASE_NAME || 'b_spot';
   return `postgresql://${user}:${password}@${host}:${port}/${dbName}`;
 }

@@ -1,3 +1,4 @@
+import { LockMode } from '@mikro-orm/core';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Admin } from './admin.entity';
@@ -14,12 +15,7 @@ export class AdminService {
   }
 
   async isAdminByEmail(email: string): Promise<boolean> {
-    const user = await this.em.findOne(User, { email: email.toLowerCase() });
-    if (!user) {
-      return false;
-    }
-
-    const admin = await this.em.findOne(Admin, { user: { id: user.id } });
+    const admin = await this.em.findOne(Admin, { user: { email: email.toLowerCase() } });
     return admin !== null;
   }
 
@@ -40,21 +36,29 @@ export class AdminService {
 
     const admin = this.em.create(Admin, { user, createdAt: new Date() });
     await this.em.persistAndFlush(admin);
-    await this.em.populate(admin, ['user']);
     return admin;
   }
 
   async revoke(userId: string): Promise<void> {
-    const admin = await this.em.findOne(Admin, { user: { id: userId } });
-    if (!admin) {
-      throw new NotFoundException('Admin record not found');
-    }
+    await this.em.transactional(async (em) => {
+      // Lock all admin rows in a consistent order to prevent concurrent revocations
+      // racing past the last-admin guard.
+      const allAdmins = await em.find(
+        Admin,
+        {},
+        { lockMode: LockMode.PESSIMISTIC_WRITE, orderBy: { id: 'ASC' } },
+      );
 
-    const adminCount = await this.em.count(Admin);
-    if (adminCount <= 1) {
-      throw new BadRequestException('Cannot revoke the last admin');
-    }
+      const admin = allAdmins.find((a) => a.user.id === userId);
+      if (!admin) {
+        throw new NotFoundException('Admin record not found');
+      }
 
-    await this.em.removeAndFlush(admin);
+      if (allAdmins.length <= 1) {
+        throw new BadRequestException('Cannot revoke the last admin');
+      }
+
+      em.remove(admin);
+    });
   }
 }
