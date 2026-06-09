@@ -4,10 +4,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ToastProviderWithViewport } from '../src/components/reacticx/Toast';
 import '../global.css';
 
-const queryClient = new QueryClient({
+// QueryClient is module-scoped so the 401 interceptor (added in Phase 7) can reference it
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: 1000 * 60 * 5,
       retry: 1,
     },
   },
@@ -70,6 +71,20 @@ export default function RootLayout() {
             options={{
               title: 'Ajouter une marque',
               presentation: 'modal',
+            }}
+          />
+          <Stack.Screen
+            name="login"
+            options={{
+              title: 'Connexion',
+              presentation: 'modal',
+            }}
+          />
+          <Stack.Screen
+            name="admin/suggestions"
+            options={{
+              title: 'Suggestions de marques',
+              presentation: 'card',
             }}
           />
           <Stack.Screen
