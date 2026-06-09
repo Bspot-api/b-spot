@@ -119,6 +119,56 @@ describe('AdminController — admin CRUD integration', () => {
     });
   });
 
+  describe('PATCH /api/admin/brand-suggestions/:id', () => {
+    it('returns 200 with updated suggestion as admin', async () => {
+      const updated = { ...suggestion, status: 'approved' };
+      mockBrandSuggestionService.updateStatus.mockResolvedValue(updated);
+      mockBrandSuggestionService.toDto.mockReturnValue(updated);
+
+      const response = await request(app.getHttpServer())
+        .patch('/api/admin/brand-suggestions/1')
+        .send({ status: 'approved' })
+        .expect(200);
+
+      expect(response.body.status).toBe('approved');
+      expect(mockBrandSuggestionService.updateStatus).toHaveBeenCalledWith(1, 'approved');
+    });
+
+    it('returns 400 for invalid status value', async () => {
+      await request(app.getHttpServer())
+        .patch('/api/admin/brand-suggestions/1')
+        .send({ status: 'invalid' })
+        .expect(400);
+    });
+
+    it('returns 404 when suggestion not found', async () => {
+      mockBrandSuggestionService.updateStatus.mockRejectedValue(new Error('not found'));
+
+      await request(app.getHttpServer())
+        .patch('/api/admin/brand-suggestions/999')
+        .send({ status: 'approved' })
+        .expect(404);
+    });
+
+    it('returns 401 when no session', async () => {
+      mockAuthService.api.getSession.mockResolvedValueOnce(null);
+
+      await request(app.getHttpServer())
+        .patch('/api/admin/brand-suggestions/1')
+        .send({ status: 'approved' })
+        .expect(401);
+    });
+
+    it('returns 403 when not admin', async () => {
+      mockAdminService.findByUserId.mockResolvedValueOnce(null);
+
+      await request(app.getHttpServer())
+        .patch('/api/admin/brand-suggestions/1')
+        .send({ status: 'approved' })
+        .expect(403);
+    });
+  });
+
   it('GET /api/admin/admins returns list of admins', async () => {
     mockAdminService.listAdmins.mockResolvedValue([adminRecord]);
 
