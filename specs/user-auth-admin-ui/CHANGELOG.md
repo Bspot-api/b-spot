@@ -29,6 +29,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/)
 
 ---
 
+## [2026-06-09 04:00] - /speckit.implement
+
+### Changed
+
+- Completed Phase 2: Foundational
+- Tasks completed: T004, T005
+- **Author**: AI (Claude)
+- **Files**: apps/mobile/src/features/auth/hooks/useAuth.ts, apps/mobile/src/api/hooks.ts
+
+---
+
 ## [2026-06-09 03:00] - /speckit.implement
 
 ### Changed

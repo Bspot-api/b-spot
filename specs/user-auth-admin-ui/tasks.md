@@ -38,8 +38,8 @@
 
 **⚠️ CRITICAL**: No user story implementation can begin until T004 and T005 are complete.
 
-- [ ] T004 Create `apps/mobile/src/features/auth/hooks/useAuth.ts` — two TanStack Query queries: `queryKey: ['auth', 'session']` (always active, calls `getSession`, `staleTime: 5 * 60 * 1000`) and `queryKey: ['auth', 'admin']` (enabled only when `session !== null`, calls `getAdminMe`, treats 403 ApiError as `isAdmin: false` without throwing, `staleTime: 5 * 60 * 1000`); return `{ session, isAdmin, adminProfile, isLoading, signOut }` where `signOut` calls `signOut()` then `queryClient.invalidateQueries({ queryKey: ['auth'] })` (depends on T001, T002, T003)
-- [ ] T005 [P] Add `useAdminSuggestions(status?: SuggestionStatus)` and `useUpdateSuggestionStatus()` to `apps/mobile/src/api/hooks.ts` — `useAdminSuggestions` is a `useQuery` with `queryKey: ['admin', 'suggestions', status]` and `staleTime: 2 * 60 * 1000`; `useUpdateSuggestionStatus` is a `useMutation` that invalidates `['admin', 'suggestions']` on success (depends on T001, T002)
+- [x] T004 Create `apps/mobile/src/features/auth/hooks/useAuth.ts` — two TanStack Query queries: `queryKey: ['auth', 'session']` (always active, calls `getSession`, `staleTime: 5 * 60 * 1000`) and `queryKey: ['auth', 'admin']` (enabled only when `session !== null`, calls `getAdminMe`, treats 403 ApiError as `isAdmin: false` without throwing, `staleTime: 5 * 60 * 1000`); return `{ session, isAdmin, adminProfile, isLoading, signOut }` where `signOut` calls `signOut()` then `queryClient.invalidateQueries({ queryKey: ['auth'] })` (depends on T001, T002, T003)
+- [x] T005 [P] Add `useAdminSuggestions(status?: SuggestionStatus)` and `useUpdateSuggestionStatus()` to `apps/mobile/src/api/hooks.ts` — `useAdminSuggestions` is a `useQuery` with `queryKey: ['admin', 'suggestions', status]` and `staleTime: 2 * 60 * 1000`; `useUpdateSuggestionStatus` is a `useMutation` that invalidates `['admin', 'suggestions']` on success (depends on T001, T002)
 
 **Checkpoint**: Foundation ready — user story phases can begin
 
