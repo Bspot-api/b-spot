@@ -128,8 +128,8 @@
 
 **Purpose**: Verification and cleanup across all stories.
 
-- [ ] T020 [P] Verify web platform compatibility — open `apps/mobile/app/(tabs)/_layout.web.tsx` and confirm `<Slot />` renders correctly with conditional admin tab logic (no tab bar on web is expected); navigate directly to `/admin` and `/admin/suggestions` as non-admin on web and verify `isAdmin` guard redirects; check NativeWind classes render on web
-- [ ] T021 Run quickstart.md end-to-end validation — follow all steps in `specs/user-auth-admin-ui/quickstart.md`: login via magic link, verify admin tab, moderate a suggestion, sign out, verify tab disappears; confirm `pnpm test` passes in `apps/api/` with new integration tests
+- [x] T020 [P] Verify web platform compatibility — open `apps/mobile/app/(tabs)/_layout.web.tsx` and confirm `<Slot />` renders correctly with conditional admin tab logic (no tab bar on web is expected); navigate directly to `/admin` and `/admin/suggestions` as non-admin on web and verify `isAdmin` guard redirects; check NativeWind classes render on web
+- [x] T021 Run quickstart.md end-to-end validation — follow all steps in `specs/user-auth-admin-ui/quickstart.md`: login via magic link, verify admin tab, moderate a suggestion, sign out, verify tab disappears; confirm `pnpm test` passes in `apps/api/` with new integration tests
 
 ---
 

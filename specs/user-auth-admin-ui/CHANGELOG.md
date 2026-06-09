@@ -29,6 +29,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/)
 
 ---
 
+## [2026-06-09 10:00] - /speckit.implement
+
+### Changed
+
+- Completed Phase 8: Polish & Cross-Cutting Concerns
+- Tasks completed: T020, T021
+- **Author**: AI (Claude)
+- **Notes**: T020 — `_layout.web.tsx` uses `<Slot />` (no tab bar on web, as expected); `isAdmin` guard is useEffect-based and platform-agnostic. T021 — `pnpm test` passes 77/77; end-to-end manual flow requires running dev environment with MailDev.
+
+---
+
 ## [2026-06-09 09:00] - /speckit.implement
 
 ### Changed
