@@ -64,8 +64,8 @@
 
 **Independent Test**: Log in as seeded admin → Admin tab appears in tab bar. Log out → Admin tab disappears immediately. Log in as non-admin → Admin tab never appears. Reload web app as admin → Admin tab still present.
 
-- [ ] T008 [US2] Modify `apps/mobile/app/(tabs)/_layout.tsx` — import `useAuth` from `../../src/features/auth/hooks/useAuth`; call `useAuth()` at top of component; add a third `<Tabs.Screen name="admin" options={{ title: 'Admin', href: isAdmin ? undefined : null, tabBarIcon: ... }} />` after the existing two screens (depends on T004)
-- [ ] T009 [US2] Create `apps/mobile/app/(tabs)/admin.tsx` — basic admin dashboard: show `adminProfile.name` and `adminProfile.email` from `useAuth()`; show a "Déconnexion" button that calls `signOut()` from `useAuth()`; add `isAdmin` guard at top — if `!isAdmin && !isLoading`, call `router.replace('/')` (protects direct URL access on web); placeholder text "Chargement des suggestions..." for the counters section (to be enhanced in T014) (depends on T004, T008)
+- [x] T008 [US2] Modify `apps/mobile/app/(tabs)/_layout.tsx` — import `useAuth` from `../../src/features/auth/hooks/useAuth`; call `useAuth()` at top of component; add a third `<Tabs.Screen name="admin" options={{ title: 'Admin', href: isAdmin ? undefined : null, tabBarIcon: ... }} />` after the existing two screens (depends on T004)
+- [x] T009 [US2] Create `apps/mobile/app/(tabs)/admin.tsx` — basic admin dashboard: show `adminProfile.name` and `adminProfile.email` from `useAuth()`; show a "Déconnexion" button that calls `signOut()` from `useAuth()`; add `isAdmin` guard at top — if `!isAdmin && !isLoading`, call `router.replace('/')` (protects direct URL access on web); placeholder text "Chargement des suggestions..." for the counters section (to be enhanced in T014) (depends on T004, T008)
 
 **Checkpoint**: User Stories 1 and 2 fully functional — login + admin tab conditional display works
 
