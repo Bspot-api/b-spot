@@ -226,6 +226,8 @@ Mobile types are auto-generated from the API's OpenAPI schema:
 - Mobile — AsyncStorage local (clé `@b-spot/scan-history`). API — aucun stockage DB en phase 1. (feat/scan-history)
 - TypeScript 5 (strict mode) + NestJS 10, MikroORM 6, PostgreSQL 15, `better-auth`, MailDev (feat/better-auth-admin)
 - PostgreSQL 15 — 4 tables Better-Auth + table `admins` dédiée (feat/better-auth-admin)
+- TypeScript 5 (strict mode — `strict: true`, `noImplicitAny`, `strictNullChecks`) (feat/user-auth-admin-ui)
+- PostgreSQL 15 (API) — no new tables; AsyncStorage not used for auth (session lives in cookie managed by Better-Auth) (feat/user-auth-admin-ui)
 
 ## Recent Changes
 - refactor/mobile-app-rewrite: Added TypeScript strict (`strict: true`, `noImplicitAny`, `strictNullChecks`) + Expo ~52.0 (Metro bundler), NestJS 10, MikroORM 6, NativeWind 4, TanStack Query 5, Expo Router 6
