@@ -1,5 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { BrandSuggestionDto } from '../../brand-suggestion/dto/brand-suggestion.dto';
+import { BrandSuggestionStatus } from '../../brand-suggestion/brand-suggestion.entity';
 
 export class PromoteAdminDto {
   @ApiProperty({ example: '01970000-0000-7000-8000-000000000002' })
@@ -45,4 +47,26 @@ export class AdminRecordDto {
 
   @ApiProperty()
   createdAt!: string;
+}
+
+export class ListBrandSuggestionsQueryDto {
+  @ApiPropertyOptional({ enum: BrandSuggestionStatus })
+  @IsOptional()
+  @IsEnum(BrandSuggestionStatus)
+  status?: BrandSuggestionStatus;
+}
+
+export class UpdateBrandSuggestionStatusDto {
+  @ApiProperty({ enum: BrandSuggestionStatus })
+  @IsEnum(BrandSuggestionStatus)
+  @IsNotEmpty()
+  status!: BrandSuggestionStatus;
+}
+
+export class BrandSuggestionListDto {
+  @ApiProperty({ type: [BrandSuggestionDto] })
+  items!: BrandSuggestionDto[];
+
+  @ApiProperty()
+  total!: number;
 }

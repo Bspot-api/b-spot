@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { toNodeHandler } from 'better-auth/node';
+import { BrandSuggestionModule } from '../brand-suggestion/brand-suggestion.module';
 import { CacheModule } from '../cache/cache.module';
 import { AdminController } from './admin.controller';
 import { AdminGuard } from './admin.guard';
@@ -11,7 +12,11 @@ import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 
 @Module({
-  imports: [CacheModule, MikroOrmModule.forFeature([User, Session, Account, Verification, Admin])],
+  imports: [
+    CacheModule,
+    BrandSuggestionModule,
+    MikroOrmModule.forFeature([User, Session, Account, Verification, Admin]),
+  ],
   controllers: [AdminController],
   providers: [AuthService, AdminService, AuthGuard, AdminGuard],
   exports: [AuthService, AdminService, AuthGuard, AdminGuard],

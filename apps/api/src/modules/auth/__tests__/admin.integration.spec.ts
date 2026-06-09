@@ -4,6 +4,7 @@ import { BadRequestException } from '@nestjs/common';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
+import { BrandSuggestionService } from '../../brand-suggestion/brand-suggestion.service';
 import { AdminController } from '../admin.controller';
 import { AdminGuard } from '../admin.guard';
 import { AdminService } from '../admin.service';
@@ -24,6 +25,25 @@ describe('AdminController — admin CRUD integration', () => {
     listAdmins: jest.fn(),
     promote: jest.fn(),
     revoke: jest.fn(),
+  };
+
+  const suggestion = {
+    id: 1,
+    brandName: 'TestBrand',
+    barcode: '123',
+    productName: 'Prod',
+    productImageUrl: undefined,
+    notes: undefined,
+    offBrandRaw: undefined,
+    status: 'new',
+    createdAt: '2026-06-09T00:00:00.000Z',
+    updatedAt: '2026-06-09T00:00:00.000Z',
+  };
+
+  const mockBrandSuggestionService = {
+    findByStatus: jest.fn(),
+    updateStatus: jest.fn(),
+    toDto: jest.fn((s: typeof suggestion) => s),
   };
 
   const adminSession = {
@@ -47,6 +67,7 @@ describe('AdminController — admin CRUD integration', () => {
         AdminGuard,
         { provide: AuthService, useValue: mockAuthService },
         { provide: AdminService, useValue: mockAdminService },
+        { provide: BrandSuggestionService, useValue: mockBrandSuggestionService },
       ],
     }).compile();
 
@@ -60,6 +81,42 @@ describe('AdminController — admin CRUD integration', () => {
   afterEach(async () => {
     jest.clearAllMocks();
     await app.close();
+  });
+
+  describe('GET /api/admin/brand-suggestions', () => {
+    it('returns 200 with items and total as admin', async () => {
+      mockBrandSuggestionService.findByStatus.mockResolvedValue({ items: [suggestion], total: 1 });
+
+      const response = await request(app.getHttpServer())
+        .get('/api/admin/brand-suggestions')
+        .expect(200);
+
+      expect(response.body.total).toBe(1);
+      expect(response.body.items).toHaveLength(1);
+      expect(response.body.items[0].brandName).toBe('TestBrand');
+    });
+
+    it('filters by status query param', async () => {
+      mockBrandSuggestionService.findByStatus.mockResolvedValue({ items: [suggestion], total: 1 });
+
+      await request(app.getHttpServer())
+        .get('/api/admin/brand-suggestions?status=new')
+        .expect(200);
+
+      expect(mockBrandSuggestionService.findByStatus).toHaveBeenCalledWith('new');
+    });
+
+    it('returns 401 when no session', async () => {
+      mockAuthService.api.getSession.mockResolvedValueOnce(null);
+
+      await request(app.getHttpServer()).get('/api/admin/brand-suggestions').expect(401);
+    });
+
+    it('returns 403 when not admin', async () => {
+      mockAdminService.findByUserId.mockResolvedValueOnce(null);
+
+      await request(app.getHttpServer()).get('/api/admin/brand-suggestions').expect(403);
+    });
   });
 
   it('GET /api/admin/admins returns list of admins', async () => {

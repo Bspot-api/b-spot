@@ -4,23 +4,39 @@ import {
   Delete,
   Get,
   HttpCode,
+  NotFoundException,
   Param,
+  ParseIntPipe,
+  Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { BrandSuggestionService } from '../brand-suggestion/brand-suggestion.service';
+import { BrandSuggestionDto } from '../brand-suggestion/dto/brand-suggestion.dto';
 import { AdminGuard } from './admin.guard';
 import { AdminService } from './admin.service';
 import { AuthGuard } from './auth.guard';
 import { AuthenticatedRequest } from './auth.types';
-import { AdminProfileDto, AdminRecordDto, PromoteAdminDto } from './dto/admin.dto';
+import {
+  AdminProfileDto,
+  AdminRecordDto,
+  BrandSuggestionListDto,
+  ListBrandSuggestionsQueryDto,
+  PromoteAdminDto,
+  UpdateBrandSuggestionStatusDto,
+} from './dto/admin.dto';
 
 @ApiTags('admin')
 @Controller('api/admin')
 @UseGuards(AuthGuard, AdminGuard)
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(
+    private readonly adminService: AdminService,
+    private readonly brandSuggestionService: BrandSuggestionService,
+  ) {}
 
   @Get('me')
   @ApiOperation({ summary: 'Get current admin profile' })
@@ -71,6 +87,34 @@ export class AdminController {
       },
       createdAt: admin.createdAt.toISOString(),
     };
+  }
+
+  @Get('brand-suggestions')
+  @ApiOperation({ summary: 'List brand suggestions' })
+  @ApiResponse({ status: 200, type: BrandSuggestionListDto })
+  async listSuggestions(
+    @Query() query: ListBrandSuggestionsQueryDto,
+  ): Promise<BrandSuggestionListDto> {
+    const result = await this.brandSuggestionService.findByStatus(query.status);
+    return {
+      items: result.items.map((s) => this.brandSuggestionService.toDto(s)),
+      total: result.total,
+    };
+  }
+
+  @Patch('brand-suggestions/:id')
+  @ApiOperation({ summary: 'Update brand suggestion status' })
+  @ApiResponse({ status: 200, type: BrandSuggestionDto })
+  async updateSuggestion(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateBrandSuggestionStatusDto,
+  ): Promise<BrandSuggestionDto> {
+    try {
+      const suggestion = await this.brandSuggestionService.updateStatus(id, body.status);
+      return this.brandSuggestionService.toDto(suggestion);
+    } catch {
+      throw new NotFoundException(`Suggestion ${id} not found`);
+    }
   }
 
   @Delete('admins/:userId')

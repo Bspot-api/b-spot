@@ -55,6 +55,24 @@ export class BrandSuggestionService {
     });
   }
 
+  async findByStatus(
+    status?: BrandSuggestionStatus,
+  ): Promise<{ items: BrandSuggestion[]; total: number }> {
+    const items = await this.suggestionRepo.find(
+      status ? { status } : {},
+      { orderBy: { createdAt: 'DESC' }, limit: 50 },
+    );
+    return { items, total: items.length };
+  }
+
+  async updateStatus(id: number, status: BrandSuggestionStatus): Promise<BrandSuggestion> {
+    const suggestion = await this.suggestionRepo.findOne({ id });
+    if (!suggestion) throw new Error(`Suggestion ${id} not found`);
+    suggestion.status = status;
+    await this.em.persistAndFlush(suggestion);
+    return suggestion;
+  }
+
   toDto(entity: BrandSuggestion): BrandSuggestionDto {
     return {
       id: entity.id,

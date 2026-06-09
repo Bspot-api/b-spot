@@ -3,6 +3,7 @@ jest.mock('../auth.service');
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
+import { BrandSuggestionService } from '../../brand-suggestion/brand-suggestion.service';
 import { AdminController } from '../admin.controller';
 import { AdminGuard } from '../admin.guard';
 import { AdminService } from '../admin.service';
@@ -25,6 +26,12 @@ describe('AdminController — auth integration', () => {
     revoke: jest.fn(),
   };
 
+  const mockBrandSuggestionService = {
+    findByStatus: jest.fn(),
+    updateStatus: jest.fn(),
+    toDto: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AdminController],
@@ -33,6 +40,7 @@ describe('AdminController — auth integration', () => {
         AdminGuard,
         { provide: AuthService, useValue: mockAuthService },
         { provide: AdminService, useValue: mockAdminService },
+        { provide: BrandSuggestionService, useValue: mockBrandSuggestionService },
       ],
     }).compile();
 
