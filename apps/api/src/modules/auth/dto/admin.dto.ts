@@ -63,6 +63,29 @@ export class UpdateBrandSuggestionStatusDto {
   status!: BrandSuggestionStatus;
 }
 
+export class UpdateBrandSuggestionFieldsDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  brandName?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  productName?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  barcode?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  notes?: string;
+}
+
 export class BrandSuggestionListDto {
   @ApiProperty({ type: [BrandSuggestionDto] })
   items!: BrandSuggestionDto[];

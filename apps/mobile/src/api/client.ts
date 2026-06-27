@@ -8,6 +8,7 @@ import type {
   ScanResultDto,
   SessionDto,
   SuggestionStatus,
+  UpdateSuggestionFieldsDto,
 } from './types';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3001';
@@ -43,6 +44,10 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
     if (!response.ok) {
       const body = await response.json().catch(() => ({})) as { message?: string };
       throw new ApiError(response.status, body?.message ?? `HTTP ${response.status}`);
+    }
+
+    if (response.status === 204 || response.headers.get('content-length') === '0') {
+      return undefined as T;
     }
 
     return response.json() as Promise<T>;
@@ -111,5 +116,19 @@ export async function updateSuggestionStatus(
   return apiFetch<BrandSuggestionDto>(`/api/admin/brand-suggestions/${id}`, {
     method: 'PATCH',
     body: JSON.stringify({ status }),
+  });
+}
+
+export async function deleteSuggestion(id: number): Promise<void> {
+  await apiFetch<void>(`/api/admin/brand-suggestions/${id}`, { method: 'DELETE' });
+}
+
+export async function updateSuggestionFields(
+  id: number,
+  fields: UpdateSuggestionFieldsDto,
+): Promise<BrandSuggestionDto> {
+  return apiFetch<BrandSuggestionDto>(`/api/admin/brand-suggestions/${id}/fields`, {
+    method: 'PATCH',
+    body: JSON.stringify(fields),
   });
 }

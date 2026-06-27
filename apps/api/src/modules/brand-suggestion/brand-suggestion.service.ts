@@ -65,10 +65,31 @@ export class BrandSuggestionService {
     return { items, total: items.length };
   }
 
+  async deleteById(id: number): Promise<void> {
+    const suggestion = await this.suggestionRepo.findOne({ id });
+    if (!suggestion) throw new Error(`Suggestion ${id} not found`);
+    await this.em.removeAndFlush(suggestion);
+  }
+
   async updateStatus(id: number, status: BrandSuggestionStatus): Promise<BrandSuggestion> {
     const suggestion = await this.suggestionRepo.findOne({ id });
     if (!suggestion) throw new Error(`Suggestion ${id} not found`);
     suggestion.status = status;
+    await this.em.persistAndFlush(suggestion);
+    return suggestion;
+  }
+
+  async updateFields(
+    id: number,
+    fields: { brandName?: string; productName?: string; barcode?: string; notes?: string },
+  ): Promise<BrandSuggestion> {
+    const suggestion = await this.suggestionRepo.findOne({ id });
+    if (!suggestion) throw new Error(`Suggestion ${id} not found`);
+    if (fields.brandName !== undefined) suggestion.brandName = fields.brandName.trim();
+    if (fields.productName !== undefined) suggestion.productName = fields.productName.trim() || undefined;
+    if (fields.barcode !== undefined) suggestion.barcode = fields.barcode.trim() || undefined;
+    if (fields.notes !== undefined) suggestion.notes = fields.notes.trim() || undefined;
+    suggestion.updatedAt = new Date();
     await this.em.persistAndFlush(suggestion);
     return suggestion;
   }

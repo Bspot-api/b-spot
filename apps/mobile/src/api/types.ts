@@ -86,6 +86,13 @@ export interface UpdateSuggestionStatusDto {
   status: SuggestionStatus;
 }
 
+export interface UpdateSuggestionFieldsDto {
+  brandName?: string;
+  productName?: string;
+  barcode?: string;
+  notes?: string;
+}
+
 export interface SessionDto {
   user: {
     id: string;

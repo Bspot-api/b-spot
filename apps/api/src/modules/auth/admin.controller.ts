@@ -26,6 +26,7 @@ import {
   BrandSuggestionListDto,
   ListBrandSuggestionsQueryDto,
   PromoteAdminDto,
+  UpdateBrandSuggestionFieldsDto,
   UpdateBrandSuggestionStatusDto,
 } from './dto/admin.dto';
 
@@ -112,6 +113,34 @@ export class AdminController {
     try {
       const suggestion = await this.brandSuggestionService.updateStatus(id, body.status);
       return this.brandSuggestionService.toDto(suggestion);
+    } catch {
+      throw new NotFoundException(`Suggestion ${id} not found`);
+    }
+  }
+
+  @Patch('brand-suggestions/:id/fields')
+  @ApiOperation({ summary: 'Update brand suggestion fields' })
+  @ApiResponse({ status: 200, type: BrandSuggestionDto })
+  async updateSuggestionFields(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateBrandSuggestionFieldsDto,
+  ): Promise<BrandSuggestionDto> {
+    try {
+      const suggestion = await this.brandSuggestionService.updateFields(id, body);
+      return this.brandSuggestionService.toDto(suggestion);
+    } catch {
+      throw new NotFoundException(`Suggestion ${id} not found`);
+    }
+  }
+
+  @Delete('brand-suggestions/:id')
+  @HttpCode(204)
+  @ApiOperation({ summary: 'Delete a brand suggestion' })
+  @ApiResponse({ status: 204, description: 'Suggestion deleted' })
+  @ApiResponse({ status: 404, description: 'Suggestion not found' })
+  async deleteSuggestion(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    try {
+      await this.brandSuggestionService.deleteById(id);
     } catch {
       throw new NotFoundException(`Suggestion ${id} not found`);
     }

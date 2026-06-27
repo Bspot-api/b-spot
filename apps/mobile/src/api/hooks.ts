@@ -1,13 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createBrandSuggestion,
+  deleteSuggestion,
   getCompany,
   listAdminSuggestions,
   scanByBrand,
   scanProduct,
+  updateSuggestionFields,
   updateSuggestionStatus,
 } from './client';
-import type { CreateBrandSuggestionDto, SuggestionStatus } from './types';
+import type { CreateBrandSuggestionDto, SuggestionStatus, UpdateSuggestionFieldsDto } from './types';
 
 export function useScanProduct() {
   return useMutation({
@@ -48,6 +50,27 @@ export function useUpdateSuggestionStatus() {
   return useMutation({
     mutationFn: ({ id, status }: { id: number; status: SuggestionStatus }) =>
       updateSuggestionStatus(id, status),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'suggestions'] });
+    },
+  });
+}
+
+export function useDeleteSuggestion() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => deleteSuggestion(id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'suggestions'] });
+    },
+  });
+}
+
+export function useUpdateSuggestionFields() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, fields }: { id: number; fields: UpdateSuggestionFieldsDto }) =>
+      updateSuggestionFields(id, fields),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['admin', 'suggestions'] });
     },
