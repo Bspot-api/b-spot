@@ -1,0 +1,168 @@
+openapi: "3.0.3"
+info:
+  title: B-Spot Admin Endpoints
+  version: "1.0.0"
+  description: >
+    Admin-only endpoints. All routes require an authenticated session cookie
+    AND admin status (HTTP 403 if not admin, HTTP 401 if not authenticated).
+
+paths:
+  /api/admin/me:
+    get:
+      summary: Get current admin profile
+      tags: [admin]
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Admin profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminProfileDto"
+        "401":
+          description: No active session
+        "403":
+          description: User is not an admin
+
+  /api/admin/brand-suggestions:
+    get:
+      summary: List brand suggestions (admin only)
+      tags: [admin]
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/SuggestionStatus"
+          description: Filter by status. Omit to return all suggestions.
+      responses:
+        "200":
+          description: List of brand suggestions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BrandSuggestionListDto"
+        "401":
+          description: No active session
+        "403":
+          description: User is not an admin
+
+  /api/admin/brand-suggestions/{id}:
+    patch:
+      summary: Update brand suggestion status (admin only)
+      tags: [admin]
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBrandSuggestionStatusDto"
+      responses:
+        "200":
+          description: Updated brand suggestion
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BrandSuggestionDto"
+        "400":
+          description: Invalid status value
+        "401":
+          description: No active session
+        "403":
+          description: User is not an admin
+        "404":
+          description: Suggestion not found
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: better-auth.session_token
+
+  schemas:
+    SuggestionStatus:
+      type: string
+      enum: [new, reviewed, approved, rejected]
+
+    AdminProfileDto:
+      type: object
+      required: [adminId, userId, email, name, promotedAt]
+      properties:
+        adminId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        promotedAt:
+          type: string
+          format: date-time
+
+    BrandSuggestionDto:
+      type: object
+      required: [id, brandName, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        brandName:
+          type: string
+        barcode:
+          type: string
+          nullable: true
+        productName:
+          type: string
+          nullable: true
+        productImageUrl:
+          type: string
+          format: uri
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        offBrandRaw:
+          type: string
+          nullable: true
+        status:
+          $ref: "#/components/schemas/SuggestionStatus"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    BrandSuggestionListDto:
+      type: object
+      required: [items, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/BrandSuggestionDto"
+        total:
+          type: integer
+          description: Total number of items returned (not a paginated count)
+
+    UpdateBrandSuggestionStatusDto:
+      type: object
+      required: [status]
+      properties:
+        status:
+          $ref: "#/components/schemas/SuggestionStatus"

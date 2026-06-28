@@ -12,6 +12,7 @@ node_modules/
 
 # Deployment secrets
 create-junction-tables.sql
+google-service-account.json
 
 # Production configurations with secrets  
 docker-compose.prod.yml
@@ -119,7 +120,6 @@ Thumbs.db
 *.sqlite3
 
 # Docker
-.dockerignore
 
 # Testing
 coverage/
@@ -149,4 +149,7 @@ seeds/
 # migrations/
 
 # Local development
-.local/ 
+.local/
+
+# Playwright MCP
+.playwright-mcp/
