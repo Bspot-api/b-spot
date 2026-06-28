@@ -9,7 +9,11 @@ import {
   updateSuggestionFields,
   updateSuggestionStatus,
 } from './client';
-import type { CreateBrandSuggestionDto, SuggestionStatus, UpdateSuggestionFieldsDto } from './types';
+import type {
+  CreateBrandSuggestionDto,
+  SuggestionStatus,
+  UpdateSuggestionFieldsDto,
+} from './types';
 
 export function useScanProduct() {
   return useMutation({

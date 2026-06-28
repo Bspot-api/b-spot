@@ -1,17 +1,11 @@
-import type { Toast, ToastContextValue, ToastOptions } from "../Toast.types";
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import type { Toast, ToastContextValue, ToastOptions } from '../Toast.types';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 const DEFAULT_TOAST_OPTIONS: Required<ToastOptions> = {
   duration: 3000,
-  type: "default",
-  position: "bottom",
-  backgroundColor: "#262626",
+  type: 'default',
+  position: 'bottom',
+  backgroundColor: '#262626',
   onClose: () => {},
   action: null,
   expandedContent: null,
@@ -23,33 +17,28 @@ const ToastContext = createContext<ToastContextValue | undefined>(undefined);
 export const useToast = (): ToastContextValue => {
   const context = useContext(ToastContext);
   if (!context) {
-    throw new Error("useToast must be used within a ToastProvider");
+    throw new Error('useToast must be used within a ToastProvider');
   }
   return context;
 };
 
-export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [expandedToasts, setExpandedToasts] = useState<Set<string>>(new Set());
 
-  const show = useCallback(
-    (content: React.ReactNode | string, options?: ToastOptions): string => {
-      const id = Math.random().toString(36).substring(2, 9);
-      const toast: Toast = {
-        id,
-        content,
-        options: {
-          ...DEFAULT_TOAST_OPTIONS,
-          ...options,
-        },
-      };
-      setToasts((prevToasts) => [...prevToasts, toast]);
-      return id;
-    },
-    [],
-  );
+  const show = useCallback((content: React.ReactNode | string, options?: ToastOptions): string => {
+    const id = Math.random().toString(36).substring(2, 9);
+    const toast: Toast = {
+      id,
+      content,
+      options: {
+        ...DEFAULT_TOAST_OPTIONS,
+        ...options,
+      },
+    };
+    setToasts((prevToasts) => [...prevToasts, toast]);
+    return id;
+  }, []);
 
   const update = useCallback(
     (id: string, content: React.ReactNode | string, options?: ToastOptions) => {
@@ -64,11 +53,11 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
                   ...options,
                 },
               }
-            : toast,
-        ),
+            : toast
+        )
       );
     },
-    [],
+    []
   );
 
   const dismiss = useCallback((id: string) => {
@@ -134,7 +123,5 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
     collapseToast,
   };
 
-  return (
-    <ToastContext.Provider value={value}>{children}</ToastContext.Provider>
-  );
+  return <ToastContext.Provider value={value}>{children}</ToastContext.Provider>;
 };

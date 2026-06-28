@@ -1,7 +1,7 @@
-import type { StyleProp, ViewStyle } from "react-native";
+import type { StyleProp, ViewStyle } from 'react-native';
 
-export type ToastType = "default" | "success" | "error" | "warning" | "info";
-export type ToastPosition = "top" | "bottom";
+export type ToastType = 'default' | 'success' | 'error' | 'warning' | 'info';
+export type ToastPosition = 'top' | 'bottom';
 
 export interface ToastProps {
   children: React.ReactNode;
@@ -20,9 +20,7 @@ export interface ToastOptions {
     label: string;
     onPress: () => void;
   } | null;
-  expandedContent?:
-    | React.ReactNode
-    | ((props: ExpandedContentProps) => React.ReactNode);
+  expandedContent?: React.ReactNode | ((props: ExpandedContentProps) => React.ReactNode);
   backgroundColor?: string;
   style?: StyleProp<ViewStyle>;
 }
@@ -36,11 +34,7 @@ export interface Toast {
 export interface ToastContextValue {
   toasts: Toast[];
   show: (content: React.ReactNode | string, options?: ToastOptions) => string;
-  update: (
-    id: string,
-    content: React.ReactNode | string,
-    options?: ToastOptions,
-  ) => void;
+  update: (id: string, content: React.ReactNode | string, options?: ToastOptions) => void;
   dismiss: (id: string) => void;
   dismissAll: () => void;
   expandedToasts: Set<string>;

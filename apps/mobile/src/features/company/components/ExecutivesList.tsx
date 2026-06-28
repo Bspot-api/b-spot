@@ -69,4 +69,3 @@ function formatShortDate(value: string): string {
     year: 'numeric',
   }).format(date);
 }
-

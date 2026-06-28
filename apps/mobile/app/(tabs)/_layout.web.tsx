@@ -16,9 +16,7 @@ export default function WebLayout() {
             </Pressable>
           )}
           <Pressable onPress={() => router.push('/login')}>
-            <Text style={styles.navLink}>
-              {session ? session.user.email : 'Se connecter'}
-            </Text>
+            <Text style={styles.navLink}>{session ? session.user.email : 'Se connecter'}</Text>
           </Pressable>
         </View>
       </View>

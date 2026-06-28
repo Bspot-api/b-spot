@@ -1,12 +1,6 @@
 import Constants from 'expo-constants';
 import { useCallback, useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Pressable, Text, TextInput, View } from 'react-native';
 import { useBarcodeScanner } from '../../src/features/scanner/hooks/useBarcodeScanner';
 import { useBrandSearch } from '../../src/features/scanner/hooks/useBrandSearch';
 
@@ -19,13 +13,22 @@ export default function WebSearchScreen() {
   const [input, setInput] = useState('');
   const [validationError, setValidationError] = useState<string | undefined>();
 
-  const { state: barcodeState, errorMessage: barcodeError, handleBarcodeScan } = useBarcodeScanner();
+  const {
+    state: barcodeState,
+    errorMessage: barcodeError,
+    handleBarcodeScan,
+  } = useBarcodeScanner();
   const { state: brandState, errorMessage: brandError, handleBrandSearch } = useBrandSearch();
 
   const isLoading = barcodeState === 'loading' || brandState === 'loading';
-  const apiError = mode === 'barcode'
-    ? (barcodeState === 'error' ? barcodeError : undefined)
-    : (brandState === 'error' ? brandError : undefined);
+  const apiError =
+    mode === 'barcode'
+      ? barcodeState === 'error'
+        ? barcodeError
+        : undefined
+      : brandState === 'error'
+        ? brandError
+        : undefined;
   const displayError = validationError ?? apiError;
 
   const handleModeChange = useCallback((next: SearchMode) => {
@@ -71,7 +74,9 @@ export default function WebSearchScreen() {
             className={`flex-1 rounded-lg py-2 items-center ${mode === 'barcode' ? 'bg-white shadow-sm' : ''}`}
             accessibilityRole="button"
           >
-            <Text className={`text-sm font-semibold ${mode === 'barcode' ? 'text-zinc-900' : 'text-zinc-500'}`}>
+            <Text
+              className={`text-sm font-semibold ${mode === 'barcode' ? 'text-zinc-900' : 'text-zinc-500'}`}
+            >
               Code-barres
             </Text>
           </Pressable>
@@ -80,7 +85,9 @@ export default function WebSearchScreen() {
             className={`flex-1 rounded-lg py-2 items-center ${mode === 'brand' ? 'bg-white shadow-sm' : ''}`}
             accessibilityRole="button"
           >
-            <Text className={`text-sm font-semibold ${mode === 'brand' ? 'text-zinc-900' : 'text-zinc-500'}`}>
+            <Text
+              className={`text-sm font-semibold ${mode === 'brand' ? 'text-zinc-900' : 'text-zinc-500'}`}
+            >
               Marque
             </Text>
           </Pressable>
@@ -120,15 +127,13 @@ export default function WebSearchScreen() {
         </Pressable>
 
         {displayError && (
-          <Text className="mt-3 text-sm text-red-600 text-center">
-            {displayError}
-          </Text>
+          <Text className="mt-3 text-sm text-red-600 text-center">{displayError}</Text>
         )}
       </View>
 
       <Text className="mt-8 text-xs text-zinc-400 text-center max-w-xs">
         {mode === 'barcode'
-          ? 'Saisissez le code EAN-8, EAN-13 ou UPC imprimé sur l\'emballage'
+          ? "Saisissez le code EAN-8, EAN-13 ou UPC imprimé sur l'emballage"
           : 'Saisissez le nom exact ou approché de la marque'}
       </Text>
 

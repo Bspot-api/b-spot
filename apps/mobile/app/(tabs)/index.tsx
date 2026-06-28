@@ -18,7 +18,7 @@ export default function ScannerScreen() {
       setIsCameraActive(false);
       handleBarcodeScan(barcode);
     },
-    [handleBarcodeScan],
+    [handleBarcodeScan]
   );
 
   return (
@@ -31,7 +31,10 @@ export default function ScannerScreen() {
       <ScanOverlay state={state} errorMessage={errorMessage} isCameraActive={isCameraActive} />
 
       {!isCameraActive && state !== 'loading' && (
-        <View className="absolute inset-0 items-center justify-center px-6" pointerEvents="box-none">
+        <View
+          className="absolute inset-0 items-center justify-center px-6"
+          pointerEvents="box-none"
+        >
           <TouchableOpacity
             onPress={handleStartScan}
             activeOpacity={0.9}

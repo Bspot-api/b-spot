@@ -30,7 +30,11 @@ const TABS: { status: SuggestionStatus; label: string }[] = [
 ];
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  return new Date(iso).toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
 }
 
 function SuggestionItem({
@@ -75,8 +79,12 @@ function SuggestionItem({
       <View className="flex-row items-start justify-between">
         <View className="flex-1">
           <Text className="font-semibold text-zinc-900">{item.brandName}</Text>
-          {item.productName && <Text className="mt-0.5 text-sm text-zinc-600">{item.productName}</Text>}
-          {item.barcode && <Text className="mt-0.5 text-xs text-zinc-400">EAN: {item.barcode}</Text>}
+          {item.productName && (
+            <Text className="mt-0.5 text-sm text-zinc-600">{item.productName}</Text>
+          )}
+          {item.barcode && (
+            <Text className="mt-0.5 text-xs text-zinc-400">EAN: {item.barcode}</Text>
+          )}
           <Text className="mt-1 text-xs text-zinc-400">{formatDate(item.createdAt)}</Text>
         </View>
         <View className="ml-3 items-end gap-2">
@@ -173,7 +181,7 @@ export default function SuggestionsScreen() {
           notes: editNotes,
         },
       },
-      { onSuccess: () => setEditItem(null) },
+      { onSuccess: () => setEditItem(null) }
     );
   }
 
@@ -201,9 +209,7 @@ export default function SuggestionsScreen() {
             >
               {tab.label}
             </Text>
-            {activeStatus === tab.status && (
-              <View className="mt-1 h-0.5 w-full bg-zinc-900" />
-            )}
+            {activeStatus === tab.status && <View className="mt-1 h-0.5 w-full bg-zinc-900" />}
           </Pressable>
         ))}
       </View>

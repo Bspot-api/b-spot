@@ -20,7 +20,7 @@ export function useCompanyData(siren: string | undefined): UseCompanyDataResult 
   });
 
   const shareholders = [...(company?.shareholders ?? [])].sort(
-    (a, b) => b.percentage - a.percentage,
+    (a, b) => b.percentage - a.percentage
   );
 
   return {
@@ -62,4 +62,3 @@ function resolveErrorMessage(error: unknown): string | undefined {
   if (error instanceof Error) return error.message;
   return 'Impossible de charger les données entreprise.';
 }
-

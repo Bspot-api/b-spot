@@ -33,10 +33,7 @@ export function BottomSheet({ isPresented, onDismiss, children, testID }: Bottom
     >
       <Pressable style={styles.overlay} onPress={onDismiss} />
       <Animated.View
-        style={[
-          styles.sheet,
-          Platform.OS !== 'web' && { transform: [{ translateY }] },
-        ]}
+        style={[styles.sheet, Platform.OS !== 'web' && { transform: [{ translateY }] }]}
       >
         <View style={styles.handle} />
         <ScrollView

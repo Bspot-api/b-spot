@@ -1,9 +1,6 @@
-import { useToast } from "./context/ToastContext";
-import type {
-  Toast as ToastType,
-  ToastType as ToastVariant,
-} from "./Toast.types";
-import React, { useEffect, useRef } from "react";
+import { useToast } from './context/ToastContext';
+import type { Toast as ToastType, ToastType as ToastVariant } from './Toast.types';
+import React, { useEffect, useRef } from 'react';
 import {
   LayoutAnimation,
   Platform,
@@ -13,17 +10,17 @@ import {
   TouchableOpacity,
   UIManager,
   View,
-} from "react-native";
+} from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
   withTiming,
-} from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
+} from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 
-if (Platform.OS === "android") {
+if (Platform.OS === 'android') {
   if (UIManager.setLayoutAnimationEnabledExperimental) {
     UIManager.setLayoutAnimationEnabledExperimental(true);
   }
@@ -37,31 +34,31 @@ interface ToastProps {
 
 const getBackgroundColor = (type: ToastVariant) => {
   switch (type) {
-    case "success":
-      return "#10B981";
-    case "error":
-      return "#EF4444";
-    case "warning":
-      return "#F59E0B";
-    case "info":
-      return "#3B82F6";
+    case 'success':
+      return '#10B981';
+    case 'error':
+      return '#EF4444';
+    case 'warning':
+      return '#F59E0B';
+    case 'info':
+      return '#3B82F6';
     default:
-      return "#262626";
+      return '#262626';
   }
 };
 
 const getIconForType = (type: ToastVariant) => {
   switch (type) {
-    case "success":
-      return "✓";
-    case "error":
-      return "✗";
-    case "warning":
-      return "⚠";
-    case "info":
-      return "ℹ";
+    case 'success':
+      return '✓';
+    case 'error':
+      return '✗';
+    case 'warning':
+      return '⚠';
+    case 'info':
+      return 'ℹ';
     default:
-      return "";
+      return '';
   }
 };
 export const Toast: React.FC<ToastProps> = ({ toast, index }) => {
@@ -71,9 +68,7 @@ export const Toast: React.FC<ToastProps> = ({ toast, index }) => {
 
   const { dismiss, expandedToasts, expandToast, collapseToast } = useToast();
   const opacity = useSharedValue<number>(1);
-  const translateY = useSharedValue<number>(
-    toast.options.position === "top" ? -100 : 100,
-  );
+  const translateY = useSharedValue<number>(toast.options.position === 'top' ? -100 : 100);
   const scale = useSharedValue<number>(0.9);
   const rotateZ = useSharedValue<number>(0);
   const height = useSharedValue<number>(0);
@@ -87,7 +82,7 @@ export const Toast: React.FC<ToastProps> = ({ toast, index }) => {
     const baseOffset = 4;
     const maxOffset = 12;
     const offset = Math.min(index * baseOffset, maxOffset);
-    return toast.options.position === "top" ? offset : -offset;
+    return toast.options.position === 'top' ? offset : -offset;
   };
 
   const getStackScale = () => {
@@ -98,7 +93,7 @@ export const Toast: React.FC<ToastProps> = ({ toast, index }) => {
 
   useEffect(() => {
     if (prevIndexRef.current !== index && opacity.value > 0) {
-      const soonerOffset = toast.options.position === "top" ? 2 : -2;
+      const soonerOffset = toast.options.position === 'top' ? 2 : -2;
 
       translateY.value = withTiming(getStackOffset() + soonerOffset, {
         duration: 400,
@@ -141,7 +136,7 @@ export const Toast: React.FC<ToastProps> = ({ toast, index }) => {
       easing: Easing.bezier(0.25, 0.46, 0.45, 0.94),
     });
 
-    translateY.value = withTiming(toast.options.position === "top" ? -50 : 50, {
+    translateY.value = withTiming(toast.options.position === 'top' ? -50 : 50, {
       duration: 300,
       easing: Easing.bezier(0.25, 0.46, 0.45, 0.94),
     });
@@ -205,13 +200,10 @@ export const Toast: React.FC<ToastProps> = ({ toast, index }) => {
           easing: Easing.bezier(0.25, 0.46, 0.45, 0.94),
         });
 
-        translateY.value = withTiming(
-          toast.options.position === "top" ? 20 : 20,
-          {
-            duration: 400,
-            easing: Easing.bezier(0.25, 0.46, 0.45, 0.94),
-          },
-        );
+        translateY.value = withTiming(toast.options.position === 'top' ? 20 : 20, {
+          duration: 400,
+          easing: Easing.bezier(0.25, 0.46, 0.45, 0.94),
+        });
 
         scale.value = withTiming(0.95, {
           duration: 400,
@@ -273,8 +265,7 @@ export const Toast: React.FC<ToastProps> = ({ toast, index }) => {
     }
   };
 
-  const backgroundColor =
-    toast.options.backgroundColor ?? getBackgroundColor(toast.options.type);
+  const backgroundColor = toast.options.backgroundColor ?? getBackgroundColor(toast.options.type);
 
   const _styles = toast.options?.style || {};
 
@@ -285,7 +276,7 @@ export const Toast: React.FC<ToastProps> = ({ toast, index }) => {
 
     const content = toast.options.expandedContent;
 
-    if (typeof content === "function") {
+    if (typeof content === 'function') {
       return content({ dismiss: animatedDismiss });
     }
 
@@ -300,9 +291,9 @@ export const Toast: React.FC<ToastProps> = ({ toast, index }) => {
         {
           marginTop: 0,
           marginBottom: 0,
-          position: "absolute",
-          top: toast.options.position === "top" ? 80 : undefined,
-          bottom: toast.options.position === "bottom" ? 0 : undefined,
+          position: 'absolute',
+          top: toast.options.position === 'top' ? 80 : undefined,
+          bottom: toast.options.position === 'bottom' ? 0 : undefined,
         },
         _styles,
       ]}
@@ -310,12 +301,12 @@ export const Toast: React.FC<ToastProps> = ({ toast, index }) => {
       <Pressable
         style={[styles.toast, { backgroundColor }]}
         onPress={handlePress}
-        android_ripple={{ color: "rgba(255, 255, 255, 0.1)" }}
+        android_ripple={{ color: 'rgba(255, 255, 255, 0.1)' }}
       >
         <View style={styles.mainContent}>
           {icon ? <Text style={styles.icon}>{icon}</Text> : null}
           <View style={styles.contentContainer}>
-            {typeof toast.content === "string" ? (
+            {typeof toast.content === 'string' ? (
               <Text style={styles.text}>{toast.content}</Text>
             ) : (
               toast.content
@@ -329,9 +320,7 @@ export const Toast: React.FC<ToastProps> = ({ toast, index }) => {
                 animatedDismiss();
               }}
             >
-              <Text style={styles.actionText}>
-                {toast.options.action.label}
-              </Text>
+              <Text style={styles.actionText}>{toast.options.action.label}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -349,13 +338,13 @@ export const Toast: React.FC<ToastProps> = ({ toast, index }) => {
 
 const styles = StyleSheet.create({
   toastContainer: {
-    width: "90%",
+    width: '90%',
     maxWidth: 400,
-    alignSelf: "center",
+    alignSelf: 'center',
     marginVertical: 4,
     borderRadius: 100,
-    overflow: "hidden",
-    shadowColor: "#000",
+    overflow: 'hidden',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 4,
@@ -365,44 +354,44 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   toast: {
-    flexDirection: "column",
+    flexDirection: 'column',
     borderRadius: 12,
   },
   mainContent: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 16,
   },
   icon: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 20,
     marginRight: 12,
-    fontWeight: "bold",
-    textAlign: "center",
+    fontWeight: 'bold',
+    textAlign: 'center',
     width: 24,
   },
   contentContainer: {
     flex: 1,
   },
   text: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 16,
-    fontWeight: "500",
+    fontWeight: '500',
     lineHeight: 20,
   },
   actionButton: {
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 6,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     marginLeft: 12,
   },
   actionText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   expandedContent: {
-    overflow: "hidden",
+    overflow: 'hidden',
   },
 });

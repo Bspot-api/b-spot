@@ -27,15 +27,13 @@ export default function CompanyDetailScreen() {
   const resolvedBrandResolution = Array.isArray(brandResolution)
     ? brandResolution[0]
     : brandResolution;
-  const resolvedProductSource = Array.isArray(productSource)
-    ? productSource[0]
-    : productSource;
+  const resolvedProductSource = Array.isArray(productSource) ? productSource[0] : productSource;
   const { company, executives, shareholders, isLoading, errorMessage, retry } =
     useCompanyData(siren);
 
   useEffect(() => {
     if (resolvedBrandResolution === 'auto_pending') {
-      Toast.show("On a trouvé une correspondance probable et ajouté la marque (pending).", {
+      Toast.show('On a trouvé une correspondance probable et ajouté la marque (pending).', {
         type: 'warning',
         position: 'top',
         duration: 5200,
@@ -70,7 +68,9 @@ export default function CompanyDetailScreen() {
   if (!siren) {
     return (
       <View className="flex-1 items-center justify-center bg-zinc-50 px-6">
-        <Text className="text-center text-base text-zinc-700">Identifiant entreprise manquant.</Text>
+        <Text className="text-center text-base text-zinc-700">
+          Identifiant entreprise manquant.
+        </Text>
       </View>
     );
   }

@@ -1,17 +1,7 @@
-import { useToast } from "./context/ToastContext";
-import type {
-  Toast as ToastType,
-  ToastType as ToastVariant,
-} from "./Toast.types";
-import React, { useEffect, useRef } from "react";
-import {
-  Animated,
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { useToast } from './context/ToastContext';
+import type { Toast as ToastType, ToastType as ToastVariant } from './Toast.types';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface ToastProps {
   toast: ToastType;
@@ -21,31 +11,31 @@ interface ToastProps {
 
 const getBackgroundColor = (type: ToastVariant): string => {
   switch (type) {
-    case "success":
-      return "#10B981";
-    case "error":
-      return "#EF4444";
-    case "warning":
-      return "#F59E0B";
-    case "info":
-      return "#3B82F6";
+    case 'success':
+      return '#10B981';
+    case 'error':
+      return '#EF4444';
+    case 'warning':
+      return '#F59E0B';
+    case 'info':
+      return '#3B82F6';
     default:
-      return "#262626";
+      return '#262626';
   }
 };
 
 const getIconForType = (type: ToastVariant): string => {
   switch (type) {
-    case "success":
-      return "✓";
-    case "error":
-      return "✗";
-    case "warning":
-      return "⚠";
-    case "info":
-      return "ℹ";
+    case 'success':
+      return '✓';
+    case 'error':
+      return '✗';
+    case 'warning':
+      return '⚠';
+    case 'info':
+      return 'ℹ';
     default:
-      return "";
+      return '';
   }
 };
 
@@ -53,7 +43,7 @@ export const Toast: React.FC<ToastProps> = ({ toast, index }) => {
   const { dismiss, expandedToasts, expandToast, collapseToast } = useToast();
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(
-    new Animated.Value(toast.options.position === "top" ? -20 : 20),
+    new Animated.Value(toast.options.position === 'top' ? -20 : 20)
   ).current;
 
   const isExpanded = expandedToasts.has(toast.id);
@@ -89,15 +79,14 @@ export const Toast: React.FC<ToastProps> = ({ toast, index }) => {
     }
   };
 
-  const backgroundColor =
-    toast.options.backgroundColor ?? getBackgroundColor(toast.options.type);
+  const backgroundColor = toast.options.backgroundColor ?? getBackgroundColor(toast.options.type);
   const icon = getIconForType(toast.options.type);
   const _styles = toast.options?.style ?? {};
 
   const renderExpandedContent = (): React.ReactNode => {
     if (!hasExpandedContent) return null;
     const content = toast.options.expandedContent;
-    if (typeof content === "function") {
+    if (typeof content === 'function') {
       return content({ dismiss: handleDismiss });
     }
     return content;
@@ -111,21 +100,18 @@ export const Toast: React.FC<ToastProps> = ({ toast, index }) => {
           opacity,
           transform: [{ translateY }],
           zIndex: 1000 - index,
-          position: "absolute",
-          top: toast.options.position === "top" ? 80 : undefined,
-          bottom: toast.options.position === "bottom" ? 0 : undefined,
+          position: 'absolute',
+          top: toast.options.position === 'top' ? 80 : undefined,
+          bottom: toast.options.position === 'bottom' ? 0 : undefined,
         },
         _styles,
       ]}
     >
-      <Pressable
-        style={[styles.toast, { backgroundColor }]}
-        onPress={handlePress}
-      >
+      <Pressable style={[styles.toast, { backgroundColor }]} onPress={handlePress}>
         <View style={styles.mainContent}>
           {icon ? <Text style={styles.icon}>{icon}</Text> : null}
           <View style={styles.contentContainer}>
-            {typeof toast.content === "string" ? (
+            {typeof toast.content === 'string' ? (
               <Text style={styles.text}>{toast.content}</Text>
             ) : (
               toast.content
@@ -139,9 +125,7 @@ export const Toast: React.FC<ToastProps> = ({ toast, index }) => {
                 handleDismiss();
               }}
             >
-              <Text style={styles.actionText}>
-                {toast.options.action.label}
-              </Text>
+              <Text style={styles.actionText}>{toast.options.action.label}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -156,13 +140,13 @@ export const Toast: React.FC<ToastProps> = ({ toast, index }) => {
 
 const styles = StyleSheet.create({
   toastContainer: {
-    width: "90%",
+    width: '90%',
     maxWidth: 400,
-    alignSelf: "center",
+    alignSelf: 'center',
     marginVertical: 4,
     borderRadius: 100,
-    overflow: "hidden",
-    shadowColor: "#000",
+    overflow: 'hidden',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 4,
@@ -172,44 +156,44 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   toast: {
-    flexDirection: "column",
+    flexDirection: 'column',
     borderRadius: 12,
   },
   mainContent: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 16,
   },
   icon: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 20,
     marginRight: 12,
-    fontWeight: "bold",
-    textAlign: "center",
+    fontWeight: 'bold',
+    textAlign: 'center',
     width: 24,
   },
   contentContainer: {
     flex: 1,
   },
   text: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 16,
-    fontWeight: "500",
+    fontWeight: '500',
     lineHeight: 20,
   },
   actionButton: {
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 6,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     marginLeft: 12,
   },
   actionText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   expandedContent: {
-    overflow: "hidden",
+    overflow: 'hidden',
   },
 });

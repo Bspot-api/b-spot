@@ -17,7 +17,7 @@ const API_TIMEOUT = parseInt(process.env.EXPO_PUBLIC_API_TIMEOUT ?? '10000', 10)
 export class ApiError extends Error {
   constructor(
     public readonly statusCode: number,
-    message: string,
+    message: string
   ) {
     super(message);
     this.name = 'ApiError';
@@ -42,7 +42,7 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      const body = await response.json().catch(() => ({})) as { message?: string };
+      const body = (await response.json().catch(() => ({}))) as { message?: string };
       throw new ApiError(response.status, body?.message ?? `HTTP ${response.status}`);
     }
 
@@ -75,7 +75,7 @@ export async function scanByBrand(brandName: string): Promise<BrandScanResultDto
 }
 
 export async function createBrandSuggestion(
-  payload: CreateBrandSuggestionDto,
+  payload: CreateBrandSuggestionDto
 ): Promise<BrandSuggestionDto> {
   return apiFetch<BrandSuggestionDto>('/api/brand-suggestions', {
     method: 'POST',
@@ -103,7 +103,7 @@ export async function getAdminMe(): Promise<AdminProfileDto> {
 }
 
 export async function listAdminSuggestions(
-  status?: SuggestionStatus,
+  status?: SuggestionStatus
 ): Promise<BrandSuggestionListDto> {
   const query = status ? `?status=${status}` : '';
   return apiFetch<BrandSuggestionListDto>(`/api/admin/brand-suggestions${query}`);
@@ -111,7 +111,7 @@ export async function listAdminSuggestions(
 
 export async function updateSuggestionStatus(
   id: number,
-  status: SuggestionStatus,
+  status: SuggestionStatus
 ): Promise<BrandSuggestionDto> {
   return apiFetch<BrandSuggestionDto>(`/api/admin/brand-suggestions/${id}`, {
     method: 'PATCH',
@@ -125,7 +125,7 @@ export async function deleteSuggestion(id: number): Promise<void> {
 
 export async function updateSuggestionFields(
   id: number,
-  fields: UpdateSuggestionFieldsDto,
+  fields: UpdateSuggestionFieldsDto
 ): Promise<BrandSuggestionDto> {
   return apiFetch<BrandSuggestionDto>(`/api/admin/brand-suggestions/${id}/fields`, {
     method: 'PATCH',

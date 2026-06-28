@@ -1,14 +1,10 @@
-import * as React from "react";
-import { ToastProvider, useToast } from "./context/ToastContext";
-import { ToastViewport } from "./ToastViewPort";
-import type { ToastOptions, ToastProps } from "./Toast.types";
+import * as React from 'react';
+import { ToastProvider, useToast } from './context/ToastContext';
+import { ToastViewport } from './ToastViewPort';
+import type { ToastOptions, ToastProps } from './Toast.types';
 type ToastRef = {
   show?: (content: React.ReactNode | string, options?: ToastOptions) => string;
-  update?: (
-    id: string,
-    content: React.ReactNode | string,
-    options?: ToastOptions,
-  ) => void;
+  update?: (id: string, content: React.ReactNode | string, options?: ToastOptions) => void;
   dismiss?: (id: string) => void;
   dismissAll?: () => void;
 };
@@ -26,9 +22,7 @@ const ToastController: React.FC = () => {
   return null;
 };
 
-export const ToastProviderWithViewport: React.FC<ToastProps> = ({
-  children,
-}) => {
+export const ToastProviderWithViewport: React.FC<ToastProps> = ({ children }) => {
   return (
     <ToastProvider>
       <ToastController />
@@ -42,20 +36,16 @@ export const Toast = {
   show: (content: React.ReactNode | string, options?: ToastOptions): string => {
     if (!toastRef.show) {
       console.error(
-        "Toast provider not initialized. Make sure you have wrapped your app with ToastProviderWithViewport.",
+        'Toast provider not initialized. Make sure you have wrapped your app with ToastProviderWithViewport.'
       );
-      return "";
+      return '';
     }
     return toastRef.show(content, options);
   },
-  update: (
-    id: string,
-    content: React.ReactNode | string,
-    options?: ToastOptions,
-  ): void => {
+  update: (id: string, content: React.ReactNode | string, options?: ToastOptions): void => {
     if (!toastRef.update) {
       console.error(
-        "Toast provider not initialized. Make sure you have wrapped your app with ToastProviderWithViewport.",
+        'Toast provider not initialized. Make sure you have wrapped your app with ToastProviderWithViewport.'
       );
       return;
     }
@@ -64,7 +54,7 @@ export const Toast = {
   dismiss: (id: string): void => {
     if (!toastRef.dismiss) {
       console.error(
-        "Toast provider not initialized. Make sure you have wrapped your app with ToastProviderWithViewport.",
+        'Toast provider not initialized. Make sure you have wrapped your app with ToastProviderWithViewport.'
       );
       return;
     }
@@ -73,7 +63,7 @@ export const Toast = {
   dismissAll: (): void => {
     if (!toastRef.dismissAll) {
       console.error(
-        "Toast provider not initialized. Make sure you have wrapped your app with ToastProviderWithViewport.",
+        'Toast provider not initialized. Make sure you have wrapped your app with ToastProviderWithViewport.'
       );
       return;
     }
@@ -81,5 +71,5 @@ export const Toast = {
   },
 };
 
-export { ToastProvider, useToast } from "./context/ToastContext";
-export type { ToastOptions, ToastType, ToastPosition } from "./Toast.types";
+export { ToastProvider, useToast } from './context/ToastContext';
+export type { ToastOptions, ToastType, ToastPosition } from './Toast.types';

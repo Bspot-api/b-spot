@@ -37,19 +37,16 @@ export const OrbitDotLoader: React.FC<IOrbitDotLoader> = ({
   const centerScale = useSharedValue(1);
 
   useEffect(() => {
-    rotation.value = withRepeat(
-      withTiming(360, { duration, easing: Easing.linear }),
-      -1,
-    );
+    rotation.value = withRepeat(withTiming(360, { duration, easing: Easing.linear }), -1);
   }, [duration]);
 
   useEffect(() => {
     centerScale.value = withRepeat(
       withSequence(
         withTiming(1.3, { duration: 400, easing: Easing.out(Easing.ease) }),
-        withTiming(1, { duration: 400, easing: Easing.in(Easing.ease) }),
+        withTiming(1, { duration: 400, easing: Easing.in(Easing.ease) })
       ),
-      -1,
+      -1
     );
   }, []);
 

@@ -37,9 +37,7 @@ export function CompanyHeader({ company, onShare, productSource }: CompanyHeader
           {productSource && (
             <View className="rounded-full bg-emerald-100 px-3 py-2">
               <Text className="text-xs font-medium text-emerald-800">
-                {isBeautySource(productSource)
-                  ? 'Produit cosmetique'
-                  : 'Produit alimentaire'}
+                {isBeautySource(productSource) ? 'Produit cosmetique' : 'Produit alimentaire'}
               </Text>
             </View>
           )}
@@ -68,8 +66,6 @@ function formatDate(value: string): string {
   }).format(date);
 }
 
-function isBeautySource(
-  source: 'OFF' | 'OBF' | 'OPEN_FOOD_FACTS' | 'OPEN_BEAUTY_FACTS',
-): boolean {
+function isBeautySource(source: 'OFF' | 'OBF' | 'OPEN_FOOD_FACTS' | 'OPEN_BEAUTY_FACTS'): boolean {
   return source === 'OBF' || source === 'OPEN_BEAUTY_FACTS';
 }

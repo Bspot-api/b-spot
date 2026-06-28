@@ -10,7 +10,11 @@ interface ScanOverlayProps {
 
 export function ScanOverlay({ state, errorMessage, isCameraActive = true }: ScanOverlayProps) {
   return (
-    <View style={StyleSheet.absoluteFill} className="items-center justify-center" pointerEvents="none">
+    <View
+      style={StyleSheet.absoluteFill}
+      className="items-center justify-center"
+      pointerEvents="none"
+    >
       {/* Scanning frame with corner markers */}
       <View style={styles.frame}>
         <View style={[styles.corner, styles.cornerTL]} />
@@ -22,7 +26,10 @@ export function ScanOverlay({ state, errorMessage, isCameraActive = true }: Scan
       {/* Status messages */}
       <View className="mt-8 items-center">
         {state === 'loading' && (
-          <View className="flex-row items-center gap-2 rounded-full px-5 py-2.5" style={styles.pill}>
+          <View
+            className="flex-row items-center gap-2 rounded-full px-5 py-2.5"
+            style={styles.pill}
+          >
             <ActivityIndicator color="white" size="small" />
             <Text className="text-white font-medium text-sm">Recherche en cours...</Text>
           </View>

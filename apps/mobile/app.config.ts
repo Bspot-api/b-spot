@@ -13,8 +13,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   const variant = getVariant();
   const isDev = variant === 'development';
 
-  const scheme = isDev ? 'bspot-dev' : base.scheme ?? 'bspot';
-  const name = isDev ? 'B-Spot Dev' : base.name ?? 'B-Spot';
+  const scheme = isDev ? 'bspot-dev' : (base.scheme ?? 'bspot');
+  const name = isDev ? 'B-Spot Dev' : (base.name ?? 'B-Spot');
   const iosBundleIdentifier = isDev
     ? `${base.ios?.bundleIdentifier ?? 'com.bspot.mobile'}.dev`
     : base.ios?.bundleIdentifier;

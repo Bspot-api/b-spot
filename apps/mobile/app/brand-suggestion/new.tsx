@@ -42,9 +42,9 @@ export default function BrandSuggestionScreen() {
 
   const subtitle = useMemo(() => {
     if (existingSuggestionId) {
-      return "On a déjà créé une suggestion automatique. Tu peux ajouter des infos pour nous aider à la valider.";
+      return 'On a déjà créé une suggestion automatique. Tu peux ajouter des infos pour nous aider à la valider.';
     }
-    return "Aide-nous à référencer cette marque. Les infos ci-dessous sont préremplies à partir du scan.";
+    return 'Aide-nous à référencer cette marque. Les infos ci-dessous sont préremplies à partir du scan.';
   }, [existingSuggestionId]);
 
   async function handleSubmit() {
@@ -65,13 +65,13 @@ export default function BrandSuggestionScreen() {
 
       Alert.alert(
         'Merci !',
-        "Ta contribution a bien été enregistrée. Elle nous aide à enrichir la base de marques.",
-        [{ text: 'OK', onPress: () => router.back() }],
+        'Ta contribution a bien été enregistrée. Elle nous aide à enrichir la base de marques.',
+        [{ text: 'OK', onPress: () => router.back() }]
       );
     } catch {
       Alert.alert(
         'Erreur',
-        "Impossible d'envoyer la suggestion pour le moment. Réessaie dans un instant.",
+        "Impossible d'envoyer la suggestion pour le moment. Réessaie dans un instant."
       );
     }
   }

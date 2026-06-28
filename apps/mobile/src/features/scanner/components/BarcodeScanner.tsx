@@ -25,7 +25,7 @@ export function BarcodeScanner({ onScan, isScanning, isCameraActive }: BarcodeSc
       setScanned(true);
       onScan(data);
     },
-    [scanned, isScanning, onScan],
+    [scanned, isScanning, onScan]
   );
 
   if (!permission) {
@@ -45,10 +45,7 @@ export function BarcodeScanner({ onScan, isScanning, isCameraActive }: BarcodeSc
         <Text className="text-zinc-400 text-base text-center mb-8">
           B-Spot a besoin d'accéder à votre caméra pour scanner les codes-barres produits.
         </Text>
-        <TouchableOpacity
-          onPress={requestPermission}
-          className="bg-white px-8 py-3 rounded-full"
-        >
+        <TouchableOpacity onPress={requestPermission} className="bg-white px-8 py-3 rounded-full">
           <Text className="text-zinc-900 font-semibold text-base">Autoriser l'accès</Text>
         </TouchableOpacity>
       </View>

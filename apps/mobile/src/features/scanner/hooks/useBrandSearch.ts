@@ -42,8 +42,7 @@ export function useBrandSearch(): UseBrandSearch {
             },
           });
         } else {
-          const msg =
-            result.message ?? 'Marque non trouvée. Essayez un nom plus précis.';
+          const msg = result.message ?? 'Marque non trouvée. Essayez un nom plus précis.';
           setErrorMessage(msg);
           setState('error');
           Toast.show(msg, { type: 'warning', position: 'top', duration: 4000 });
@@ -57,7 +56,7 @@ export function useBrandSearch(): UseBrandSearch {
         setTimeout(() => setState('idle'), 3000);
       }
     },
-    [searchBrand, router],
+    [searchBrand, router]
   );
 
   return {
