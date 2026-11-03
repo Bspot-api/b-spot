@@ -15,18 +15,23 @@ export function resolveAdminAccess(auth: AdminAuthState): AdminAccess {
   return 'granted';
 }
 
-export const LOGIN_ROUTE = '/login';
-export const HOME_ROUTE = '/';
+const LOGIN_ROUTE = '/login';
+const HOME_ROUTE = '/';
+
+export type AdminRedirect = typeof LOGIN_ROUTE | typeof HOME_ROUTE | null;
 
 /**
  * Where an admin screen redirects, or null to stay. A visitor who arrives
  * logged out goes to the login screen; someone whose session ended while on
- * the screen (sign-out) goes home.
+ * the screen (sign-out) goes home, as before this guard existed.
  */
-export function adminRedirectTarget(
-  access: AdminAccess,
-  hadSession: boolean
-): typeof LOGIN_ROUTE | typeof HOME_ROUTE | null {
+export function resolveAdminRedirect({
+  access,
+  hadSession,
+}: {
+  access: AdminAccess;
+  hadSession: boolean;
+}): AdminRedirect {
   if (access === 'home') return HOME_ROUTE;
   if (access === 'login') return hadSession ? HOME_ROUTE : LOGIN_ROUTE;
   return null;

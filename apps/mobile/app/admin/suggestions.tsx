@@ -128,7 +128,10 @@ export default function SuggestionsScreen() {
   const [editBarcode, setEditBarcode] = useState('');
   const [editNotes, setEditNotes] = useState('');
 
-  const suggestionsQuery = useAdminSuggestions(activeStatus, { enabled: access === 'granted' });
+  const suggestionsQuery = useAdminSuggestions({
+    status: activeStatus,
+    enabled: access === 'granted',
+  });
   const updateMutation = useUpdateSuggestionStatus();
   const deleteMutation = useDeleteSuggestion();
   const fieldsMutation = useUpdateSuggestionFields();

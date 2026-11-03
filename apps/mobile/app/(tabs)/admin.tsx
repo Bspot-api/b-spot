@@ -40,7 +40,7 @@ function SuggestionCounter({
 export default function AdminScreen() {
   const router = useRouter();
   const { access, adminProfile, signOut } = useAdminGuard();
-  const suggestionsQuery = useAdminSuggestions(undefined, { enabled: access === 'granted' });
+  const suggestionsQuery = useAdminSuggestions({ enabled: access === 'granted' });
 
   async function handleSignOut() {
     await signOut();

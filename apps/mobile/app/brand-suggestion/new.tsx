@@ -15,7 +15,7 @@ import { Toast } from '../../src/components/reacticx/Toast';
 
 const MESSAGES = {
   missingBrand: 'Merci de renseigner le nom de la marque.',
-  sent: 'Merci ! Ta contribution a bien été enregistrée.',
+  sent: 'Merci ! Ta contribution a bien été enregistrée. Elle nous aide à enrichir la base de marques.',
   failed: "Impossible d'envoyer la suggestion pour le moment. Réessaie dans un instant.",
 } as const;
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'expo-router';
-import { adminRedirectTarget, resolveAdminAccess, type AdminAccess } from '../adminAccess';
+import { resolveAdminAccess, resolveAdminRedirect, type AdminAccess } from '../adminAccess';
 import { useAuth } from './useAuth';
 
 /**
@@ -21,7 +21,7 @@ export function useAdminGuard(): ReturnType<typeof useAuth> & { access: AdminAcc
   });
 
   useEffect(() => {
-    const target = adminRedirectTarget(access, hadSession.current);
+    const target = resolveAdminRedirect({ access, hadSession: hadSession.current });
     if (target) router.replace(target);
   }, [access, router]);
 

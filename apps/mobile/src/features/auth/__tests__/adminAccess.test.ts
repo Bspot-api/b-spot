@@ -1,4 +1,4 @@
-import { adminRedirectTarget, resolveAdminAccess } from '../adminAccess';
+import { resolveAdminAccess, resolveAdminRedirect } from '../adminAccess';
 
 describe('resolveAdminAccess', () => {
   it('is pending while the auth state is loading', () => {
@@ -24,21 +24,21 @@ describe('resolveAdminAccess', () => {
   });
 });
 
-describe('adminRedirectTarget', () => {
+describe('resolveAdminRedirect', () => {
   it('does not redirect while pending or once granted', () => {
-    expect(adminRedirectTarget('pending', false)).toBeNull();
-    expect(adminRedirectTarget('granted', true)).toBeNull();
+    expect(resolveAdminRedirect({ access: 'pending', hadSession: false })).toBeNull();
+    expect(resolveAdminRedirect({ access: 'granted', hadSession: true })).toBeNull();
   });
 
   it('sends a visitor who arrived logged out to the login screen', () => {
-    expect(adminRedirectTarget('login', false)).toBe('/login');
+    expect(resolveAdminRedirect({ access: 'login', hadSession: false })).toBe('/login');
   });
 
   it('sends an admin who just signed out home, as before', () => {
-    expect(adminRedirectTarget('login', true)).toBe('/');
+    expect(resolveAdminRedirect({ access: 'login', hadSession: true })).toBe('/');
   });
 
   it('sends a non-admin home', () => {
-    expect(adminRedirectTarget('home', true)).toBe('/');
+    expect(resolveAdminRedirect({ access: 'home', hadSession: true })).toBe('/');
   });
 });
