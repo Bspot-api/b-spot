@@ -1,6 +1,6 @@
 # 01 — Web journeys with Playwright
 
-**Status:** ready
+**Status:** in-progress
 **Blocked by:** None — can start immediately
 
 Parent: [End-to-end tests for the critical journeys](../20261103-2143-e2e-tests.spec.md)
