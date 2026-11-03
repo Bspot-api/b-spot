@@ -11,12 +11,25 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCreateBrandSuggestion } from '../../src/api/hooks';
-import { Toast } from '../../src/components/reacticx/Toast';
+import { showFeedback } from '../../src/components/feedback/showFeedback';
 
-const MESSAGES = {
-  missingBrand: 'Merci de renseigner le nom de la marque.',
-  sent: 'Merci ! Ta contribution a bien été enregistrée. Elle nous aide à enrichir la base de marques.',
-  failed: "Impossible d'envoyer la suggestion pour le moment. Réessaie dans un instant.",
+const FEEDBACK = {
+  missingBrand: {
+    title: 'Marque manquante',
+    message: 'Merci de renseigner le nom de la marque.',
+    type: 'warning',
+  },
+  sent: {
+    title: 'Merci !',
+    message:
+      'Ta contribution a bien été enregistrée. Elle nous aide à enrichir la base de marques.',
+    type: 'success',
+  },
+  failed: {
+    title: 'Erreur',
+    message: "Impossible d'envoyer la suggestion pour le moment. Réessaie dans un instant.",
+    type: 'error',
+  },
 } as const;
 
 function getParam(value: string | string[] | undefined): string | undefined {
@@ -60,7 +73,7 @@ export default function BrandSuggestionScreen() {
 
   async function handleSubmit() {
     if (!brandName.trim()) {
-      Toast.show(MESSAGES.missingBrand, { type: 'warning' });
+      showFeedback(FEEDBACK.missingBrand);
       return;
     }
 
@@ -73,10 +86,9 @@ export default function BrandSuggestionScreen() {
         offBrandRaw,
         notes: notes.trim() || undefined,
       });
-      Toast.show(MESSAGES.sent, { type: 'success' });
-      leaveScreen();
+      showFeedback({ ...FEEDBACK.sent, onDismiss: leaveScreen });
     } catch {
-      Toast.show(MESSAGES.failed, { type: 'error' });
+      showFeedback(FEEDBACK.failed);
     }
   }
 
