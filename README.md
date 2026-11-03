@@ -31,7 +31,7 @@ B-Spot is an open-source mobile application (similar to Yuka) that empowers cons
 - **Old Stack** (archived): React web app + NestJS API for investment fund networks
 - **New Stack** (in development): Expo React Native mobile app + NestJS API for product scanning
 
-See [CLAUDE.md](CLAUDE.md) for detailed architecture and [specs/mobile-app-rewrite/](specs/mobile-app-rewrite/) for implementation plan.
+See [CLAUDE.md](CLAUDE.md) for detailed architecture and [project-management/](project-management/) for tasks and history.
 
 ## 🚀 Quick Start (New Architecture)
 
@@ -110,7 +110,7 @@ b-spot/
 │   │   │   └── common/       # Shared components
 │   │   └── 📁 api/           # Generated API client (from OpenAPI)
 │   └── app.json              # Expo configuration
-├── 📝 specs/                 # Feature specifications
+├── 📝 project-management/    # Tasks, specs and journal (chisel)
 │   └── mobile-app-rewrite/
 │       ├── spec.md           # Feature specification
 │       ├── plan.md           # Technical implementation plan
@@ -147,9 +147,9 @@ b-spot/
 ## 📚 Documentation
 
 - **[CLAUDE.md](CLAUDE.md)** - Complete developer guide with commands and architecture
-- **[specs/mobile-app-rewrite/spec.md](specs/mobile-app-rewrite/spec.md)** - Feature specification
-- **[specs/mobile-app-rewrite/plan.md](specs/mobile-app-rewrite/plan.md)** - Technical implementation plan
-- **[.specify/memory/constitution.md](.specify/memory/constitution.md)** - Project constitution and principles
+- **[project-management/archive/speckit-mobile-app-rewrite/spec.md](project-management/archive/speckit-mobile-app-rewrite/spec.md)** - Original rewrite specification (archived)
+- **[project-management/archive/speckit-mobile-app-rewrite/plan.md](project-management/archive/speckit-mobile-app-rewrite/plan.md)** - Original implementation plan (archived)
+- **[docs/constitution.md](docs/constitution.md)** - Project constitution and principles
 
 ## 🎯 Development Roadmap
 
@@ -185,7 +185,7 @@ b-spot/
 We welcome contributions! The project is currently in rebuild phase. Once the new mobile app is functional, we'll provide detailed contributing guidelines.
 
 For now, check out:
-- **[specs/mobile-app-rewrite/](specs/mobile-app-rewrite/)** - Implementation specifications
+- **[project-management/](project-management/)** - Tasks, specs and journal
 - **[CLAUDE.md](CLAUDE.md)** - Development guide
 
 ## 📄 License

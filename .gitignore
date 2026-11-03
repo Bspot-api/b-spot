@@ -153,3 +153,6 @@ seeds/
 
 # Playwright MCP
 .playwright-mcp/
+# Deno (chisel CLI via deno x)
+deno.lock
+.agents/user.md
