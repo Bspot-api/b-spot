@@ -443,9 +443,9 @@ redirect. No hook in the app.
 - [x] Admin entry journey + testIDs
 - [x] Moderation journey + testIDs
 - [x] Session expiry journey
-- [ ] Two consecutive green `pnpm e2e:web` runs
-- [ ] Gates: `pnpm lint`, `pnpm test`, `pnpm build`
-- [ ] README section: running the web suite
+- [x] Two consecutive green `pnpm e2e:web` runs
+- [ ] Gates: `pnpm lint`, `pnpm test`, `pnpm build` — test and build green; lint red on debt that predates the slice (spec Notes)
+- [x] README section: running the web suite
 
 ## Notes & Snippets
 

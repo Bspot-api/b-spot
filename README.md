@@ -84,6 +84,47 @@ See [CLAUDE.md](CLAUDE.md) for detailed architecture and [project-management/](p
    pnpm dev:mobile # Mobile app only
    ```
 
+## 🧪 End-to-end tests
+
+The critical journeys run against the real app, the real API and a real
+database. Only the four external APIs (Open Food Facts, Open Beauty Facts,
+recherche-entreprises, Pappers) are replaced by a local fixture server, so
+no run calls them or spends Pappers quota. Everything lives in `apps/e2e`.
+
+### Web (Playwright)
+
+One-time setup:
+
+```bash
+pnpm install
+pnpm --filter @b-spot/e2e exec playwright install chromium
+```
+
+Run, with Docker running:
+
+```bash
+pnpm e2e:web
+```
+
+The command does the following, then exits non-zero on any failure:
+
+1. Starts b-spot's `postgres` and `maildev` containers if they are not
+   running. A MailDev it starts listens on SMTP 1125 and web 1180, so it
+   does not clash with another stack on 1025/1080. It stops at the end
+   only the containers it started.
+2. Drops and recreates the `b_spot_e2e` database, then migrates and seeds
+   it. It never touches the development database `b_spot`.
+3. Builds the API and exports the web app against `http://localhost:3101`.
+4. Runs Playwright, which starts the fixture server (`:4010`), the API
+   (`:3101`) and the web build (`:8182`), then walks every journey.
+
+Extra arguments go to Playwright, e.g. `pnpm e2e:web --project=web -g login`.
+The HTML report is written to `apps/e2e/playwright-report/`.
+
+The API reads four optional base URLs: `OPEN_FOOD_FACTS_BASE_URL`,
+`OPEN_BEAUTY_FACTS_BASE_URL`, `RECHERCHE_ENTREPRISES_BASE_URL` and
+`PAPPERS_BASE_URL`. Unset, it uses the production URLs.
+
 ## 📁 Project Structure (New Architecture)
 
 ```
