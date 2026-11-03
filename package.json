@@ -17,7 +17,8 @@
     "db:down": "docker-compose down",
     "db:logs": "docker-compose logs -f postgres",
     "mail:logs": "docker-compose logs -f maildev",
-    "generate:types": "pnpm --filter mobile generate:types"
+    "generate:types": "pnpm --filter mobile generate:types",
+    "e2e:web": "pnpm --filter @b-spot/e2e e2e:web"
   },
   "devDependencies": {
     "@mikro-orm/cli": "^6.4.16",

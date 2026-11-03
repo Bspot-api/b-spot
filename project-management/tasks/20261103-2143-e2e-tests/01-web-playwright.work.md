@@ -392,11 +392,11 @@ redirect. No hook in the app.
 
 ## Implementation Checkboxes
 
-- [ ] External API URL config + unit tests (defaults kept, override read)
-- [ ] Wire the config into product, brand-discovery and pappers services
-- [ ] `apps/e2e` package skeleton (package.json, tsconfig, eslint, root script, .gitignore)
-- [ ] Fixture server + catalogue + environment check spec
-- [ ] Orchestrator: docker, DB reset/seed/guard, web export, static server, Playwright webServers, teardown
+- [x] External API URL config + unit tests (defaults kept, override read)
+- [x] Wire the config into product, brand-discovery and pappers services
+- [x] `apps/e2e` package skeleton (package.json, tsconfig, eslint, root script, .gitignore)
+- [x] Fixture server + catalogue + environment check spec
+- [x] Orchestrator: docker, DB reset/seed/guard, web export, static server, Playwright webServers, teardown
 - [ ] Per-test reset + page-error guard + network guards
 - [ ] MailDev helper + login journey + login testIDs
 - [ ] Scan journey + testIDs

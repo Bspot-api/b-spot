@@ -156,3 +156,8 @@ seeds/
 # Deno (chisel CLI via deno x)
 deno.lock
 .agents/user.md
+
+# E2E (apps/e2e)
+apps/e2e/.web-build/
+apps/e2e/test-results/
+apps/e2e/playwright-report/
