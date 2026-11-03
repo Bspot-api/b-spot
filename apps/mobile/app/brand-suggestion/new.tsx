@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -12,6 +11,13 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCreateBrandSuggestion } from '../../src/api/hooks';
+import { Toast } from '../../src/components/reacticx/Toast';
+
+const MESSAGES = {
+  missingBrand: 'Merci de renseigner le nom de la marque.',
+  sent: 'Merci ! Ta contribution a bien été enregistrée.',
+  failed: "Impossible d'envoyer la suggestion pour le moment. Réessaie dans un instant.",
+} as const;
 
 function getParam(value: string | string[] | undefined): string | undefined {
   if (Array.isArray(value)) return value[0];
@@ -47,9 +53,14 @@ export default function BrandSuggestionScreen() {
     return 'Aide-nous à référencer cette marque. Les infos ci-dessous sont préremplies à partir du scan.';
   }, [existingSuggestionId]);
 
+  function leaveScreen() {
+    if (router.canGoBack()) router.back();
+    else router.replace('/');
+  }
+
   async function handleSubmit() {
     if (!brandName.trim()) {
-      Alert.alert('Marque manquante', 'Merci de renseigner le nom de la marque.');
+      Toast.show(MESSAGES.missingBrand, { type: 'warning' });
       return;
     }
 
@@ -62,17 +73,10 @@ export default function BrandSuggestionScreen() {
         offBrandRaw,
         notes: notes.trim() || undefined,
       });
-
-      Alert.alert(
-        'Merci !',
-        'Ta contribution a bien été enregistrée. Elle nous aide à enrichir la base de marques.',
-        [{ text: 'OK', onPress: () => router.back() }]
-      );
+      Toast.show(MESSAGES.sent, { type: 'success' });
+      leaveScreen();
     } catch {
-      Alert.alert(
-        'Erreur',
-        "Impossible d'envoyer la suggestion pour le moment. Réessaie dans un instant."
-      );
+      Toast.show(MESSAGES.failed, { type: 'error' });
     }
   }
 
