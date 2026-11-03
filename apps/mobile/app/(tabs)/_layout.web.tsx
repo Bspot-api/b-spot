@@ -10,6 +10,9 @@ export default function WebLayout() {
       <View style={styles.navbar}>
         <Text style={styles.logo}>B-Spot</Text>
         <View style={styles.navRight}>
+          <Pressable onPress={() => router.push('/history')}>
+            <Text style={styles.navLink}>Historique</Text>
+          </Pressable>
           {isAdmin && (
             <Pressable onPress={() => router.push('/admin')}>
               <Text style={styles.navLink}>Admin</Text>
