@@ -58,10 +58,10 @@ export class BrandSuggestionService {
   async findByStatus(
     status?: BrandSuggestionStatus,
   ): Promise<{ items: BrandSuggestion[]; total: number }> {
-    const items = await this.suggestionRepo.find(
-      status ? { status } : {},
-      { orderBy: { createdAt: 'DESC' }, limit: 50 },
-    );
+    const items = await this.suggestionRepo.find(status ? { status } : {}, {
+      orderBy: { createdAt: 'DESC' },
+      limit: 50,
+    });
     return { items, total: items.length };
   }
 
@@ -86,7 +86,8 @@ export class BrandSuggestionService {
     const suggestion = await this.suggestionRepo.findOne({ id });
     if (!suggestion) throw new Error(`Suggestion ${id} not found`);
     if (fields.brandName !== undefined) suggestion.brandName = fields.brandName.trim();
-    if (fields.productName !== undefined) suggestion.productName = fields.productName.trim() || undefined;
+    if (fields.productName !== undefined)
+      suggestion.productName = fields.productName.trim() || undefined;
     if (fields.barcode !== undefined) suggestion.barcode = fields.barcode.trim() || undefined;
     if (fields.notes !== undefined) suggestion.notes = fields.notes.trim() || undefined;
     suggestion.updatedAt = new Date();
