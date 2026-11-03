@@ -43,3 +43,6 @@ session — is exercised through the app's own screens.
 - How the magic link reaches the app on the simulator (opening the link in
   Safari and letting the app's session polling pick it up, or a `bspot://`
   callback) is for the plan to settle against the login screen as built.
+- 2026-11-03, Architect — found while planning slice 01: `app.config.ts`
+  gives the development build the scheme `bspot-dev`, not `bspot`. The
+  deep link the flows open is the one of the build they drive.

@@ -4,7 +4,7 @@ Created by the Crewmate at the plan step, 2026-11-03. Spec:
 `project-management/tasks/20261103-2143-e2e-tests/01-web-playwright.spec.md`
 (parent: `project-management/tasks/20261103-2143-e2e-tests.spec.md`).
 
-**Plan:** waiting for the Architect's reading.
+**Plan:** approved by the Architect, 2026-11-03 (with the human's rulings on the non-admin journey and the Open Beauty Facts fix, see Rulings).
 
 ## Program Design
 
@@ -443,6 +443,31 @@ redirect. No hook in the app.
   `bspot://company/<id>`.
 - `CLAUDE.md` says Expo ~52; `apps/mobile/package.json` is on Expo 54 /
   Expo Router 6. No impact on the plan.
+
+### Rulings — Architect, 2026-11-03
+
+- **Blocking external hosts:** the fetch guard loaded through
+  `NODE_OPTIONS` from `apps/e2e` is accepted. It ships in neither the API
+  nor the app, so it is not test code in the app.
+- **History by URL:** accepted. Adding a history link to the web navbar is
+  outside this slice.
+- **Brand suggestion on web:** asserting on the 201 response and the
+  database row is accepted. The silent `Alert.alert` on web is reported to
+  the human as a separate bug.
+- **`/admin` while logged out:** reported to the human as a separate bug.
+  Not fixed here.
+- **Slice 2 scheme:** the dev build's `bspot-dev` scheme is noted in the
+  slice 2 spec for its plan to settle.
+- **Regular user and Open Beauty Facts fallback:** brought to the human,
+  because both change what a row of the approved journeys table means.
+  The human ruled on 2026-11-03:
+  - **Non-admin journey:** tested as a logged-out visitor, plus an admin
+    demoted server-side who loses the entry on reload. Login stays
+    admin-only.
+  - **Open Beauty Facts fallback:** fixed in this slice. A 404 from Open
+    Food Facts means "not found" and falls through to Open Beauty Facts.
+    The fix comes with an API regression test written first, and the
+    cosmetic journey is tested end to end.
 
 ### Real not-found answers (probed 2026-11-03)
 
