@@ -390,6 +390,43 @@ redirect. No hook in the app.
   MikroORM config, `main.ts`), the web screens and `Dockerfile.web`, and a
   hand probe of the four external APIs' not-found answers.
 
+- 2026-11-03 (code) — External API URL config and the Open Beauty Facts
+  fix landed test-first (config spec, then one URL case per service, then
+  the 404 regression in `product.service.spec.ts`), commit `325908d`.
+  E2E environment and environment checks: `97d27be`. Login journey and
+  testIDs: `9c6ad4e`. Remaining journeys: `2dc4bc7`. The testIDs were
+  added in one pass for all web screens (each journey was still written
+  and run against them before being committed) to save a 40 s web export
+  per journey.
+- Plan revisions met while coding (all within the approved design):
+  - **MailDev ports.** Another stack on this machine holds 1025/1080 with
+    a non-MailDev mail server. When b-spot's MailDev is not running, the
+    run starts it on 1125/1180 (the compose file's `SMTP_PORT` /
+    `SMTP_PORT_WEB` variables); when it is running, the run adopts its
+    real ports (`docker compose port`) and exports them as
+    `E2E_SMTP_PORT` / `E2E_MAILDEV_WEB_PORT`.
+  - **MailDev 3.** `maildev/maildev:latest` is now 3.0.0: the message
+    list moved to `/api/email` and the date field is `time`. The helper
+    tries `/api/email`, then `/email`, and reads `time` or `date`.
+  - **API process.** Run from the compiled `apps/api/dist/src/main.js`
+    (the orchestrator builds it), with cwd `apps/e2e` so the API's dotenv
+    never loads `apps/api/.env`; the guard is loaded with `node --import
+    tsx --import env/block-external-hosts.ts`.
+  - **Web favicon.** Expo 54's web export fails on
+    `assets/favicon.ico` ("Invalid mimeType"), so `pnpm build` and the
+    web export were broken before this slice. `app.json` now points
+    `web.favicon` at `assets/favicon.png`, the same 32 px image converted.
+  - **Product-source badge defect.** The API sends `source: 'OBF'` /
+    `'OFF'`; the mobile type and `useBarcodeScanner` expect
+    `'OPEN_BEAUTY_FACTS'`, so every product is labelled "Produit
+    alimentaire". Not fixed here (screen behaviour); the badge assertion
+    is `test.fixme` in `web/scan.spec.ts`. The cosmetic journey itself
+    (Open Beauty Facts fallback → company page) passes.
+  - **Pre-existing lint debt.** `pnpm lint` was already red before this
+    slice in `apps/api` (29 errors: functions over 30 lines in services
+    and migrations, prettier in `brand-suggestion.service.ts`, spec files
+    outside the tsconfig). See the gates entry below.
+
 ## Implementation Checkboxes
 
 - [x] External API URL config + unit tests (defaults kept, override read)
@@ -399,13 +436,13 @@ redirect. No hook in the app.
 - [x] Orchestrator: docker, DB reset/seed/guard, web export, static server, Playwright webServers, teardown
 - [x] Per-test reset + page-error guard + network guards
 - [x] MailDev helper + login journey + login testIDs
-- [ ] Scan journey + testIDs
-- [ ] Brand search journey + testIDs
-- [ ] History journey + testIDs
-- [ ] Brand suggestion journey + testIDs
-- [ ] Admin entry journey + testIDs
-- [ ] Moderation journey + testIDs
-- [ ] Session expiry journey
+- [x] Scan journey + testIDs
+- [x] Brand search journey + testIDs
+- [x] History journey + testIDs
+- [x] Brand suggestion journey + testIDs
+- [x] Admin entry journey + testIDs
+- [x] Moderation journey + testIDs
+- [x] Session expiry journey
 - [ ] Two consecutive green `pnpm e2e:web` runs
 - [ ] Gates: `pnpm lint`, `pnpm test`, `pnpm build`
 - [ ] README section: running the web suite
@@ -468,6 +505,24 @@ redirect. No hook in the app.
     Food Facts means "not found" and falls through to Open Beauty Facts.
     The fix comes with an API regression test written first, and the
     cosmetic journey is tested end to end.
+
+- **Moderation on web (Architect, 2026-11-03, corrected the same evening):**
+  a first ruling asked to mark reject and delete `test.fixme`, on the
+  premise that their confirmation used `Alert.alert`. The premise was
+  wrong: `app/admin/suggestions.tsx` already uses `window.confirm` on web.
+  Final ruling: reject and delete are tested for real, the test accepts
+  the dialog (`page.once('dialog', d => d.accept())`). The Crewmate's
+  probe run confirmed both pass.
+- **`fix/web-ux-bugs` (Architect, 2026-11-03):** a parallel task
+  (`project-management/tasks/20261103-2226-web-ux-fixes.spec.md`, on that
+  branch) changes the brand-suggestion feedback into toasts, makes
+  `/admin` and `/admin/suggestions` redirect to `/login` without a toast
+  when logged out, and adds a "Historique" navbar link. This slice does
+  not fix those screens and adds only `testID`s; only assertions that
+  depend on those three changes go `test.fixme`. Crewmate's reading: none
+  of the web journeys asserts on them (brand suggestion asserts the 201
+  and the row, history is reached by URL, no journey visits `/admin`
+  logged out), so no test is fixme'd for that reason.
 
 ### Real not-found answers (probed 2026-11-03)
 
