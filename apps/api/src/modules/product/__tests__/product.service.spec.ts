@@ -77,7 +77,7 @@ describe('ProductService', () => {
       expect(result!.barcode).toBe('3017620422003');
       expect(result!.name).toBe('Nutella');
       expect(result!.brandName).toBe('Nutella'); // first brand only
-      expect(result!.category).toBe('Spreads');  // first category only
+      expect(result!.category).toBe('Spreads'); // first category only
       expect(result!.source).toBe(ProductSource.OPEN_FOOD_FACTS);
     });
 
@@ -173,7 +173,8 @@ describe('ProductService', () => {
     });
 
     it('falls back to OBF when OFF returns not found', async () => {
-      jest.spyOn(global, 'fetch')
+      jest
+        .spyOn(global, 'fetch')
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({ status: 0 }),
@@ -200,8 +201,51 @@ describe('ProductService', () => {
       expect(result!.category).toBe('Hair care');
     });
 
+    it('falls back to OBF when OFF answers 404 with status 0 (real not-found answer)', async () => {
+      const fetchSpy = jest
+        .spyOn(global, 'fetch')
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 404,
+          json: async () => ({
+            code: '3600000000017',
+            status: 0,
+            status_verbose: 'product not found',
+          }),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: async () => ({
+            status: 1,
+            product: { product_name: 'Creme Test', brands: 'Ombrelis', categories: 'Skin care' },
+          }),
+        } as Response);
+
+      const result = await service.fetchProduct('3600000000017');
+
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
+      expect(result).not.toBeNull();
+      expect(result!.source).toBe(ProductSource.OPEN_BEAUTY_FACTS);
+      expect(result!.brandName).toBe('Ombrelis');
+    });
+
+    it('does not fall back to OBF when OFF answers a 5xx', async () => {
+      const fetchSpy = jest.spyOn(global, 'fetch').mockResolvedValueOnce({
+        ok: false,
+        status: 503,
+        json: async () => ({}),
+      } as Response);
+
+      const result = await service.fetchProduct('3017620422003');
+
+      expect(result).toBeNull();
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+    });
+
     it('returns null when OFF and OBF both return not found', async () => {
-      jest.spyOn(global, 'fetch')
+      jest
+        .spyOn(global, 'fetch')
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({ status: 0 }),
@@ -217,14 +261,51 @@ describe('ProductService', () => {
     });
 
     it('returns null and does not fallback to OBF when OFF fails technically', async () => {
-      const fetchSpy = jest.spyOn(global, 'fetch').mockRejectedValueOnce(
-        new Error('OFF network error'),
-      );
+      const fetchSpy = jest
+        .spyOn(global, 'fetch')
+        .mockRejectedValueOnce(new Error('OFF network error'));
 
       const result = await service.fetchProduct('3017620422003');
 
       expect(result).toBeNull();
       expect(fetchSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('external base URLs', () => {
+    afterEach(() => {
+      delete process.env.OPEN_FOOD_FACTS_BASE_URL;
+    });
+
+    it('calls the production Open Food Facts URL when no base URL is set', async () => {
+      const fetchSpy = jest
+        .spyOn(global, 'fetch')
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ status: 1, product: {} }),
+        } as Response);
+
+      await service.fetchFromOpenFoodFacts('3017620422003');
+
+      expect(fetchSpy).toHaveBeenCalledWith(
+        'https://world.openfoodfacts.org/api/v2/product/3017620422003',
+      );
+    });
+
+    it('calls the configured Open Food Facts base URL', async () => {
+      process.env.OPEN_FOOD_FACTS_BASE_URL = 'http://localhost:4010/off';
+      const fetchSpy = jest
+        .spyOn(global, 'fetch')
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ status: 1, product: {} }),
+        } as Response);
+
+      await service.fetchFromOpenFoodFacts('3017620422003');
+
+      expect(fetchSpy).toHaveBeenCalledWith(
+        'http://localhost:4010/off/api/v2/product/3017620422003',
+      );
     });
   });
 });

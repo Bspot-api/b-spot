@@ -5,9 +5,10 @@ import { EntityManager } from '@mikro-orm/core';
 import { Product, ProductSource } from './product.entity';
 import { Brand } from '../brand/brand.entity';
 import { ProductDto } from './dto/product.dto';
+import { readExternalApiUrls } from '../../config/external-api-urls';
 
-const OFF_API = 'https://world.openfoodfacts.org/api/v2/product';
-const OBF_API = 'https://world.openbeautyfacts.org/api/v2/product';
+const FACTS_PRODUCT_PATH = '/api/v2/product';
+const HTTP_NOT_FOUND = 404;
 
 interface OffProduct {
   product_name?: string;
@@ -106,11 +107,14 @@ export class ProductService {
     barcode: string,
     source: ProductSource,
   ): Promise<FactsFetchResult> {
-    const endpoint = source === ProductSource.OPEN_BEAUTY_FACTS ? OBF_API : OFF_API;
     const sourceLabel = source === ProductSource.OPEN_BEAUTY_FACTS ? 'OBF' : 'OFF';
 
     try {
-      const response = await fetch(`${endpoint}/${barcode}`);
+      const response = await fetch(this.buildFactsUrl(barcode, source));
+      // Open Food Facts / Open Beauty Facts answer an unknown barcode with a 404.
+      if (response.status === HTTP_NOT_FOUND) {
+        return { outcome: 'not_found', product: null };
+      }
       if (!response.ok) {
         this.logger.warn(`${sourceLabel} API returned ${response.status} for barcode ${barcode}`);
         return { outcome: 'technical_error', product: null };
@@ -129,6 +133,13 @@ export class ProductService {
       this.logger.error(`${sourceLabel} fetch failed for barcode ${barcode}`, err);
       return { outcome: 'technical_error', product: null };
     }
+  }
+
+  private buildFactsUrl(barcode: string, source: ProductSource): string {
+    const urls = readExternalApiUrls();
+    const base =
+      source === ProductSource.OPEN_BEAUTY_FACTS ? urls.openBeautyFacts : urls.openFoodFacts;
+    return `${base}${FACTS_PRODUCT_PATH}/${barcode}`;
   }
 
   private parseFactsProduct(

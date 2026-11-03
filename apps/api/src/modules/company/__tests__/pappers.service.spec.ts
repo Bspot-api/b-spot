@@ -15,11 +15,14 @@ const NESTLE_PAPPERS_RESPONSE = {
   denomination: 'Nestlé France SA',
   representants: [
     { prenom: 'Mark', nom: 'Schneider', qualite: 'Directeur Général', date_debut: '2017-01-01' },
-    { prenom: 'Henri', nom: 'de Castries', qualite: 'Président du Conseil', date_debut: '2019-06-01' },
+    {
+      prenom: 'Henri',
+      nom: 'de Castries',
+      qualite: 'Président du Conseil',
+      date_debut: '2019-06-01',
+    },
   ],
-  beneficiaires_effectifs: [
-    { nom: 'Nestlé SA', pourcentages_parts: 100, type_personne: 'morale' },
-  ],
+  beneficiaires_effectifs: [{ nom: 'Nestlé SA', pourcentages_parts: 100, type_personne: 'morale' }],
 };
 
 describe('PappersService', () => {
@@ -30,10 +33,7 @@ describe('PappersService', () => {
     process.env.PAPPERS_API_KEY = 'test_api_key';
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        PappersService,
-        { provide: CacheService, useValue: cacheServiceMock },
-      ],
+      providers: [PappersService, { provide: CacheService, useValue: cacheServiceMock }],
     }).compile();
 
     service = module.get<PappersService>(PappersService);
@@ -111,9 +111,15 @@ describe('PappersService', () => {
 
       expect(result).not.toBeNull();
       expect(result!.legalName).toBe('Nestlé France SA');
-      expect(cacheServiceMock.setCachedPappers).toHaveBeenCalledWith('552108011', NESTLE_PAPPERS_RESPONSE);
+      expect(cacheServiceMock.setCachedPappers).toHaveBeenCalledWith(
+        '552108011',
+        NESTLE_PAPPERS_RESPONSE,
+      );
       expect(cacheServiceMock.logApiCall).toHaveBeenCalledWith(
-        expect.anything(), '/v2/entreprise', 'siren=552108011', true,
+        expect.anything(),
+        '/v2/entreprise',
+        'siren=552108011',
+        true,
       );
     });
 
@@ -134,7 +140,11 @@ describe('PappersService', () => {
 
       expect(result).toBeNull();
       expect(cacheServiceMock.logApiCall).toHaveBeenCalledWith(
-        expect.anything(), '/v2/entreprise', 'siren=999999999', false, 'Quota exceeded',
+        expect.anything(),
+        '/v2/entreprise',
+        'siren=999999999',
+        false,
+        'Quota exceeded',
       );
     });
 
@@ -145,7 +155,49 @@ describe('PappersService', () => {
 
       expect(result).toBeNull();
       expect(cacheServiceMock.logApiCall).toHaveBeenCalledWith(
-        expect.anything(), '/v2/entreprise', 'siren=552108011', false, expect.any(String),
+        expect.anything(),
+        '/v2/entreprise',
+        'siren=552108011',
+        false,
+        expect.any(String),
+      );
+    });
+  });
+
+  describe('external base URL', () => {
+    beforeEach(() => {
+      cacheServiceMock.getCachedPappers.mockResolvedValue(null);
+      cacheServiceMock.isPappersQuotaExhausted.mockResolvedValue(false);
+    });
+
+    afterEach(() => {
+      delete process.env.PAPPERS_BASE_URL;
+    });
+
+    function mockPappersOk(): jest.SpyInstance {
+      return jest
+        .spyOn(global, 'fetch')
+        .mockResolvedValueOnce({ ok: true, json: async () => NESTLE_PAPPERS_RESPONSE } as Response);
+    }
+
+    it('calls the production Pappers URL when no base URL is set', async () => {
+      const fetchSpy = mockPappersOk();
+
+      await service.getCompanyBySiren('552108011');
+
+      expect(fetchSpy).toHaveBeenCalledWith(
+        'https://api.pappers.fr/v2/entreprise?siren=552108011&api_token=test_api_key',
+      );
+    });
+
+    it('calls the configured Pappers base URL', async () => {
+      process.env.PAPPERS_BASE_URL = 'http://localhost:4010/pappers';
+      const fetchSpy = mockPappersOk();
+
+      await service.getCompanyBySiren('552108011');
+
+      expect(fetchSpy).toHaveBeenCalledWith(
+        'http://localhost:4010/pappers/v2/entreprise?siren=552108011&api_token=test_api_key',
       );
     });
   });

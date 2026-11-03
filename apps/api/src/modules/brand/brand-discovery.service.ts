@@ -4,8 +4,9 @@ import { EntityManager } from '@mikro-orm/core';
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { PappersService } from '../company/pappers.service';
 import { Brand, BrandMatchSource, BrandStatus } from './brand.entity';
+import { readExternalApiUrls } from '../../config/external-api-urls';
 
-const ENTREPRISE_SEARCH_API = 'https://recherche-entreprises.api.gouv.fr/search';
+const ENTREPRISE_SEARCH_PATH = '/search';
 const ACTIVE_THRESHOLD = 85;
 const PENDING_THRESHOLD = 60;
 
@@ -130,7 +131,7 @@ export class BrandDiscoveryService {
   private async searchCompanies(
     query: string,
   ): Promise<Array<{ siren: string; name: string; raw: EntrepriseSearchResult }>> {
-    const url = new URL(ENTREPRISE_SEARCH_API);
+    const url = new URL(`${readExternalApiUrls().rechercheEntreprises}${ENTREPRISE_SEARCH_PATH}`);
     url.searchParams.set('q', query);
     url.searchParams.set('per_page', '5');
     url.searchParams.set('page', '1');

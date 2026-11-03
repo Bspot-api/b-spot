@@ -3,8 +3,9 @@ import { CacheService } from '../cache/cache.service';
 import { ExternalApi } from '../cache/api-usage-log.entity';
 import type { CompanyData } from './dto/company.dto';
 import type { Executive, Shareholder } from './company.entity';
+import { readExternalApiUrls } from '../../config/external-api-urls';
 
-const PAPPERS_API = 'https://api.pappers.fr/v2/entreprise';
+const PAPPERS_COMPANY_PATH = '/v2/entreprise';
 
 interface PappersRepresentant {
   nom?: string;
@@ -58,7 +59,7 @@ export class PappersService {
       return null;
     }
 
-    const url = `${PAPPERS_API}?siren=${siren}&api_token=${apiKey}`;
+    const url = `${readExternalApiUrls().pappers}${PAPPERS_COMPANY_PATH}?siren=${siren}&api_token=${apiKey}`;
 
     try {
       const response = await fetch(url);
