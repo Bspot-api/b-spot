@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ActivityIndicator, FlatList, Image, Pressable, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomSheet } from '../../src/components/BottomSheet';
 import { confirmAction } from '../../src/components/confirm/confirmAction';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import {
   useAdminSuggestions,
   useDeleteSuggestion,
   useUpdateSuggestionFields,
   useUpdateSuggestionStatus,
 } from '../../src/api/hooks';
-import { useAuth } from '../../src/features/auth/hooks/useAuth';
+import { useAdminGuard } from '../../src/features/auth/hooks/useAdminGuard';
 import type { BrandSuggestionDto, SuggestionStatus } from '../../src/api/types';
 
 const TABS: { status: SuggestionStatus; label: string }[] = [
@@ -118,8 +118,7 @@ function SuggestionItem({
 }
 
 export default function SuggestionsScreen() {
-  const router = useRouter();
-  const { isAdmin, isLoading: authLoading } = useAuth();
+  const { access } = useAdminGuard();
   const params = useLocalSearchParams<{ status?: SuggestionStatus }>();
   const [activeStatus, setActiveStatus] = useState<SuggestionStatus>(params.status ?? 'new');
 
@@ -129,14 +128,10 @@ export default function SuggestionsScreen() {
   const [editBarcode, setEditBarcode] = useState('');
   const [editNotes, setEditNotes] = useState('');
 
-  const suggestionsQuery = useAdminSuggestions(activeStatus);
+  const suggestionsQuery = useAdminSuggestions(activeStatus, { enabled: access === 'granted' });
   const updateMutation = useUpdateSuggestionStatus();
   const deleteMutation = useDeleteSuggestion();
   const fieldsMutation = useUpdateSuggestionFields();
-
-  useEffect(() => {
-    if (!authLoading && !isAdmin) router.replace('/');
-  }, [isAdmin, authLoading, router]);
 
   function handleAction(id: number, status: SuggestionStatus) {
     updateMutation.mutate({ id, status });
@@ -170,7 +165,7 @@ export default function SuggestionsScreen() {
     );
   }
 
-  if (authLoading) {
+  if (access !== 'granted') {
     return (
       <View className="flex-1 items-center justify-center bg-zinc-50">
         <ActivityIndicator size="small" color="#27272a" />

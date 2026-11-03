@@ -41,11 +41,12 @@ export function useCreateBrandSuggestion() {
   });
 }
 
-export function useAdminSuggestions(status?: SuggestionStatus) {
+export function useAdminSuggestions(status?: SuggestionStatus, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['admin', 'suggestions', status],
     queryFn: () => listAdminSuggestions(status),
     staleTime: 2 * 60 * 1000,
+    enabled: options?.enabled ?? true,
   });
 }
 
