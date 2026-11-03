@@ -532,4 +532,70 @@ redirect. No hook in the app.
 
 ## Diff-Review Findings
 
-_Filled at the review step._
+`code-review` on `41781ba...HEAD` (commits `325908d` to `4522b88`), two
+fresh sub-agents, 2026-11-03.
+
+### Standards
+
+- **Function names without a verb** (`docs/agent-rules/common.md`, "Start
+  functions with a verb") — fixed: `runCompose`, `listRunningServices`,
+  `readHostPort`, `readReceivedAt`, `readCurrentDatabaseName`, `findCard`.
+- **Exported functions without JSDoc** (`common.md`, "Use JSDoc to
+  document public classes and methods") — fixed in `support/db.ts` and
+  `fixtures-server/responses.ts`.
+- **Inline magic number** (`CLAUDE.md`, "use explicit constants") —
+  fixed: `DEFAULT_MAGIC_LINK_TIMEOUT_MS` in `support/maildev.ts`.
+- **Duplicated sleep / poll and spawn env** — fixed: `support/wait.ts`
+  `sleep()` shared by `docker.ts` and `maildev.ts`; `buildChildEnv()` in
+  `env/process.ts`.
+- **Repeated switch on `ProductSource`** in `product.service.ts` — fixed:
+  one `FACTS_BASE_URL_KEY` map, and the log label is the enum value
+  itself (`'OFF'` / `'OBF'`).
+- **`app/admin/suggestions.tsx` over 300 lines, made worse by the
+  testIDs** (`CLAUDE.md`, max 300 lines per file) — answered: the file was
+  already 356 lines; this slice may add only attributes to the screens
+  (Architect's ruling on `fix/web-ux-bugs`), and that branch edits the same
+  file, so splitting it here would collide. Left to a follow-up.
+- **Hosts, env names, fixture paths and testIDs written in both the app
+  and `apps/e2e`; `SuggestionStatus` re-declared** — answered: deliberate.
+  The plan forbids the app from importing the e2e package and keeps the
+  e2e suite a black box of the API; the environment checks and the
+  journeys fail loudly if either side drifts.
+- **`readExternalApiUrls()` called per request instead of injected** —
+  answered: approved plan decision (no provider token, no churn in the
+  existing `TestingModule` setups); three call sites, one function.
+- **`FixtureAnswer.body: unknown`** — answered: the value only goes to
+  `JSON.stringify`; no property is ever read from it.
+
+### Spec
+
+- **README section missing** — fixed at the close (README, "End-to-end
+  tests").
+- **repeatable and suite-green unticked** — repeatable: verified (two
+  consecutive `pnpm e2e:web` runs, 22 passed / 1 skipped each). suite-green:
+  `pnpm test` and `pnpm build` green; `pnpm lint` red on debt that predates
+  the slice (see the acceptance criteria at the close).
+- **Reject is tested though the row says approve, edit, delete** —
+  answered: Architect's ruling (reject and delete tested for real).
+- **Favicon changed in the app** — answered: the web export (and `pnpm
+  build`) was broken without it; recorded in the Worklog, reported.
+- **Prettier rewrite of `brand-suggestion.service.ts`** — answered:
+  `pnpm lint --fix` rewrote it; `.agents/project.md` says to commit what it
+  rewrites.
+- **Guard wraps `fetch` only** — answered: Architect's ruling; every
+  external call in the API uses `fetch` today.
+- **Cosmetic badge `test.fixme`** — answered: a mobile defect (source
+  `'OBF'` vs `'OPEN_BEAUTY_FACTS'`), reported to the Architect, outside
+  this slice's screens rule.
+- **`apps/e2e` lint runs `eslint --fix`** — answered: same convention as
+  `apps/api`'s lint script.
+- **Playwright `webServer` starts the three processes, not the entry
+  point** — answered: still one command and one teardown for the web
+  suite. Slice 02 (no Playwright) needs its own starter for the fixture
+  server, the API and nothing else; noted for its plan.
+- **MailDev ports differ from the compose defaults** — answered: recorded
+  in the Worklog; caused by another stack holding 1025/1080 on this
+  machine; the compose file's own variables are used.
+- **`fetchLatestMagicLink` also takes `since`** — answered: without it a
+  link from an earlier run for the same address could be returned; the
+  seam still takes the address and returns the latest link.

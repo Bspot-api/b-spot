@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { API_URL, E2E_DATABASE_NAME, FIXTURES_URL } from '../env/e2e-env';
-import { currentDatabaseName } from '../support/db';
+import { readCurrentDatabaseName } from '../support/db';
 import {
   BRAND_SEARCH_NAME,
   BROVANE_FIXTURE,
@@ -55,5 +55,5 @@ test('fixtures — Pappers: found, unknown SIREN 404, missing token 401', async 
 test('the API under test answers and the suite talks to the e2e database', async ({ request }) => {
   const health = await request.get(`${API_URL}/health`);
   expect(health.ok()).toBe(true);
-  expect(await currentDatabaseName()).toBe(E2E_DATABASE_NAME);
+  expect(await readCurrentDatabaseName()).toBe(E2E_DATABASE_NAME);
 });

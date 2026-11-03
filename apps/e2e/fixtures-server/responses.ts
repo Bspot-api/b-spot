@@ -36,10 +36,12 @@ function factsAnswer(products: readonly FixtureProduct[], barcode: string): Fixt
   };
 }
 
+/** Open Food Facts' answer for a barcode: the product, or its real 404 not-found body. */
 export function openFoodFactsAnswer(barcode: string): FixtureAnswer {
   return factsAnswer(FOOD_PRODUCTS, barcode);
 }
 
+/** Open Beauty Facts' answer for a barcode, same shapes as Open Food Facts. */
 export function openBeautyFactsAnswer(barcode: string): FixtureAnswer {
   return factsAnswer(BEAUTY_PRODUCTS, barcode);
 }
@@ -48,6 +50,7 @@ function normalize(value: string): string {
   return value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 }
 
+/** recherche-entreprises' result page for a query; empty when nothing matches. */
 export function rechercheEntreprisesAnswer(query: string): FixtureAnswer {
   const hits = SEARCH_HITS.filter((hit) => hit.query === normalize(query));
   const results = hits.map((hit) => ({
@@ -86,6 +89,7 @@ function pappersBody(company: FixtureCompany): Record<string, unknown> {
   };
 }
 
+/** Pappers' company answer: 401 without token, 404 for an unknown SIREN. */
 export function pappersAnswer(siren: string, apiToken: string | null): FixtureAnswer {
   if (!apiToken) {
     return {

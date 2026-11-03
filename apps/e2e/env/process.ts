@@ -5,6 +5,10 @@ export interface CommandOptions {
   env?: Record<string, string>;
 }
 
+function buildChildEnv(options: CommandOptions): NodeJS.ProcessEnv {
+  return { ...process.env, ...options.env };
+}
+
 /** Runs a command with inherited stdio; resolves with its exit code. */
 export function runCommandForExitCode(
   command: string,
@@ -14,7 +18,7 @@ export function runCommandForExitCode(
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd: options.cwd,
-      env: { ...process.env, ...options.env },
+      env: buildChildEnv(options),
       stdio: 'inherit',
     });
     child.on('error', reject);
@@ -43,7 +47,7 @@ export function captureCommand(
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd: options.cwd,
-      env: { ...process.env, ...options.env },
+      env: buildChildEnv(options),
     });
     let output = '';
     child.stdout.on('data', (chunk: Buffer) => {

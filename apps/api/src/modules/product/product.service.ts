@@ -5,10 +5,14 @@ import { EntityManager } from '@mikro-orm/core';
 import { Product, ProductSource } from './product.entity';
 import { Brand } from '../brand/brand.entity';
 import { ProductDto } from './dto/product.dto';
-import { readExternalApiUrls } from '../../config/external-api-urls';
+import { ExternalApiUrls, readExternalApiUrls } from '../../config/external-api-urls';
 
 const FACTS_PRODUCT_PATH = '/api/v2/product';
 const HTTP_NOT_FOUND = 404;
+const FACTS_BASE_URL_KEY: Record<ProductSource, keyof ExternalApiUrls> = {
+  [ProductSource.OPEN_FOOD_FACTS]: 'openFoodFacts',
+  [ProductSource.OPEN_BEAUTY_FACTS]: 'openBeautyFacts',
+};
 
 interface OffProduct {
   product_name?: string;
@@ -107,7 +111,7 @@ export class ProductService {
     barcode: string,
     source: ProductSource,
   ): Promise<FactsFetchResult> {
-    const sourceLabel = source === ProductSource.OPEN_BEAUTY_FACTS ? 'OBF' : 'OFF';
+    const sourceLabel = source; // the enum values are the labels: 'OFF' / 'OBF'
 
     try {
       const response = await fetch(this.buildFactsUrl(barcode, source));
@@ -136,9 +140,7 @@ export class ProductService {
   }
 
   private buildFactsUrl(barcode: string, source: ProductSource): string {
-    const urls = readExternalApiUrls();
-    const base =
-      source === ProductSource.OPEN_BEAUTY_FACTS ? urls.openBeautyFacts : urls.openFoodFacts;
+    const base = readExternalApiUrls()[FACTS_BASE_URL_KEY[source]];
     return `${base}${FACTS_PRODUCT_PATH}/${barcode}`;
   }
 

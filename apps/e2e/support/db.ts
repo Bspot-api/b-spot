@@ -94,6 +94,7 @@ export interface StoredSuggestion {
   notes: string | null;
 }
 
+/** Reads the stored brand suggestions whose notes equal `notes`. */
 export function findSuggestionsByNotes(notes: string): Promise<StoredSuggestion[]> {
   return withClient(async (client) => {
     const result = await client.query<StoredSuggestion>(
@@ -104,7 +105,8 @@ export function findSuggestionsByNotes(notes: string): Promise<StoredSuggestion[
   });
 }
 
-export function currentDatabaseName(): Promise<string> {
+/** Reads the name of the database the e2e pool is connected to. */
+export function readCurrentDatabaseName(): Promise<string> {
   return withClient(async (client) => {
     const result = await client.query<{ name: string }>('SELECT current_database() AS name');
     return result.rows[0].name;
