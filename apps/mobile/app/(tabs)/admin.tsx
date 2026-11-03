@@ -1,8 +1,7 @@
-import { useEffect } from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAdminSuggestions } from '../../src/api/hooks';
-import { useAuth } from '../../src/features/auth/hooks/useAuth';
+import { useAdminGuard } from '../../src/features/auth/hooks/useAdminGuard';
 import type { SuggestionStatus } from '../../src/api/types';
 
 const STATUS_LABELS: Record<SuggestionStatus, string> = {
@@ -41,19 +40,15 @@ function SuggestionCounter({
 
 export default function AdminScreen() {
   const router = useRouter();
-  const { isAdmin, isLoading, adminProfile, signOut } = useAuth();
-  const suggestionsQuery = useAdminSuggestions();
-
-  useEffect(() => {
-    if (!isLoading && !isAdmin) router.replace('/');
-  }, [isAdmin, isLoading, router]);
+  const { access, adminProfile, signOut } = useAdminGuard();
+  const suggestionsQuery = useAdminSuggestions({ enabled: access === 'granted' });
 
   async function handleSignOut() {
     await signOut();
     router.replace('/');
   }
 
-  if (isLoading) {
+  if (access === 'pending') {
     return (
       <View className="flex-1 items-center justify-center bg-zinc-50">
         <ActivityIndicator size="small" color="#27272a" />
@@ -61,7 +56,7 @@ export default function AdminScreen() {
     );
   }
 
-  if (!isAdmin || !adminProfile) return null;
+  if (access !== 'granted' || !adminProfile) return null;
 
   const items = suggestionsQuery.data?.items ?? [];
   const countsByStatus = (s: SuggestionStatus) => items.filter((i) => i.status === s).length;

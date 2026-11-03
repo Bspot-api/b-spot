@@ -1,25 +1,16 @@
-import { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  Image,
-  Platform,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { useState } from 'react';
+import { ActivityIndicator, FlatList, Image, Pressable, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomSheet } from '../../src/components/BottomSheet';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { confirmAction } from '../../src/components/confirm/confirmAction';
+import { useLocalSearchParams } from 'expo-router';
 import {
   useAdminSuggestions,
   useDeleteSuggestion,
   useUpdateSuggestionFields,
   useUpdateSuggestionStatus,
 } from '../../src/api/hooks';
-import { useAuth } from '../../src/features/auth/hooks/useAuth';
+import { useAdminGuard } from '../../src/features/auth/hooks/useAdminGuard';
 import type { BrandSuggestionDto, SuggestionStatus } from '../../src/api/types';
 
 const TABS: { status: SuggestionStatus; label: string }[] = [
@@ -49,29 +40,23 @@ function SuggestionItem({
   onEdit: (item: BrandSuggestionDto) => void;
 }) {
   function confirmReject() {
-    if (Platform.OS === 'web') {
-      if (window.confirm(`Rejeter la suggestion "${item.brandName}" ?`)) {
-        onAction(item.id, 'rejected');
-      }
-      return;
-    }
-    Alert.alert('Rejeter', `Rejeter la suggestion "${item.brandName}" ?`, [
-      { text: 'Annuler', style: 'cancel' },
-      { text: 'Rejeter', style: 'destructive', onPress: () => onAction(item.id, 'rejected') },
-    ]);
+    confirmAction({
+      title: 'Rejeter',
+      message: `Rejeter la suggestion "${item.brandName}" ?`,
+      confirmLabel: 'Rejeter',
+      destructive: true,
+      onConfirm: () => onAction(item.id, 'rejected'),
+    });
   }
 
   function confirmDelete() {
-    if (Platform.OS === 'web') {
-      if (window.confirm(`Supprimer définitivement "${item.brandName}" ?`)) {
-        onDelete(item.id);
-      }
-      return;
-    }
-    Alert.alert('Supprimer', `Supprimer définitivement "${item.brandName}" ?`, [
-      { text: 'Annuler', style: 'cancel' },
-      { text: 'Supprimer', style: 'destructive', onPress: () => onDelete(item.id) },
-    ]);
+    confirmAction({
+      title: 'Supprimer',
+      message: `Supprimer définitivement "${item.brandName}" ?`,
+      confirmLabel: 'Supprimer',
+      destructive: true,
+      onConfirm: () => onDelete(item.id),
+    });
   }
 
   return (
@@ -146,8 +131,7 @@ function SuggestionItem({
 }
 
 export default function SuggestionsScreen() {
-  const router = useRouter();
-  const { isAdmin, isLoading: authLoading } = useAuth();
+  const { access } = useAdminGuard();
   const params = useLocalSearchParams<{ status?: SuggestionStatus }>();
   const [activeStatus, setActiveStatus] = useState<SuggestionStatus>(params.status ?? 'new');
 
@@ -157,14 +141,13 @@ export default function SuggestionsScreen() {
   const [editBarcode, setEditBarcode] = useState('');
   const [editNotes, setEditNotes] = useState('');
 
-  const suggestionsQuery = useAdminSuggestions(activeStatus);
+  const suggestionsQuery = useAdminSuggestions({
+    status: activeStatus,
+    enabled: access === 'granted',
+  });
   const updateMutation = useUpdateSuggestionStatus();
   const deleteMutation = useDeleteSuggestion();
   const fieldsMutation = useUpdateSuggestionFields();
-
-  useEffect(() => {
-    if (!authLoading && !isAdmin) router.replace('/');
-  }, [isAdmin, authLoading, router]);
 
   function handleAction(id: number, status: SuggestionStatus) {
     updateMutation.mutate({ id, status });
@@ -198,7 +181,7 @@ export default function SuggestionsScreen() {
     );
   }
 
-  if (authLoading) {
+  if (access !== 'granted') {
     return (
       <View className="flex-1 items-center justify-center bg-zinc-50">
         <ActivityIndicator size="small" color="#27272a" />

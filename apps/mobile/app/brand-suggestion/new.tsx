@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -12,6 +11,26 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCreateBrandSuggestion } from '../../src/api/hooks';
+import { showFeedback } from '../../src/components/feedback/showFeedback';
+
+const FEEDBACK = {
+  missingBrand: {
+    title: 'Marque manquante',
+    message: 'Merci de renseigner le nom de la marque.',
+    type: 'warning',
+  },
+  sent: {
+    title: 'Merci !',
+    message:
+      'Ta contribution a bien été enregistrée. Elle nous aide à enrichir la base de marques.',
+    type: 'success',
+  },
+  failed: {
+    title: 'Erreur',
+    message: "Impossible d'envoyer la suggestion pour le moment. Réessaie dans un instant.",
+    type: 'error',
+  },
+} as const;
 
 function getParam(value: string | string[] | undefined): string | undefined {
   if (Array.isArray(value)) return value[0];
@@ -47,9 +66,14 @@ export default function BrandSuggestionScreen() {
     return 'Aide-nous à référencer cette marque. Les infos ci-dessous sont préremplies à partir du scan.';
   }, [existingSuggestionId]);
 
+  function leaveScreen() {
+    if (router.canGoBack()) router.back();
+    else router.replace('/');
+  }
+
   async function handleSubmit() {
     if (!brandName.trim()) {
-      Alert.alert('Marque manquante', 'Merci de renseigner le nom de la marque.');
+      showFeedback(FEEDBACK.missingBrand);
       return;
     }
 
@@ -62,17 +86,9 @@ export default function BrandSuggestionScreen() {
         offBrandRaw,
         notes: notes.trim() || undefined,
       });
-
-      Alert.alert(
-        'Merci !',
-        'Ta contribution a bien été enregistrée. Elle nous aide à enrichir la base de marques.',
-        [{ text: 'OK', onPress: () => router.back() }]
-      );
+      showFeedback({ ...FEEDBACK.sent, onDismiss: leaveScreen });
     } catch {
-      Alert.alert(
-        'Erreur',
-        "Impossible d'envoyer la suggestion pour le moment. Réessaie dans un instant."
-      );
+      showFeedback(FEEDBACK.failed);
     }
   }
 
