@@ -25,6 +25,7 @@ function SuggestionCounter({
   return (
     <Pressable
       onPress={() => router.push({ pathname: '/admin/suggestions', params: { status } })}
+      testID={`admin-counter-${status}`}
       className="flex-1 items-center rounded-xl border border-zinc-100 bg-zinc-50 py-3 active:opacity-75"
       accessibilityRole="button"
     >
@@ -69,9 +70,12 @@ export default function AdminScreen() {
     <View className="flex-1 bg-zinc-50 px-4 pt-6">
       <View className="rounded-2xl border border-zinc-200 bg-white p-4">
         <Text className="text-lg font-semibold text-zinc-900">{adminProfile.name}</Text>
-        <Text className="mt-1 text-sm text-zinc-500">{adminProfile.email}</Text>
+        <Text className="mt-1 text-sm text-zinc-500" testID="admin-profile-email">
+          {adminProfile.email}
+        </Text>
         <Pressable
           onPress={handleSignOut}
+          testID="admin-sign-out"
           className="mt-4 rounded-xl bg-zinc-100 px-4 py-3 active:opacity-75"
           accessibilityRole="button"
         >

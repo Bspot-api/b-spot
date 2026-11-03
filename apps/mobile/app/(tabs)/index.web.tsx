@@ -71,6 +71,7 @@ export default function WebSearchScreen() {
         <View className="flex-row rounded-xl bg-zinc-100 p-1 mb-5">
           <Pressable
             onPress={() => handleModeChange('barcode')}
+            testID="search-mode-barcode"
             className={`flex-1 rounded-lg py-2 items-center ${mode === 'barcode' ? 'bg-white shadow-sm' : ''}`}
             accessibilityRole="button"
           >
@@ -82,6 +83,7 @@ export default function WebSearchScreen() {
           </Pressable>
           <Pressable
             onPress={() => handleModeChange('brand')}
+            testID="search-mode-brand"
             className={`flex-1 rounded-lg py-2 items-center ${mode === 'brand' ? 'bg-white shadow-sm' : ''}`}
             accessibilityRole="button"
           >
@@ -110,6 +112,7 @@ export default function WebSearchScreen() {
           returnKeyType="search"
           editable={!isLoading}
           accessibilityLabel={mode === 'barcode' ? 'Code-barres du produit' : 'Nom de la marque'}
+          testID="search-input"
         />
 
         <Pressable
@@ -118,6 +121,7 @@ export default function WebSearchScreen() {
           className="rounded-xl bg-zinc-900 py-3 items-center active:opacity-80"
           accessibilityRole="button"
           accessibilityLabel="Rechercher"
+          testID="search-submit"
         >
           {isLoading ? (
             <ActivityIndicator color="#fff" />
@@ -127,7 +131,9 @@ export default function WebSearchScreen() {
         </Pressable>
 
         {displayError && (
-          <Text className="mt-3 text-sm text-red-600 text-center">{displayError}</Text>
+          <Text className="mt-3 text-sm text-red-600 text-center" testID="search-error">
+            {displayError}
+          </Text>
         )}
       </View>
 

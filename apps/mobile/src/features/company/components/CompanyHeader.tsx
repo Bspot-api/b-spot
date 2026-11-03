@@ -22,8 +22,12 @@ export function CompanyHeader({ company, onShare, productSource }: CompanyHeader
           <Text className="text-base font-semibold text-zinc-700">{initials || 'CO'}</Text>
         </View>
         <View className="flex-1">
-          <Text className="text-lg font-bold text-zinc-900">{company.legalName}</Text>
-          <Text className="mt-1 text-sm text-zinc-500">SIREN {company.siren}</Text>
+          <Text className="text-lg font-bold text-zinc-900" testID="company-legal-name">
+            {company.legalName}
+          </Text>
+          <Text className="mt-1 text-sm text-zinc-500" testID="company-siren">
+            SIREN {company.siren}
+          </Text>
         </View>
       </View>
 
@@ -36,7 +40,10 @@ export function CompanyHeader({ company, onShare, productSource }: CompanyHeader
           </View>
           {productSource && (
             <View className="rounded-full bg-emerald-100 px-3 py-2">
-              <Text className="text-xs font-medium text-emerald-800">
+              <Text
+                className="text-xs font-medium text-emerald-800"
+                testID="company-product-source"
+              >
                 {isBeautySource(productSource) ? 'Produit cosmetique' : 'Produit alimentaire'}
               </Text>
             </View>

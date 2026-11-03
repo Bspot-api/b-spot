@@ -11,11 +11,11 @@ export default function WebLayout() {
         <Text style={styles.logo}>B-Spot</Text>
         <View style={styles.navRight}>
           {isAdmin && (
-            <Pressable onPress={() => router.push('/admin')}>
+            <Pressable onPress={() => router.push('/admin')} testID="nav-admin-link">
               <Text style={styles.navLink}>Admin</Text>
             </Pressable>
           )}
-          <Pressable onPress={() => router.push('/login')}>
+          <Pressable onPress={() => router.push('/login')} testID="nav-login-link">
             <Text style={styles.navLink}>{session ? session.user.email : 'Se connecter'}</Text>
           </Pressable>
         </View>

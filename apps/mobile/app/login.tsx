@@ -39,7 +39,7 @@ export default function LoginScreen() {
 
   if (sent) {
     return (
-      <View className="flex-1 items-center justify-center bg-zinc-50 px-6">
+      <View className="flex-1 items-center justify-center bg-zinc-50 px-6" testID="login-sent">
         <OrbitDotLoader size={64} duration={1000} numDots={6} dotColor="#18181b" />
         <Text className="mt-8 text-2xl font-bold text-zinc-900">Vérifiez votre boîte mail</Text>
         <Text className="mt-3 text-center text-zinc-500">
@@ -59,6 +59,7 @@ export default function LoginScreen() {
       <TextInput
         value={email}
         onChangeText={setEmail}
+        testID="login-email-input"
         placeholder="votre@email.com"
         keyboardType="email-address"
         autoCapitalize="none"
@@ -69,6 +70,7 @@ export default function LoginScreen() {
       <Pressable
         onPress={handleSubmit}
         disabled={sendLink.isPending || !email.trim()}
+        testID="login-submit"
         className="mt-4 flex-row items-center justify-center rounded-xl bg-zinc-900 px-4 py-4 active:opacity-85"
         accessibilityRole="button"
       >
@@ -83,7 +85,7 @@ export default function LoginScreen() {
       </Pressable>
 
       {sendLink.isError && (
-        <Text className="mt-3 text-center text-red-500">
+        <Text className="mt-3 text-center text-red-500" testID="login-error">
           Impossible d'envoyer le lien. Vérifiez votre email et réessayez.
         </Text>
       )}

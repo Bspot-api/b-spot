@@ -13,6 +13,7 @@ export function ScanHistoryItem({ entry, onPress }: ScanHistoryItemProps) {
       className="rounded-2xl border border-zinc-200 bg-white px-4 py-3 active:opacity-75"
       accessibilityRole="button"
       accessibilityLabel={`${entry.productName} — ${entry.companyName}`}
+      testID="history-item"
     >
       <View className="flex-row items-start justify-between">
         <View className="flex-1 gap-0.5">

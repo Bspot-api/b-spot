@@ -17,6 +17,7 @@ export function ShareholdersList({ shareholders }: ShareholdersListProps) {
           {shareholders.map((shareholder, index) => (
             <View
               key={`${shareholder.name}-${shareholder.type}-${index}`}
+              testID="shareholder-item"
               className="rounded-xl border border-zinc-100 bg-zinc-50 p-3"
             >
               <View className="flex-row items-start justify-between gap-2">

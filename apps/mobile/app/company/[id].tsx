@@ -82,7 +82,7 @@ export default function CompanyDetailScreen() {
   if (!company) {
     return (
       <View className="flex-1 items-center justify-center bg-zinc-50 px-6">
-        <Text className="text-center text-lg font-semibold text-zinc-900">
+        <Text className="text-center text-lg font-semibold text-zinc-900" testID="company-error">
           Impossible de charger cette entreprise
         </Text>
         <Text className="mt-2 text-center text-sm text-zinc-600">

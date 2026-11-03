@@ -397,8 +397,8 @@ redirect. No hook in the app.
 - [x] `apps/e2e` package skeleton (package.json, tsconfig, eslint, root script, .gitignore)
 - [x] Fixture server + catalogue + environment check spec
 - [x] Orchestrator: docker, DB reset/seed/guard, web export, static server, Playwright webServers, teardown
-- [ ] Per-test reset + page-error guard + network guards
-- [ ] MailDev helper + login journey + login testIDs
+- [x] Per-test reset + page-error guard + network guards
+- [x] MailDev helper + login journey + login testIDs
 - [ ] Scan journey + testIDs
 - [ ] Brand search journey + testIDs
 - [ ] History journey + testIDs

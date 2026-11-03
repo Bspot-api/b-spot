@@ -75,7 +75,7 @@ function SuggestionItem({
   }
 
   return (
-    <View className="mb-3 rounded-2xl border border-zinc-200 bg-white p-4">
+    <View className="mb-3 rounded-2xl border border-zinc-200 bg-white p-4" testID="suggestion-card">
       <View className="flex-row items-start justify-between">
         <View className="flex-1">
           <Text className="font-semibold text-zinc-900">{item.brandName}</Text>
@@ -89,10 +89,20 @@ function SuggestionItem({
         </View>
         <View className="ml-3 items-end gap-2">
           <View className="flex-row gap-3">
-            <Pressable onPress={() => onEdit(item)} hitSlop={8} className="active:opacity-50">
+            <Pressable
+              onPress={() => onEdit(item)}
+              hitSlop={8}
+              className="active:opacity-50"
+              testID="suggestion-edit"
+            >
               <Ionicons name="create-outline" size={18} color="#a1a1aa" />
             </Pressable>
-            <Pressable onPress={confirmDelete} hitSlop={8} className="active:opacity-50">
+            <Pressable
+              onPress={confirmDelete}
+              hitSlop={8}
+              className="active:opacity-50"
+              testID="suggestion-delete"
+            >
               <Ionicons name="trash-outline" size={18} color="#ef4444" />
             </Pressable>
           </View>
@@ -106,6 +116,7 @@ function SuggestionItem({
         {item.status !== 'approved' && (
           <Pressable
             onPress={() => onAction(item.id, 'approved')}
+            testID="suggestion-approve"
             className="flex-1 rounded-lg bg-emerald-100 py-2 active:opacity-75"
           >
             <Text className="text-center text-xs font-medium text-emerald-700">Approuver</Text>
@@ -114,6 +125,7 @@ function SuggestionItem({
         {item.status !== 'reviewed' && item.status !== 'approved' && (
           <Pressable
             onPress={() => onAction(item.id, 'reviewed')}
+            testID="suggestion-review"
             className="flex-1 rounded-lg bg-zinc-100 py-2 active:opacity-75"
           >
             <Text className="text-center text-xs font-medium text-zinc-600">En révision</Text>
@@ -122,6 +134,7 @@ function SuggestionItem({
         {item.status !== 'rejected' && (
           <Pressable
             onPress={confirmReject}
+            testID="suggestion-reject"
             className="flex-1 rounded-lg bg-red-100 py-2 active:opacity-75"
           >
             <Text className="text-center text-xs font-medium text-red-600">Rejeter</Text>
@@ -200,6 +213,7 @@ export default function SuggestionsScreen() {
           <Pressable
             key={tab.status}
             onPress={() => setActiveStatus(tab.status)}
+            testID={`suggestions-tab-${tab.status}`}
             className="flex-1 py-3 active:opacity-75"
           >
             <Text
@@ -243,14 +257,18 @@ export default function SuggestionsScreen() {
             />
           )}
           ListEmptyComponent={
-            <View className="flex-1 items-center justify-center py-12">
+            <View className="flex-1 items-center justify-center py-12" testID="suggestions-empty">
               <Text className="text-zinc-400">Aucune suggestion dans cette catégorie.</Text>
             </View>
           }
         />
       )}
 
-      <BottomSheet isPresented={editItem !== null} onDismiss={() => setEditItem(null)}>
+      <BottomSheet
+        isPresented={editItem !== null}
+        onDismiss={() => setEditItem(null)}
+        testID="suggestion-edit-sheet"
+      >
         <View style={{ padding: 20, gap: 16 }}>
           <Text style={{ fontSize: 17, fontWeight: '600', color: '#18181b' }}>
             Modifier la suggestion
@@ -261,6 +279,7 @@ export default function SuggestionsScreen() {
             <TextInput
               value={editBrandName}
               onChangeText={setEditBrandName}
+              testID="suggestion-edit-brand-input"
               style={inputStyle}
               placeholder="Nom de la marque"
               placeholderTextColor="#a1a1aa"
@@ -311,6 +330,7 @@ export default function SuggestionsScreen() {
             </Pressable>
             <Pressable
               onPress={handleEditSave}
+              testID="suggestion-edit-save"
               disabled={fieldsMutation.isPending}
               style={({ pressed }) => [saveButtonStyle, pressed && { opacity: 0.7 }]}
             >

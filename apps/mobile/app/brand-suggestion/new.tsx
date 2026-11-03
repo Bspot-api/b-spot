@@ -92,6 +92,7 @@ export default function BrandSuggestionScreen() {
           <TextInput
             value={brandName}
             onChangeText={setBrandName}
+            testID="suggestion-brand-input"
             placeholder="Ex: Cristaline"
             className="mt-2 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-3 text-zinc-900"
             autoCapitalize="words"
@@ -109,6 +110,7 @@ export default function BrandSuggestionScreen() {
           <TextInput
             value={notes}
             onChangeText={setNotes}
+            testID="suggestion-notes-input"
             placeholder="Ex: vu en rayon eaux / pack de 6 bouteilles..."
             multiline
             textAlignVertical="top"
@@ -119,6 +121,7 @@ export default function BrandSuggestionScreen() {
         <Pressable
           onPress={handleSubmit}
           disabled={createSuggestion.isPending}
+          testID="suggestion-submit"
           className="mt-5 flex-row items-center justify-center rounded-xl bg-zinc-900 px-4 py-4 active:opacity-85"
           accessibilityRole="button"
         >
