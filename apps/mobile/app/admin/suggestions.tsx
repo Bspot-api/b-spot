@@ -1,17 +1,8 @@
 import { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  Image,
-  Platform,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { ActivityIndicator, FlatList, Image, Pressable, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomSheet } from '../../src/components/BottomSheet';
+import { confirmAction } from '../../src/components/confirm/confirmAction';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   useAdminSuggestions,
@@ -49,29 +40,23 @@ function SuggestionItem({
   onEdit: (item: BrandSuggestionDto) => void;
 }) {
   function confirmReject() {
-    if (Platform.OS === 'web') {
-      if (window.confirm(`Rejeter la suggestion "${item.brandName}" ?`)) {
-        onAction(item.id, 'rejected');
-      }
-      return;
-    }
-    Alert.alert('Rejeter', `Rejeter la suggestion "${item.brandName}" ?`, [
-      { text: 'Annuler', style: 'cancel' },
-      { text: 'Rejeter', style: 'destructive', onPress: () => onAction(item.id, 'rejected') },
-    ]);
+    confirmAction({
+      title: 'Rejeter',
+      message: `Rejeter la suggestion "${item.brandName}" ?`,
+      confirmLabel: 'Rejeter',
+      destructive: true,
+      onConfirm: () => onAction(item.id, 'rejected'),
+    });
   }
 
   function confirmDelete() {
-    if (Platform.OS === 'web') {
-      if (window.confirm(`Supprimer définitivement "${item.brandName}" ?`)) {
-        onDelete(item.id);
-      }
-      return;
-    }
-    Alert.alert('Supprimer', `Supprimer définitivement "${item.brandName}" ?`, [
-      { text: 'Annuler', style: 'cancel' },
-      { text: 'Supprimer', style: 'destructive', onPress: () => onDelete(item.id) },
-    ]);
+    confirmAction({
+      title: 'Supprimer',
+      message: `Supprimer définitivement "${item.brandName}" ?`,
+      confirmLabel: 'Supprimer',
+      destructive: true,
+      onConfirm: () => onDelete(item.id),
+    });
   }
 
   return (
