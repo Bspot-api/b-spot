@@ -1,28 +1,24 @@
 import { useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, Text, TextInput, View } from 'react-native';
-import { BottomSheet } from '../../src/components/BottomSheet';
+import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import {
   useAdminSuggestions,
   useDeleteSuggestion,
-  useUpdateSuggestionFields,
   useUpdateSuggestionStatus,
 } from '../../src/api/hooks';
 import { SuggestionCard } from '../../src/features/admin/components/SuggestionCard';
+import { SuggestionEditSheet } from '../../src/features/admin/components/SuggestionEditSheet';
 import { SuggestionStatusTabs } from '../../src/features/admin/components/SuggestionStatusTabs';
+import { useSuggestionEditor } from '../../src/features/admin/hooks/useSuggestionEditor';
 import { useAdminGuard } from '../../src/features/auth/hooks/useAdminGuard';
-import type { BrandSuggestionDto, SuggestionStatus } from '../../src/api/types';
+import type { SuggestionStatus } from '../../src/api/types';
 
 export default function SuggestionsScreen() {
   const { access } = useAdminGuard();
   const params = useLocalSearchParams<{ status?: SuggestionStatus }>();
   const [activeStatus, setActiveStatus] = useState<SuggestionStatus>(params.status ?? 'new');
 
-  const [editItem, setEditItem] = useState<BrandSuggestionDto | null>(null);
-  const [editBrandName, setEditBrandName] = useState('');
-  const [editProductName, setEditProductName] = useState('');
-  const [editBarcode, setEditBarcode] = useState('');
-  const [editNotes, setEditNotes] = useState('');
+  const editor = useSuggestionEditor();
 
   const suggestionsQuery = useAdminSuggestions({
     status: activeStatus,
@@ -30,7 +26,6 @@ export default function SuggestionsScreen() {
   });
   const updateMutation = useUpdateSuggestionStatus();
   const deleteMutation = useDeleteSuggestion();
-  const fieldsMutation = useUpdateSuggestionFields();
 
   function handleAction(id: number, status: SuggestionStatus) {
     updateMutation.mutate({ id, status });
@@ -38,30 +33,6 @@ export default function SuggestionsScreen() {
 
   function handleDelete(id: number) {
     deleteMutation.mutate(id);
-  }
-
-  function handleEdit(item: BrandSuggestionDto) {
-    setEditItem(item);
-    setEditBrandName(item.brandName);
-    setEditProductName(item.productName ?? '');
-    setEditBarcode(item.barcode ?? '');
-    setEditNotes(item.notes ?? '');
-  }
-
-  function handleEditSave() {
-    if (!editItem) return;
-    fieldsMutation.mutate(
-      {
-        id: editItem.id,
-        fields: {
-          brandName: editBrandName.trim() || editItem.brandName,
-          productName: editProductName,
-          barcode: editBarcode,
-          notes: editNotes,
-        },
-      },
-      { onSuccess: () => setEditItem(null) }
-    );
   }
 
   if (access !== 'granted') {
@@ -101,7 +72,7 @@ export default function SuggestionsScreen() {
               item={item}
               onAction={handleAction}
               onDelete={handleDelete}
-              onEdit={handleEdit}
+              onEdit={editor.startEdit}
             />
           )}
           ListEmptyComponent={
@@ -112,113 +83,14 @@ export default function SuggestionsScreen() {
         />
       )}
 
-      <BottomSheet
-        isPresented={editItem !== null}
-        onDismiss={() => setEditItem(null)}
-        testID="suggestion-edit-sheet"
-      >
-        <View style={{ padding: 20, gap: 16 }}>
-          <Text style={{ fontSize: 17, fontWeight: '600', color: '#18181b' }}>
-            Modifier la suggestion
-          </Text>
-
-          <View style={{ gap: 4 }}>
-            <Text style={{ fontSize: 12, color: '#71717a', fontWeight: '500' }}>Marque *</Text>
-            <TextInput
-              value={editBrandName}
-              onChangeText={setEditBrandName}
-              testID="suggestion-edit-brand-input"
-              style={inputStyle}
-              placeholder="Nom de la marque"
-              placeholderTextColor="#a1a1aa"
-            />
-          </View>
-
-          <View style={{ gap: 4 }}>
-            <Text style={{ fontSize: 12, color: '#71717a', fontWeight: '500' }}>Produit</Text>
-            <TextInput
-              value={editProductName}
-              onChangeText={setEditProductName}
-              style={inputStyle}
-              placeholder="Nom du produit"
-              placeholderTextColor="#a1a1aa"
-            />
-          </View>
-
-          <View style={{ gap: 4 }}>
-            <Text style={{ fontSize: 12, color: '#71717a', fontWeight: '500' }}>Code-barre</Text>
-            <TextInput
-              value={editBarcode}
-              onChangeText={setEditBarcode}
-              style={inputStyle}
-              placeholder="EAN"
-              placeholderTextColor="#a1a1aa"
-              keyboardType="numeric"
-            />
-          </View>
-
-          <View style={{ gap: 4 }}>
-            <Text style={{ fontSize: 12, color: '#71717a', fontWeight: '500' }}>Notes</Text>
-            <TextInput
-              value={editNotes}
-              onChangeText={setEditNotes}
-              style={[inputStyle, { minHeight: 72, textAlignVertical: 'top' }]}
-              placeholder="Notes internes"
-              placeholderTextColor="#a1a1aa"
-              multiline
-            />
-          </View>
-
-          <View style={{ flexDirection: 'row', gap: 12, marginTop: 4 }}>
-            <Pressable
-              onPress={() => setEditItem(null)}
-              style={({ pressed }) => [cancelButtonStyle, pressed && { opacity: 0.7 }]}
-            >
-              <Text style={{ color: '#71717a', fontWeight: '500', fontSize: 15 }}>Annuler</Text>
-            </Pressable>
-            <Pressable
-              onPress={handleEditSave}
-              testID="suggestion-edit-save"
-              disabled={fieldsMutation.isPending}
-              style={({ pressed }) => [saveButtonStyle, pressed && { opacity: 0.7 }]}
-            >
-              {fieldsMutation.isPending ? (
-                <ActivityIndicator size="small" color="#fff" />
-              ) : (
-                <Text style={{ color: '#fff', fontWeight: '600', fontSize: 15 }}>Enregistrer</Text>
-              )}
-            </Pressable>
-          </View>
-        </View>
-      </BottomSheet>
+      <SuggestionEditSheet
+        isPresented={editor.isOpen}
+        draft={editor.draft}
+        isSaving={editor.isSaving}
+        onChangeDraft={editor.changeDraft}
+        onDismiss={editor.cancelEdit}
+        onSave={editor.saveEdit}
+      />
     </View>
   );
 }
-
-const inputStyle = {
-  borderWidth: 1,
-  borderColor: '#e4e4e7',
-  borderRadius: 10,
-  paddingHorizontal: 12,
-  paddingVertical: 10,
-  fontSize: 15,
-  color: '#18181b',
-  backgroundColor: '#fafafa',
-};
-
-const cancelButtonStyle = {
-  flex: 1,
-  borderWidth: 1,
-  borderColor: '#e4e4e7',
-  borderRadius: 12,
-  paddingVertical: 13,
-  alignItems: 'center' as const,
-};
-
-const saveButtonStyle = {
-  flex: 1,
-  backgroundColor: '#18181b',
-  borderRadius: 12,
-  paddingVertical: 13,
-  alignItems: 'center' as const,
-};
