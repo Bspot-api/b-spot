@@ -24,12 +24,12 @@ export function useSuggestionEditor(): SuggestionEditor {
   const [draft, setDraft] = useState<SuggestionDraft>(EMPTY_DRAFT);
   const fieldsMutation = useUpdateSuggestionFields();
 
-  function startEdit(item: BrandSuggestionDto) {
+  function startEdit(item: BrandSuggestionDto): void {
     setEditItem(item);
     setDraft(toSuggestionDraft(item));
   }
 
-  function saveEdit() {
+  function saveEdit(): void {
     if (!editItem) return;
     fieldsMutation.mutate(
       { id: editItem.id, fields: toSuggestionFields({ draft, item: editItem }) },

@@ -58,7 +58,7 @@ export function SuggestionEditSheet({
         <View style={{ flexDirection: 'row', gap: 12, marginTop: 4 }}>
           <Pressable
             onPress={onDismiss}
-            style={({ pressed }) => [cancelButtonStyle, pressed && { opacity: 0.7 }]}
+            style={({ pressed }) => [CANCEL_BUTTON_STYLE, pressed && { opacity: 0.7 }]}
           >
             <Text style={{ color: '#71717a', fontWeight: '500', fontSize: 15 }}>Annuler</Text>
           </Pressable>
@@ -66,7 +66,7 @@ export function SuggestionEditSheet({
             onPress={onSave}
             testID="suggestion-edit-save"
             disabled={isSaving}
-            style={({ pressed }) => [saveButtonStyle, pressed && { opacity: 0.7 }]}
+            style={({ pressed }) => [SAVE_BUTTON_STYLE, pressed && { opacity: 0.7 }]}
           >
             {isSaving ? (
               <ActivityIndicator size="small" color="#fff" />
@@ -96,7 +96,7 @@ function DraftField({ label, multiline, ...inputProps }: DraftFieldProps) {
       <Text style={{ fontSize: 12, color: '#71717a', fontWeight: '500' }}>{label}</Text>
       <TextInput
         {...inputProps}
-        style={multiline ? [inputStyle, { minHeight: 72, textAlignVertical: 'top' }] : inputStyle}
+        style={multiline ? [INPUT_STYLE, { minHeight: 72, textAlignVertical: 'top' }] : INPUT_STYLE}
         placeholderTextColor="#a1a1aa"
         multiline={multiline}
       />
@@ -104,7 +104,7 @@ function DraftField({ label, multiline, ...inputProps }: DraftFieldProps) {
   );
 }
 
-const inputStyle = {
+const INPUT_STYLE = {
   borderWidth: 1,
   borderColor: '#e4e4e7',
   borderRadius: 10,
@@ -115,7 +115,7 @@ const inputStyle = {
   backgroundColor: '#fafafa',
 };
 
-const cancelButtonStyle = {
+const CANCEL_BUTTON_STYLE = {
   flex: 1,
   borderWidth: 1,
   borderColor: '#e4e4e7',
@@ -124,7 +124,7 @@ const cancelButtonStyle = {
   alignItems: 'center' as const,
 };
 
-const saveButtonStyle = {
+const SAVE_BUTTON_STYLE = {
   flex: 1,
   backgroundColor: '#18181b',
   borderRadius: 12,
