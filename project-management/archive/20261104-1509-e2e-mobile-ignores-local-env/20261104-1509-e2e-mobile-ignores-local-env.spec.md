@@ -1,6 +1,6 @@
 # `pnpm e2e:mobile` ignores the developer's local `.env`
 
-**Status:** in-progress
+**Status:** done
 
 ---
 
@@ -42,19 +42,19 @@ says the process env wins over `.env`, is wrong.
 
 ## Acceptance Criteria
 
-- [ ] **local-env-ignored** — with an `apps/mobile/.env` setting
+- [x] **local-env-ignored** — with an `apps/mobile/.env` setting
   `EXPO_PUBLIC_API_URL` to another URL, `pnpm e2e:mobile` passes 4/4, twice
   in a row.
-- [ ] **developer-files-untouched** — the run never moves, edits or deletes
+- [x] **developer-files-untouched** — the run never moves, edits or deletes
   a developer's `apps/mobile/.env*` file, even when it is killed mid-run.
   Anything the run creates is removed at the end and is gitignored.
-- [ ] **without-env-still-passes** — with no `apps/mobile/.env`,
+- [x] **without-env-still-passes** — with no `apps/mobile/.env`,
   `pnpm e2e:mobile` passes 4/4.
-- [ ] **regression-guard** — a failing check names the cause if the bundle
+- [x] **regression-guard** — a failing check names the cause if the bundle
   ever carries a different API URL than the e2e one (for example a
   preflight on the served bundle, or a flow-level assertion with a clear
   message).
-- [ ] **suite-green** — `pnpm lint`, `pnpm test`, `pnpm build` and
+- [x] **suite-green** — `pnpm lint`, `pnpm test`, `pnpm build` and
   `pnpm e2e:web` pass.
 
 ## Seams
@@ -82,3 +82,15 @@ says the process env wins over `.env`, is wrong.
 - 2026-11-04, Architect: the human chose to fix this as its own task,
   rather than moving the developer's `.env` aside during the run or
   documenting the limitation.
+- 2026-11-04, Crewmate (close): every criterion is met. The evidence is
+  in the worklog of the work document.
+  - `local-env-ignored`: three 4/4 runs with a 3001 `.env`, two before the
+    review and one after its fixes.
+  - `developer-files-untouched`: identical checksums across two SIGINT
+    runs. The run creates no file; orphaned processes on kill predate this
+    task and are reported.
+  - `without-env-still-passes`: one 4/4 run.
+  - `regression-guard`: the red preflight run named the cause.
+  - `suite-green`: lint, test and build passed, and `e2e:web` passed 25.
+  - The human should confirm the undocumented hook (see "Rulings" in the
+    work document).

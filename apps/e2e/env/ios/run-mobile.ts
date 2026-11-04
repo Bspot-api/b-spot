@@ -10,6 +10,7 @@ import path from 'node:path';
 import { E2E_ROOT, MAESTRO_RESULTS_DIR, MAESTRO_ROOT } from '../e2e-env';
 import { withE2eEnvironment } from '../environment';
 import { runCommandForExitCode } from '../process';
+import { assertBundleUsesApiUrl } from './bundle-preflight';
 import { startControlServer } from './control-server';
 import { buildMaestroEnv } from './maestro-env';
 import { startMetro } from './metro';
@@ -36,6 +37,7 @@ function runMaestro(udid: string): Promise<number> {
 async function runFlows(udid: string): Promise<number> {
   const metro = await startMetro();
   try {
+    await assertBundleUsesApiUrl();
     const control = await startControlServer(udid);
     try {
       return await runMaestro(udid);
