@@ -124,17 +124,47 @@ first and releases it at the end, failure included. Logs go to
 
 - 2026-11-04, Crewmate: plan written; `pnpm install` run in the worktree.
   No code yet.
+- 2026-11-04, Crewmate: coded in the plan's order.
+  - The contract check went red first (`PRODUCT_SOURCES is not iterable`).
+    The web label tests did not run in that run, because the `web` project
+    depends on `environment`.
+  - With the mobile edits stashed, `--project=web --no-deps -g
+    "cosmetic|food"` showed the expected red. The two cosmetic tests (scan
+    page and history) failed on `toHaveText`, and the food test passed.
+  - After the five mobile edits:
+    - `pnpm test`: mobile 23/23, API 89/89.
+    - `pnpm build`: green.
+    - `pnpm e2e:web`: 25/25, twice in a row.
+  - Mobile `tsc --noEmit` shows 93 errors before and after the change. All
+    of them are missing jest globals in `__tests__` files, so they predate
+    this task.
+  - Mobile eslint on the touched files fails on line 1 of each file:
+    "Definition for rule '@typescript-eslint/no-empty-object-type' was not
+    found". This is the ESLint-deps debt that the lint-repair task owns.
+  - e2e eslint on the touched files: green.
+  - Commit bf004c5.
+- 2026-11-04, Crewmate, environment finding: from a git worktree,
+  `pnpm e2e:web` fails at `docker compose up`.
+  - Cause: compose derives its project name from the directory
+    (`b-spot-product-source`). It does not see the running `b-spot`
+    containers, tries to create its own, and collides on the container
+    names `b-spot-maildev` / `b-spot-postgres`.
+  - Workaround: run with `COMPOSE_PROJECT_NAME=b-spot`.
+  - I removed the network and volume the failed run had created; the
+    Architect's containers were never touched.
+  - Not fixed here: the fix belongs to `apps/e2e/env/docker.ts`, outside
+    this task's scope.
 
 ## Implementation Checkboxes
 
-- [ ] Contract check `apps/e2e/checks/api-contract.spec.ts` written, red
-- [ ] Cosmetic test un-fixmed, food assertion and history test added, red
-- [ ] `apps/mobile/src/api/types.ts`: `PRODUCT_SOURCES`, short-form `ProductSource`
-- [ ] `useBarcodeScanner`: mapping removed
-- [ ] `history/types.ts`, `CompanyHeader`, `company/[id].tsx` typed `ProductSource`
-- [ ] Mobile `tsc --noEmit`, `pnpm test` green
-- [ ] `pnpm e2e:web` green (under the lock)
-- [ ] Lint on the touched packages, diff kept narrow
+- [x] Contract check `apps/e2e/checks/api-contract.spec.ts` written, red
+- [x] Cosmetic test un-fixmed, food assertion and history test added, red
+- [x] `apps/mobile/src/api/types.ts`: `PRODUCT_SOURCES`, short-form `ProductSource`
+- [x] `useBarcodeScanner`: mapping removed
+- [x] `history/types.ts`, `CompanyHeader`, `company/[id].tsx` typed `ProductSource`
+- [x] Mobile `tsc --noEmit` (no new error), `pnpm test` green
+- [x] `pnpm e2e:web` green (under the lock)
+- [x] Lint on the touched files: e2e green; mobile red on the pre-existing ESLint config debt only
 - [ ] `code-review` run, findings recorded
 - [ ] Close: criteria ticked, journal entry, archive, retro
 
