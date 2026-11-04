@@ -5,6 +5,31 @@ task — never generated.
 
 ## 2026-11-04
 
+- e2e mobile ignores the local `.env` (`fix/e2e-mobile-local-env`):
+  `pnpm e2e:mobile` now passes 4/4 even when the developer has an
+  `apps/mobile/.env*` with another `EXPO_PUBLIC_API_URL`.
+  - **Cause.** In development, Expo 54 bundles `apps/mobile/.env*` as
+    modules: `@expo/metro-config`'s transform worker lists them with
+    `require.context`. Their values win over Metro's process env, which
+    goes against Expo's documented precedence. `EXPO_NO_DOTENV` does not
+    reach this path. Slice 02's comment, which said the process env wins,
+    was wrong.
+  - **Fix.** The e2e Metro sets `B_SPOT_E2E_IGNORE_DOTENV_FILES=1`.
+    `apps/mobile/metro.config.js` then adds `apps/mobile/.env*` to
+    `resolver.blockList`, so they never enter Metro's file map. This
+    relies on Expo internals. The e2e Metro also sets `EXPO_NO_DOTENV=1`.
+    No developer file is moved or written.
+  - **Guard.** A preflight reads the bundle the dev build loads, and fails
+    before any flow when it carries another API URL, or none. Its parser
+    is unit-tested (`apps/e2e` now has a `test` script, `tsx --test`).
+  - **Open.**
+    - The human should confirm the undocumented hook over the documented
+      `--no-dev`, which would change what runs under test.
+    - A killed `pnpm e2e:mobile` leaves Metro, the API and the fixture
+      server running. This predates the task: no signal handler, and
+      detached process groups.
+  - Documents: `project-management/archive/20261104-1509-e2e-mobile-ignores-local-env/`.
+
 - Product source label (`fix/product-source-label`): cosmetics are now
   labelled "Produit cosmetique" on their company page.
   - The app now uses the API's `'OFF' | 'OBF'` source values. Before, the

@@ -229,6 +229,20 @@ The worktree's `apps/mobile/.env` held `EXPO_PUBLIC_API_URL=http://localhost:300
   - **Gates.** `pnpm lint` 0, `pnpm test` 0 (the `apps/e2e` suite passes
     6/6), `pnpm build` 0, `pnpm e2e:web` 25 passed. README sentence added.
 
+- 2026-11-04 (review and close) — `code-review` ran; its findings and
+  answers are below.
+  - **Review fixes:** a verb name, a type guard, the constant in the
+    message, and Arrange-Act-Assert tests. `pnpm lint` and `pnpm test`
+    then passed.
+  - **Dev build.** Before the confirmation run, `com.bspot.mobile.dev` was
+    no longer installed on the simulator; the cause is unknown, and maybe
+    a session outside this worktree. It was reinstalled with
+    `APP_VARIANT=development expo run:ios --no-bundler`, as the brief
+    allows.
+  - **Confirmation run**, 3001 `.env`: 4/4 in 2m 6s, with the preflight
+    logging 3101 (`run8-after-review-env.log`).
+  - The worktree's reproduction `.env` was removed.
+
 ## Implementation Checkboxes
 
 - [x] Pure guard `bundle-api-url.ts` + its test, test script in `apps/e2e`
@@ -274,4 +288,65 @@ The worktree's `apps/mobile/.env` held `EXPO_PUBLIC_API_URL=http://localhost:300
 
 ## Diff-Review Findings
 
-_(after `code-review`)_
+`code-review` was run on `577a2de...HEAD` (four commits), with two fresh
+reviewers.
+
+### Standards
+
+- **`asReadableBundleUrl` did not start with a verb** (the
+  function-naming rule of `docs/agent-rules/common.md`). Fixed: renamed
+  `stripBytecodeParam`.
+- **Test variables were not named `inputX`/`actualX` and the tests were
+  not Arrange-Act-Assert** (the Testing rules of `common.md`). Fixed:
+  `bundle-api-url.test.ts` now uses `input…`/`actual…` names and
+  separates arrange, act and assert.
+- **The mismatch message hardcoded `B_SPOT_E2E_IGNORE_DOTENV_FILES`**
+  (explicit constants, "Code Quality Standards" of `CLAUDE.md`). Fixed:
+  it interpolates `IGNORE_DOTENV_FILES_VARIABLE`.
+- **The manifest was cast with `as ExpoManifest` without a guard**
+  (Type Safety First in `docs/constitution.md`). Fixed:
+  `extractLaunchAssetUrl(manifest: unknown)` narrows each level.
+- **The commit subjects are statements, not imperatives**
+  (`docs/agent-rules/git-workflow.md`). Answered: they follow the branch's
+  existing style, such as the spec commit, and history is not rewritten.
+- **`assertBundleUsesApiUrl` has no unit test** (`common.md`). Answered:
+  it is network glue whose pure parts are tested. Its red and green are
+  proven by real runs: the red preflight run, and the green runs that log
+  `bundle uses …3101`.
+- **The gate name and its value `'1'` live in three places** (possible
+  Shotgun Surgery). Answered: `metro.config.js` is in the mobile package
+  and cannot import from `apps/e2e`, so its literal is documented beside
+  the e2e constant. The e2e side uses one constant.
+- **The message in the pure module names the Metro config** (possible
+  Feature Envy). Answered: kept on purpose. The message is the guard's
+  whole value; it must name the cause and the fix.
+- **The preflight also warms the bundle** (possible Divergent Change).
+  Answered: that is a side effect of reading the bundle, not a second
+  responsibility. Nothing in the code warms it on purpose.
+
+### Spec
+
+- **The spec prefers a documented mechanism, and `--no-dev` is one; the
+  fix relies on an undocumented hook** ("Prefer a mechanism Expo
+  documents… If only an undocumented hook works, the plan says so and
+  why"). Answered: the Architect ruled on it (see the Rulings section,
+  blockList rather than `--no-dev`). `--no-dev` works for the env but
+  changes what runs under test. **For the human to confirm at the PR**,
+  or the spec line can be amended.
+- **A killed run leaves Metro, the API and the fixture server running**
+  (`developer-files-untouched`: "Anything the run creates is removed at
+  the end"). Answered: the run creates no file, so the criterion is met
+  as written. Orphaned processes already existed before this task (no
+  signal handler in `run-mobile.ts`; detached process groups in
+  `spawnService`). Reported as its own follow-up.
+- **`EXPO_NO_DOTENV=1` is not asked for by the spec.** Answered: the
+  Architect ruled it in, for a run that does not depend on the
+  developer's machine.
+- **The preflight reads the launch bundle without `transform.bytecode`,
+  a sibling of what the device loads.** Answered: env resolution does not
+  depend on that parameter, and the red run proves the guard catches the
+  real case.
+- **Only the API URL is guarded.** Answered: that is what
+  `regression-guard` asks for.
+
+After the fixes: `apps/e2e` lint is clean and the tests pass 6/6.
