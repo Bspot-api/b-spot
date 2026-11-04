@@ -45,7 +45,7 @@ Types: `feat/`, `fix/`, `docs/`, `refactor/`, `test/`, `chore/`
 
 2. **Quality checks**:
    ```bash
-   pnpm lint && pnpm test && pnpm build
+   pnpm lint && pnpm typecheck && pnpm test && pnpm build
    ```
 
 ⛔ Fix failures before creating PR.

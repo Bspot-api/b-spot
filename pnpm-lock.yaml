@@ -304,6 +304,9 @@ importers:
       '@babel/core':
         specifier: ^7.23.6
         version: 7.28.6
+      '@types/jest':
+        specifier: ^29.5.14
+        version: 29.5.14
       '@types/react':
         specifier: ~19.1.0
         version: 19.1.17
