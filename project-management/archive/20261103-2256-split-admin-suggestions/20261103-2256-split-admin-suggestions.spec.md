@@ -9,7 +9,7 @@
 ## Context
 
 `apps/mobile/app/admin/suggestions.tsx` is over the 300-line file limit of
-`CLAUDE.md` ("Code Quality Standards"): 336 lines after the web UX fixes. It
+`CLAUDE.md` ("Code Quality Standards"): 336 lines after the web UX fixes (359 when the task started, on 2026-11-04). It
 holds the screen, the list item and the edit BottomSheet.
 
 ## Scope
@@ -34,6 +34,10 @@ holds the screen, the list item and the edit BottomSheet.
   identical before and after.
 - [x] **suite-green** — `pnpm test` and `pnpm build` pass. Both exit 0
   after the review fixes (mobile 27 tests, API 110); `pnpm lint` exit 0.
+
+- (added 2026-11-04, Architect ruling) Also extracted, as pure moves:
+  the status tabs, the edit state as a `useSuggestionEditor` hook, and two
+  draft helpers (`suggestion-draft.ts`) with a unit test.
 
 ## Seams
 
