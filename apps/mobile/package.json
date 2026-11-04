@@ -16,6 +16,7 @@
     "build": "expo export",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "typecheck": "tsc --noEmit",
     "test": "jest",
     "generate:types": "openapi-typescript http://localhost:3001/api-json -o ./src/api/generated.ts",
     "clean": "rm -rf .expo node_modules",
