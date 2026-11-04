@@ -18,7 +18,7 @@ The app adopts the API's short form `'OFF' | 'OBF'`. The API is not touched.
   `product.service.ts` mapping, its specs, `scan-flow.e2e-spec.ts` and the
   `ScanHistoryItemDto` of `apps/api/src/modules/scan/dto/scan-history.dto.ts`
   (which already declares `enum: ['OFF', 'OBF']`).
-- The app already speaks the short form everywhere but one place: history
+- Most of the app already speaks the short form: history
   entries on devices (`ScanHistoryEntry.productSource` in
   `apps/mobile/src/features/history/types.ts`), the history screen's
   navigation params, and `CompanyHeader`, which already accepts `'OBF'`.
@@ -165,7 +165,7 @@ first and releases it at the end, failure included. Logs go to
 - [x] Mobile `tsc --noEmit` (no new error), `pnpm test` green
 - [x] `pnpm e2e:web` green (under the lock)
 - [x] Lint on the touched files: e2e green; mobile red on the pre-existing ESLint config debt only
-- [ ] `code-review` run, findings recorded
+- [x] `code-review` run, findings recorded
 - [ ] Close: criteria ticked, journal entry, archive, retro
 
 ## Notes & Snippets
@@ -197,4 +197,51 @@ first and releases it at the end, failure included. Logs go to
 
 ## Diff-Review Findings
 
-_(none yet)_
+`code-review` run on 2026-11-04, on the diff since fcccaf7 (plan approval).
+Fixes landed in the review-fix commit; `pnpm e2e:web` was green again
+afterwards (25/25).
+
+### Standards
+
+- **Duplicated hardcoded labels in the e2e specs** (`git-workflow.md`
+  § Before PR, "No hardcoded strings"). Fixed. A new
+  `apps/e2e/support/product-source-labels.ts` holds
+  `PRODUCT_SOURCE_LABELS`, which `scan.spec.ts` and `history.spec.ts` use.
+- **Test variable naming** (`common.md` § Testing, `expectedX` /
+  `actualX`). Fixed in `checks/api-contract.spec.ts`.
+- **Order-dependent enum comparison.** Fixed: both sides are sorted, so
+  the check compares sets.
+- **Commit subject of the source fix not imperative** (`git-workflow.md`
+  § Commit Convention). Answered: noted. The commit stays as is, because
+  rewriting a commit the Architect may already have read costs more than
+  the wording. Later commits use the imperative.
+- **Route param cast to `ProductSource` without a check**
+  (`company/[id].tsx`). Answered: out of scope, as the program design says
+  under "Files and changes". The cast existed before, and an unknown value
+  still reads as food.
+- **`isBeautySource` compares with a bare `'OBF'`.** Answered: the literal
+  is type-checked against `ProductSource`, and a constant would add nothing.
+- **`productSource` local in `useBarcodeScanner` looks like a Middle Man.**
+  Answered: it is used twice, for the history entry and the route params,
+  so it stays.
+- **Inline unions for `brandStatus` / `brandResolution`.** Answered: this
+  predates the task and is out of scope.
+
+### Spec
+
+- **"in the history": the history list shows no source label.** Answered
+  by the Architect's ruling (Rulings — Architect): the history's part is
+  the stored entry plus the company page reopened from it, which the new
+  `history.spec.ts` test covers.
+- **`pnpm e2e:web` from a worktree needs `COMPOSE_PROJECT_NAME=b-spot`.**
+  Answered: an environment finding (see the Worklog), outside the diff.
+  Reported to the Architect.
+- **`readEnum` returned `[]` for a missing schema, which made a confusing
+  failure.** Fixed: the function now returns `undefined`, and each
+  assertion names its schema property.
+- **Device history entries stay mislabelled.** Answered: accepted with no
+  migration (Rulings — Architect); the journal entry says so.
+- **The program design said "everywhere but one place" and then listed
+  the places that already agree.** Fixed: the wording is corrected.
+- **Criteria unticked, status still `in-progress`.** Answered: the close
+  step does both.

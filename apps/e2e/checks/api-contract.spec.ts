@@ -10,17 +10,29 @@ interface OpenApiDocument {
   components: { schemas: Record<string, { properties: Record<string, EnumProperty> }> };
 }
 
-function readEnum(document: OpenApiDocument, schema: string, property: string): string[] {
-  return document.components.schemas[schema]?.properties[property]?.enum ?? [];
+/** The enum values the schema declares for `schema.property`, sorted; undefined when absent. */
+function readSortedEnum(
+  document: OpenApiDocument,
+  schema: string,
+  property: string,
+): string[] | undefined {
+  return document.components.schemas[schema]?.properties[property]?.enum?.slice().sort();
 }
 
 test('contract — the app’s product sources are the ones the API’s OpenAPI schema declares', async ({
   request,
 }) => {
+  const expectedSources = [...PRODUCT_SOURCES].sort();
+
   const response = await request.get(`${API_URL}/api-json`);
   expect(response.ok()).toBe(true);
-  const document = (await response.json()) as OpenApiDocument;
+  const actualDocument = (await response.json()) as OpenApiDocument;
 
-  expect(readEnum(document, 'ProductDto', 'source')).toEqual([...PRODUCT_SOURCES]);
-  expect(readEnum(document, 'ScanHistoryItemDto', 'productSource')).toEqual([...PRODUCT_SOURCES]);
+  expect(readSortedEnum(actualDocument, 'ProductDto', 'source'), 'ProductDto.source').toEqual(
+    expectedSources,
+  );
+  expect(
+    readSortedEnum(actualDocument, 'ScanHistoryItemDto', 'productSource'),
+    'ScanHistoryItemDto.productSource',
+  ).toEqual(expectedSources);
 });

@@ -5,6 +5,7 @@ import {
   OMBRELIS_FIXTURE,
 } from '../fixtures-server/catalogue';
 import { searchBarcode } from '../support/search';
+import { PRODUCT_SOURCE_LABELS } from '../support/product-source-labels';
 import { TEST_IDS } from '../support/test-ids';
 import { expect, test } from '../support/test';
 
@@ -36,5 +37,7 @@ test('a cosmetic reopened from the history keeps its cosmetic label', async ({ p
   await page.getByTestId(TEST_IDS.historyItem).click();
 
   await expect(page).toHaveURL(new RegExp(`/company/${OMBRELIS_FIXTURE.siren}`));
-  await expect(page.getByTestId(TEST_IDS.companyProductSource)).toHaveText('Produit cosmetique');
+  await expect(page.getByTestId(TEST_IDS.companyProductSource)).toHaveText(
+    PRODUCT_SOURCE_LABELS.cosmetic,
+  );
 });
