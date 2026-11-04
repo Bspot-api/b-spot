@@ -1,5 +1,5 @@
-import { API_URL, MOBILE_ROOT, WEB_BUILD_DIR } from './e2e-env';
-import { runCommand } from './process';
+import { API_URL, MOBILE_ROOT, WEB_BUILD_DIR } from '../e2e-env';
+import { runCommand } from '../process';
 
 /**
  * Exports the web app the way `apps/mobile/Dockerfile.web` does, pointed at

@@ -1,6 +1,6 @@
 # 02 — iOS journeys with Maestro
 
-**Status:** in-progress
+**Status:** done
 **Blocked by:** 01 — Web journeys with Playwright (the shared e2e
 environment and the stable selectors)
 
@@ -24,20 +24,34 @@ session — is exercised through the app's own screens.
 
 - [ ] ~~**ios-journeys-pass** — every row of "The critical journeys" in the
   parent spec marked for iOS has a passing Maestro flow.~~
-- [ ] **ios-journeys-pass** (2026-11-04) — every iOS row of the parent
+- [x] **ios-journeys-pass** (2026-11-04) — every iOS row of the parent
   spec's journeys table has a passing Maestro flow, except the four auth
   rows (login, admin entry, moderation, expired session). Those move to
   the native magic-link login task. The history row is checked against a
   pre-filled stored history.
-- [ ] **shared-environment** — the flows run against the environment slice
+  *Met: `scan-deep-link` (company deep link, plus the unknown-SIREN
+  failure), `brand-suggestion`, `history`, all green in
+  `apps/e2e/maestro/flows/`; the suggestion screen is reached through its
+  own route's deep link (open question in the work document).*
+- [x] **shared-environment** — the flows run against the environment slice
   01 built, with no second copy of the fixture server, seeding or reset.
-- [ ] **one-command-mobile** — `pnpm e2e:mobile` brings the environment up,
+  *Met: both runners call `withE2eEnvironment` (`apps/e2e/env/environment.ts`);
+  the control server reuses `support/db.ts`.*
+- [x] **one-command-mobile** — `pnpm e2e:mobile` brings the environment up,
   runs the flows, tears down what it started, and exits non-zero on a
   failure.
-- [ ] **no-test-code-in-app** — the app gains `testID`s only: no screen,
+  *Met: a run with a wrong expected company name exited 1 with no e2e
+  port left listening.*
+- [x] **no-test-code-in-app** — the app gains `testID`s only: no screen,
   input or route exists only for the tests.
-- [ ] **repeatable** — two consecutive `pnpm e2e:mobile` runs both pass.
-- [ ] **suite-green** — `pnpm lint`, `pnpm test`, `pnpm build` pass.
+  *Met: `app/(tabs)/_layout.tsx` gains one `testID` and two
+  `tabBarButtonTestID`s; `apps/mobile/.eslintrc.js` ignores the generated
+  `expo-env.d.ts`.*
+- [x] **repeatable** — two consecutive `pnpm e2e:mobile` runs both pass.
+  *Met: runs 2–3 and 5–7 consecutive and green; run 4 failed once,
+  unexplained (work document, "One unexplained failure").*
+- [x] **suite-green** — `pnpm lint`, `pnpm test`, `pnpm build` pass.
+  *Met on `58295ee`; `pnpm e2e:web` also green (25 passed, twice).*
 
 ---
 

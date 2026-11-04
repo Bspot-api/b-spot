@@ -4,6 +4,9 @@ import path from 'node:path';
 export const API_PORT = 3101;
 export const WEB_PORT = 8182;
 export const FIXTURES_PORT = 4010;
+/** iOS suite only: the Metro the dev build loads its JS from, and the control server. */
+export const METRO_PORT = 8183;
+export const CONTROL_PORT = 4011;
 /**
  * MailDev ports. When b-spot's MailDev is not already running, the e2e run
  * starts it on its own host ports (another stack may hold 1025/1080); when it
@@ -16,6 +19,13 @@ export const API_URL = `http://localhost:${API_PORT}`;
 export const WEB_URL = `http://localhost:${WEB_PORT}`;
 export const FIXTURES_URL = `http://localhost:${FIXTURES_PORT}`;
 export const MAILDEV_URL = `http://localhost:${MAILDEV_WEB_PORT}`;
+export const METRO_URL = `http://localhost:${METRO_PORT}`;
+/** 127.0.0.1, where the control server listens (never an IPv6 `localhost`). */
+export const CONTROL_URL = `http://127.0.0.1:${CONTROL_PORT}`;
+
+/** The iOS dev build (`APP_VARIANT=development`, see apps/mobile/app.config.ts). */
+export const IOS_BUNDLE_ID = 'com.bspot.mobile.dev';
+export const DEV_SCHEME = 'bspot-dev';
 
 /** The e2e database: same Postgres container as dev, its own name. */
 export const E2E_DATABASE_NAME = 'b_spot_e2e';
@@ -29,6 +39,8 @@ export const E2E_ROOT = path.resolve(__dirname, '..');
 export const API_ROOT = path.join(REPO_ROOT, 'apps', 'api');
 export const MOBILE_ROOT = path.join(REPO_ROOT, 'apps', 'mobile');
 export const WEB_BUILD_DIR = path.join(E2E_ROOT, '.web-build');
+export const MAESTRO_ROOT = path.join(E2E_ROOT, 'maestro');
+export const MAESTRO_RESULTS_DIR = path.join(E2E_ROOT, 'maestro-results');
 
 /** One user per auth journey, so one journey's session never touches another's. */
 export const E2E_USERS = {

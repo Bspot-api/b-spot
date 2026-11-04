@@ -161,3 +161,10 @@ deno.lock
 apps/e2e/.web-build/
 apps/e2e/test-results/
 apps/e2e/playwright-report/
+
+# Expo continuous native generation (expo prebuild / expo run)
+apps/mobile/ios/
+apps/mobile/android/
+
+# Maestro results
+apps/e2e/maestro-results/

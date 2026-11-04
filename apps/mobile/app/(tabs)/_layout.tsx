@@ -25,6 +25,7 @@ export default function TabLayout() {
             onPress={() => router.push('/login')}
             className="mr-4"
             accessibilityRole="button"
+            testID="nav-login-link"
           >
             <Text className="text-sm text-zinc-500">
               {session ? session.user.email : 'Se connecter'}
@@ -44,6 +45,7 @@ export default function TabLayout() {
         name="history"
         options={{
           title: 'Historique',
+          tabBarButtonTestID: 'nav-history-link',
           tabBarIcon: ({ color, size }) => <Ionicons name="time" color={color} size={size} />,
         }}
       />
@@ -51,6 +53,7 @@ export default function TabLayout() {
         name="admin"
         options={{
           title: 'Admin',
+          tabBarButtonTestID: 'nav-admin-link',
           href: isAdmin ? undefined : null,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="shield-checkmark" color={color} size={size} />

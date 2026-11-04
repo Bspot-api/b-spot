@@ -1,0 +1,40 @@
+# Scan a known product, the camera bypassed by the company page's deep link:
+# owner, executives and shareholders; then an unknown company fails cleanly.
+appId: ${APP_ID}
+name: scan-deep-link
+---
+- runFlow: ../common/start-clean.yaml
+- runFlow:
+    file: ../common/open-link.yaml
+    env:
+      LINK: ${FOOD_COMPANY_LINK}
+- extendedWaitUntil:
+    visible:
+      id: "company-legal-name"
+      text: ${FOOD_COMPANY_NAME}
+    timeout: 30000
+- assertVisible:
+    id: "company-siren"
+    text: "SIREN ${FOOD_COMPANY_SIREN}"
+- assertVisible:
+    id: "executive-item"
+    index: 1
+- assertNotVisible:
+    id: "executive-item"
+    index: 2
+- assertVisible: ${FOOD_EXECUTIVE}
+- scrollUntilVisible:
+    element:
+      id: "shareholder-item"
+- assertVisible: ${FOOD_SHAREHOLDER}
+- assertNotVisible:
+    id: "shareholder-item"
+    index: 1
+- runFlow:
+    file: ../common/open-link.yaml
+    env:
+      LINK: ${UNKNOWN_COMPANY_LINK}
+- extendedWaitUntil:
+    visible:
+      id: "company-error"
+    timeout: 30000

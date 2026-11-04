@@ -1,0 +1,13 @@
+# A logged-out visitor sees the login entry and no Admin tab.
+# (The admin side of this journey waits for the native magic-link login task.)
+appId: ${APP_ID}
+name: admin-entry-logged-out
+---
+- runFlow: ../common/start-clean.yaml
+- assertVisible:
+    id: "nav-login-link"
+    text: "Se connecter"
+- assertVisible:
+    id: "nav-history-link"
+- assertNotVisible:
+    id: "nav-admin-link"

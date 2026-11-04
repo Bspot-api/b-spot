@@ -1,0 +1,30 @@
+# History: empty on a fresh app; with a stored lookup (written from outside,
+# the simulator has no camera to scan with) it lists it and leads to the
+# company page.
+appId: ${APP_ID}
+name: history
+---
+- runFlow: ../common/start-clean.yaml
+- tapOn:
+    id: "nav-history-link"
+- assertVisible:
+    id: "history-empty"
+- stopApp
+- runScript: ../scripts/seed-history.js
+- launchApp
+- runFlow: ../common/load-bundle.yaml
+- tapOn:
+    id: "nav-history-link"
+- assertVisible:
+    id: "history-item"
+    text: ${FOOD_HISTORY_LABEL}
+- assertNotVisible:
+    id: "history-item"
+    index: 1
+- tapOn:
+    id: "history-item"
+- extendedWaitUntil:
+    visible:
+      id: "company-legal-name"
+      text: ${FOOD_COMPANY_NAME}
+    timeout: 30000

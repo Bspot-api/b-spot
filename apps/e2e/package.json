@@ -1,10 +1,11 @@
 {
   "name": "@b-spot/e2e",
   "version": "0.1.0",
-  "description": "B-Spot end-to-end suites: shared e2e environment, fixture server, Playwright web journeys",
+  "description": "B-Spot end-to-end suites: shared e2e environment, fixture server, Playwright web journeys, Maestro iOS flows",
   "private": true,
   "scripts": {
     "e2e:web": "tsx env/run-web.ts",
+    "e2e:mobile": "tsx env/ios/run-mobile.ts",
     "fixtures": "tsx fixtures-server/server.ts",
     "lint": "tsc --noEmit && eslint \"**/*.ts\"",
     "lint:fix": "eslint \"**/*.ts\" --fix"
