@@ -1,6 +1,8 @@
+import { expo } from '@better-auth/expo';
 import { betterAuth } from 'better-auth';
 import { magicLink } from 'better-auth/plugins';
 import { Pool } from 'pg';
+import { buildTrustedOrigins, parseAppOrigins } from './trusted-origins';
 
 export interface BetterAuthFactoryOptions {
   secret: string;
@@ -27,6 +29,10 @@ export function createBetterAuth(options: BetterAuthFactoryOptions): BetterAuthI
       database: {
         generateId: false,
       },
+      // Better-Auth skips its origin and CSRF checks under NODE_ENV=test by
+      // default. Forced on, every environment (e2e included) runs the
+      // production rules: a cookie-carrying POST needs a trusted Origin.
+      disableOriginCheck: false,
     },
     plugins: [
       magicLink({
@@ -39,6 +45,10 @@ export function createBetterAuth(options: BetterAuthFactoryOptions): BetterAuthI
           await options.sendMagicLink(data);
         },
       }),
+      // Native app: a magic link verified in the browser redirects to the
+      // trusted app scheme with the session cookie in `?cookie=`, and the
+      // app's `expo-origin` header stands in for the Origin native fetch lacks.
+      expo(),
     ],
   }) as unknown as BetterAuthInstance;
 }
@@ -68,8 +78,11 @@ export function getBetterAuthConfigFromEnv(): {
     throw new Error('BETTER_AUTH_URL is required');
   }
 
-  const corsOrigin = process.env.CORS_ORIGIN || '*';
-  const trustedOrigins = corsOrigin === '*' ? [baseURL] : [baseURL, ...corsOrigin.split(',')];
+  const trustedOrigins = buildTrustedOrigins({
+    baseURL,
+    corsOrigin: process.env.CORS_ORIGIN || '*',
+    appOrigins: parseAppOrigins(process.env.AUTH_APP_ORIGINS),
+  });
 
   return {
     secret,
