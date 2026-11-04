@@ -327,24 +327,81 @@ lock.
   tsx` (results in Program Design). No e2e environment was touched, so the
   manual lock was not needed.
 
+- 2026-11-04 (code) — Plan approved with rulings (fd61276); `feat/e2e-tests`
+  merged in (f5c318d), `pnpm install` again.
+  - **Lock** (d01cb0f): `lock-file.ts` (link-publish, read, guarded stale
+    removal, own-lock removal), `e2e-lock.ts` (attempt, bounded wait,
+    messages), `e2e-environment-lock.ts` (path, holder of this run, wait
+    limit, `exit` safety net). **Revision of the plan:** the planned
+    `e2e-lock-path.ts` is named `e2e-environment-lock.ts`, because it also
+    holds `acquireE2eEnvironmentLock`. The tests were red first (module
+    missing), then green; the race tests (8 processes on a free lock, 8 on a
+    stale one, exactly one winner) passed 3 runs out of 3. The thin
+    path/wait-limit tests were written with the wrapper, not before it.
+  - **Interrupt and busy ports** (d4c29ae): `interrupt.ts`, then
+    `port-preflight.ts`. It checks 127.0.0.1 and ::1, and names the pid
+    through `lsof -Fpc`. Both test-first. The first red of
+    `interrupt.test.ts` hung (the probe could not import, so it never said
+    `ready`); `waitForReady` now also resolves on exit.
+  - **Wiring** (df42a1e): `apps/e2e/package.json` on `node --import tsx`;
+    `docker.ts` split into `planContainers`/`startContainers` (the
+    self-cleanup `catch` is gone: the teardown owns it); `services.ts`
+    memoized `stop`, registered with `onInterrupt`; `process.ts` registers
+    each foreground child; `environment.ts` lock → plan containers →
+    port preflight → start → builds → services → run, with one memoized
+    teardown on every path. **Found and fixed on the way:** `stopChild`
+    returned a promise waiting for `exit` when the group leader had already
+    died of a signal (`exitCode === null`, `signalCode` set), so `stop()`
+    could hang. It now kills the group and resolves.
+  - **Gates:** `pnpm typecheck` 0, `pnpm lint` 0, `pnpm test` 0,
+    `pnpm build` 0 (apps/e2e: 25 unit tests).
+  - **Real runs**, all inside the manual scratchpad lock (it was held by the
+    native-login Crewmate at first; the wrapper waited):
+    - `suites-unchanged`: `pnpm e2e:web` 25 passed (55.3 s), 25 passed
+      (43.7 s); `pnpm e2e:mobile` 4/4 flows (2m 15s), 4/4 (2m 13s). Each run
+      logged `e2e environment locked
+      (/Users/tatiana/Workspace/perso/b-spot/.git/b-spot-e2e.lock.json)`;
+      after each, ports free, lock free, no process left, containers
+      `maildev postgres`.
+    - `runs-serialise`: two `pnpm e2e:web` started together, both exit 0,
+      25 passed each. One logged `in use by pid 2631 (pnpm e2e:web, …);
+      waiting up to 20m00s` and then `lock acquired after waiting 1m04s`.
+    - `stale-lock-recovered`: a hand-made lock with a dead pid; the run
+      logged `lock left by pid 14956 (pnpm e2e:web (hand-made), /nowhere,
+      since …) is stale: that process is gone; taking it over` and passed
+      25.
+    - `killed-run-leaves-nothing` and `containers-respected`: six runs of
+      `kill-experiment.sh`, all PASS (exit 130 for SIGINT to the group,
+      143 for SIGTERM to pnpm; ports 4010/4011/3101/8182/8183 free; lock
+      free; no service process; containers unchanged): web×INT, web×TERM,
+      mobile×INT, mobile×TERM during the run, and web×INT, web×TERM during
+      `expo export`. No `expo export`, migration, Playwright or Maestro of
+      this repo left either. Under Ctrl-C the logs show the expected
+      `SIGINT received`, then `SIGINT received again` and `SIGTERM
+      received again: already stopping`. Logs:
+      `/private/tmp/claude-501/-Users-tatiana-Workspace-perso-b-spot/36a2459e-2eb2-4a85-8866-2c7ae0ff328b/scratchpad/e2e-runner/`.
+    - No orphan had to be stopped by hand.
+  - **README** (c3ca458): "One run at a time, and nothing left behind".
+
 ## Implementation Checkboxes
 
-- [ ] Lock unit tests red, then `lock-file.ts` + `e2e-lock.ts` +
-  `e2e-lock-path.ts` green (race included)
-- [ ] Interrupt unit tests red, then `interrupt.ts` green
-- [ ] Runner scripts on `node --import tsx`
-- [ ] `docker.ts` plan/start split
-- [ ] `services.ts` and `process.ts` register their children; memoized
+- [x] Lock unit tests red, then `lock-file.ts` + `e2e-lock.ts` +
+  `e2e-environment-lock.ts` (planned as `e2e-lock-path.ts`) green, race included
+- [x] Busy-port preflight (Architect ruling): `port-preflight.ts`, test-first
+- [x] Interrupt unit tests red, then `interrupt.ts` green
+- [x] Runner scripts on `node --import tsx`
+- [x] `docker.ts` plan/start split
+- [x] `services.ts` and `process.ts` register their children; memoized
   stop
-- [ ] `environment.ts`: lock first, memoized teardown, exit code on
+- [x] `environment.ts`: lock first, memoized teardown, exit code on
   interrupt
-- [ ] Gates: `pnpm lint`, `pnpm test`, `pnpm build` (`suite-green`)
-- [ ] `suites-unchanged`: web ×2, mobile ×2
-- [ ] `runs-serialise`
-- [ ] `stale-lock-recovered` (real run)
-- [ ] `killed-run-leaves-nothing` + `containers-respected`: four kill
+- [x] Gates: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build` (`suite-green`)
+- [x] `suites-unchanged`: web ×2, mobile ×2
+- [x] `runs-serialise`
+- [x] `stale-lock-recovered` (real run)
+- [x] `killed-run-leaves-nothing` + `containers-respected`: four kill
   runs, plus two during the preparation
-- [ ] README "End-to-end tests" paragraph
+- [x] README "End-to-end tests" paragraph
 - [ ] `code-review`, findings below
 - [ ] Close
 
@@ -387,6 +444,61 @@ lock.
 <tsx esm loader> probe.ts`. Each run: start in its own process group, wait
 for the probe to be ready, `kill -INT -- -<pgid>`, wait 6 s, read the
 probe's trace file. Results are in the table in Program Design.
+
+### Kill experiment script (throwaway, scratchpad)
+
+`kill-experiment.sh`, with `check-leftovers.sh` (ports, lock file, service processes, containers) and `stop-orphans.sh` (used only when a check fails). Every call was wrapped in `with-manual-lock.sh`.
+
+```bash
+#!/bin/bash
+# kill-experiment.sh <web|mobile> <INT|TERM> <run|prepare>
+# Starts `pnpm e2e:<suite>` in its own process group, waits for a marker,
+# sends SIGINT to the whole group (as Ctrl-C does) or SIGTERM to pnpm only
+# (as `kill` does), then checks what is left. Run inside the manual lock.
+SUITE=$1; SIG=$2; PHASE=$3
+L=$(dirname "$0"); LOG=$L/kill-$SUITE-$SIG-$PHASE.log
+case "$SUITE-$PHASE" in
+  web-run) MARKER='Running 25 tests' ;;
+  web-prepare) MARKER='exporting the web app' ;;
+  mobile-run) MARKER='\[Passed\]' ;;
+  *) echo "unknown case"; exit 2 ;;
+esac
+BEFORE=$(docker compose -p b-spot ps --status running --services | sort | tr '\n' ' ')
+cd /Users/tatiana/Workspace/perso/b-spot-e2e-runner
+perl -e 'use POSIX; setpgid(0,0); exec @ARGV' pnpm e2e:$SUITE > "$LOG" 2>&1 &
+PNPM=$!
+for _ in $(seq 1 600); do grep -qE "$MARKER" "$LOG" && break; sleep 1; done
+sleep 3
+RUNNER=$(pgrep -f "node --import tsx env/(run-web|ios/run-mobile).ts" | head -1)
+echo "== $SUITE $SIG during $PHASE: pnpm=$PNPM runner=$RUNNER"
+if [ "$SIG" = INT ]; then kill -INT -- -$PNPM; else kill -TERM $PNPM; fi
+START=$(date +%s)
+wait $PNPM; CODE=$?
+for _ in $(seq 1 60); do kill -0 "$RUNNER" 2>/dev/null || break; sleep 1; done
+echo "pnpm exit=$CODE after $(( $(date +%s) - START ))s; runner alive: $(kill -0 "$RUNNER" 2>/dev/null && echo yes || echo no)"
+sleep 2
+grep -E '\[e2e\] (SIG|.* stopped|lock)' "$LOG" | tail -8
+"$L/check-leftovers.sh"; LEFT=$?
+AFTER=$(docker compose -p b-spot ps --status running --services | sort | tr '\n' ' ')
+echo "containers before: $BEFORE / after: $AFTER -> $([ "$BEFORE" = "$AFTER" ] && echo unchanged || echo CHANGED)"
+[ $LEFT -eq 0 ] && [ $CODE -ne 0 ] && [ "$BEFORE" = "$AFTER" ] && echo "RESULT: PASS" || echo "RESULT: FAIL"
+```
+
+`check-leftovers.sh`:
+
+```bash
+#!/bin/bash
+# Prints what an e2e run may have left behind; exit 1 if anything.
+STATUS=0
+PORTS=$(lsof -nP -iTCP -sTCP:LISTEN 2>/dev/null | grep -E ':(4010|4011|3101|8182|8183) ')
+if [ -n "$PORTS" ]; then echo "LEFTOVER PORTS:"; echo "$PORTS"; STATUS=1; else echo "ports 4010 4011 3101 8182 8183: free"; fi
+LOCK=/Users/tatiana/Workspace/perso/b-spot/.git/b-spot-e2e.lock.json
+if [ -e "$LOCK" ]; then echo "LOCK PRESENT: $(cat $LOCK)"; STATUS=1; else echo "lock: free"; fi
+PROCS=$(pgrep -fl 'expo start|fixtures-server/server.ts|dist/src/main.js|static-server.ts|maestro test|playwright test|run-web.ts|run-mobile.ts' | grep -v -- '-native-login' )
+if [ -n "$PROCS" ]; then echo "LEFTOVER PROCESSES:"; echo "$PROCS"; STATUS=1; else echo "processes: none"; fi
+echo "containers running: $(docker compose -p b-spot ps --status running --services 2>/dev/null | sort | tr '\n' ' ')"
+exit $STATUS
+```
 
 ### Rulings — Architect, 2026-11-04
 
