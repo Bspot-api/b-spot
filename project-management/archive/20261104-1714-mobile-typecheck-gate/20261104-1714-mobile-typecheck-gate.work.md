@@ -156,17 +156,35 @@ same `scripts` block. Both resolve by keeping both sides.
 - 2026-11-04 — Plan step: `pnpm install`, measured the three packages,
   probed the `@types/jest` fix and the typed routes from the scratchpad,
   wrote this design. No code.
+- 2026-11-04 — Code step, following the approved test order.
+  - `@types/jest@^29.5.14` added to mobile: mobile `tsc --noEmit` goes
+    from 103 errors to 0; mobile tests 27/27 (commit `4295a94`).
+  - `typecheck` scripts in api, mobile, e2e and root: `pnpm typecheck`
+    exits 0 (commit `340979e`, log `typecheck-green.log`).
+  - Deliberate error `export const deliberateTypeError: number = 'not a
+    number';` appended to `apps/mobile/src/features/admin/suggestion-draft.ts`:
+    `pnpm typecheck` exits 2 with TS2322 at that line
+    (`typecheck-catches-red.log`); reverted with `git checkout`, green
+    again (`typecheck-catches-reverted.log`). Never committed.
+  - strict-kept: no tsconfig in the diff since the approval commit; no
+    `any`, `@ts-ignore`, `@ts-expect-error` or `@ts-nocheck` in added lines.
+  - §F **Typecheck** line in `.agents/project.md` (commit `46aef52`).
+  - `pnpm lint` 0 (old warnings only), `pnpm test` 0 (API 110/110, mobile
+    27/27, e2e unit tests green), `pnpm build` 0.
+  - Logs in `/private/tmp/claude-501/-Users-tatiana-Workspace-perso-b-spot/36a2459e-2eb2-4a85-8866-2c7ae0ff328b/scratchpad/typecheck/`.
+- 2026-11-04 — Review step: `code-review` since the approval commit
+  `09990ad`; one finding fixed (commit `a1b7cc9`), the rest answered below.
 
 ## Implementation Checkboxes
 
-- [ ] Mobile: `@types/jest` devDependency, mobile `tsc --noEmit` at 0, mobile tests green
-- [ ] `typecheck` scripts in api, mobile, e2e and root; `pnpm typecheck` exits 0
-- [ ] Deliberate error shown failing `pnpm typecheck`, then reverted
-- [ ] strict-kept checks (tsconfig diff, `any` / `@ts-ignore` grep)
-- [ ] §F gate line in `.agents/project.md`
-- [ ] `pnpm lint`, `pnpm test`, `pnpm build` green
-- [ ] `code-review`, findings recorded
-- [ ] Close: criteria ticked, journal, archive, `retro`
+- [x] Mobile: `@types/jest` devDependency, mobile `tsc --noEmit` at 0, mobile tests green
+- [x] `typecheck` scripts in api, mobile, e2e and root; `pnpm typecheck` exits 0
+- [x] Deliberate error shown failing `pnpm typecheck`, then reverted
+- [x] strict-kept checks (tsconfig diff, `any` / `@ts-ignore` grep)
+- [x] §F gate line in `.agents/project.md`
+- [x] `pnpm lint`, `pnpm test`, `pnpm build` green
+- [x] `code-review`, findings recorded
+- [x] Close: criteria ticked, journal, archive, `retro`
 
 ## Notes & Snippets
 
@@ -191,4 +209,56 @@ same `scripts` block. Both resolve by keeping both sides.
 
 ## Diff-Review Findings
 
-_(after the review step)_
+Review of `09990ad...HEAD`, 2026-11-04. Standards: no hard violation,
+four judgement calls. Spec: every criterion met, no scope creep, four
+divergences between spec and design.
+
+**Standards**
+
+- **Gate commands copied in other documents** (Shotgun Surgery). The
+  pre-PR quality checks of `docs/agent-rules/git-workflow.md` and the
+  "Build & Test" list of `CLAUDE.md` did not name `pnpm typecheck`. —
+  *Fixed* for `git-workflow.md` (commit `a1b7cc9`). `CLAUDE.md` is left
+  alone per the Architect's ruling; the gap goes to the human.
+- **e2e type-checked twice** (Duplicated Code): its `lint` still runs
+  `tsc --noEmit`. — *Answered*: ruled by the Architect, kept for now to
+  avoid conflicts with the magic-link Crewmate; removed in a later cleanup.
+- **API `typecheck` uses a config named for ESLint** (Mysterious Name),
+  and repeats `--noEmit` which that config already sets. — *Answered*:
+  `tsconfig.eslint.json` is the only API config covering `src`, `test`,
+  the specs and `mikro-orm.config.ts`; a renamed config is a wider change
+  than this task. The explicit `--noEmit` keeps the script safe if the
+  config ever drops `noEmit`. Recorded in the journal as a known coupling.
+- **Gate depends on the gitignored `.expo/types`.** — *Answered*: ruled by
+  the Architect; the §F line says it.
+
+**Spec**
+
+- **typecheck-catches is weaker for `app/**` route paths** on a fresh
+  checkout (no typed routes). — *Answered*: same ruling as above; the
+  criterion was demonstrated on a `src/**` file, which the criterion allows.
+- **Jest globals visible in app files**, wider than "Jest types for the
+  mobile test files". — *Answered*: accepted by the Architect's ruling.
+- **The spec's Context is stale** (93 errors, implies nothing was
+  type-checked). — *Answered*: a dated note is added to the spec's Notes;
+  the 🧑 Context itself is left as approved.
+- **Planned §F wording differs from the committed line.** — *Answered*:
+  the committed line follows the later ruling; no defect.
+
+## Retro
+
+Proposals for the working rules, none applied:
+
+1. **Automated checks — make route types deterministic** (medium; owner:
+   human). `.expo/types` is gitignored and written only by `expo start`,
+   so the gate checks routes against whatever a machine has. A follow-up
+   task could generate it before `tsc`, through a documented Expo command
+   if one exists, so `app/**` route paths are checked everywhere.
+2. **Navigation — one home for gate commands** (low; owner: human).
+   §F of `.agents/project.md`, `docs/agent-rules/git-workflow.md` and
+   `CLAUDE.md` each list the gate commands, and they drifted the moment
+   one was added. The other two could point at §F instead of copying it.
+3. **Automated checks — cleanup of e2e `lint`** (low; owner: Architect):
+   drop `tsc --noEmit &&` from e2e's `lint` once the magic-link branch
+   has merged.
+
