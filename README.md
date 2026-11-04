@@ -115,11 +115,42 @@ The command does the following, then exits non-zero on any failure:
 2. Drops and recreates the `b_spot_e2e` database, then migrates and seeds
    it. It never touches the development database `b_spot`.
 3. Builds the API and exports the web app against `http://localhost:3101`.
-4. Runs Playwright, which starts the fixture server (`:4010`), the API
-   (`:3101`) and the web build (`:8182`), then walks every journey.
+4. Starts the fixture server (`:4010`), the API (`:3101`) and the web
+   build (`:8182`), runs Playwright, then stops them.
 
 Extra arguments go to Playwright, e.g. `pnpm e2e:web --project=web -g login`.
 The HTML report is written to `apps/e2e/playwright-report/`.
+
+### iOS (Maestro)
+
+One-time setup, on macOS with Xcode:
+
+```bash
+curl -fsSL "https://get.maestro.mobile.dev" | bash   # Maestro CLI
+xcrun simctl boot "iPhone 17 Pro Max"                # any iOS simulator
+cd apps/mobile && APP_VARIANT=development pnpm exec expo run:ios --no-bundler
+```
+
+The last command builds and installs the dev build (`com.bspot.mobile.dev`,
+scheme `bspot-dev`) on the booted simulator. Redo it only when a native
+dependency changes; `apps/mobile/ios/` is generated and git-ignored.
+
+Run, with Docker running and the simulator booted:
+
+```bash
+pnpm e2e:mobile
+```
+
+It brings up the same environment as the web suite (no web build), plus a
+Metro on `:8183` that serves the app's JavaScript with
+`EXPO_PUBLIC_API_URL=http://localhost:3101`, and a control server on
+`127.0.0.1:4011` that the flows call to reset the database or pre-fill the
+app's stored history. Then it runs the flows of `apps/e2e/maestro/flows/`
+and exits with Maestro's code. Each flow starts from a reset database and a
+wiped app. The simulator has no camera: the scan journey opens the company
+page's deep link (`bspot-dev://company/<siren>`), and the brand suggestion
+opens its own screen's link. Extra arguments go to `maestro test`. Reports
+and screenshots land in `apps/e2e/maestro-results/`.
 
 The API reads four optional base URLs: `OPEN_FOOD_FACTS_BASE_URL`,
 `OPEN_BEAUTY_FACTS_BASE_URL`, `RECHERCHE_ENTREPRISES_BASE_URL` and
