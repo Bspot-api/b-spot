@@ -50,6 +50,8 @@ export const E2E_USERS = {
   moderation: 'moderation@e2e.test',
   expiry: 'expiry@e2e.test',
   regular: 'regular@e2e.test',
+  /** The HTTP-level check of the native app's login and sign-out (checks/native-auth.spec.ts). */
+  nativeCheck: 'native-check@e2e.test',
 } as const;
 
 export const E2E_USER_EMAILS: readonly string[] = Object.values(E2E_USERS);
@@ -80,6 +82,7 @@ export function buildApiEnv(): Record<string, string> {
     BETTER_AUTH_URL: API_URL,
     BETTER_AUTH_SECRET: 'e2e-only-secret-not-used-anywhere-else-0123456789',
     CORS_ORIGIN: WEB_URL,
+    AUTH_APP_ORIGINS: `${DEV_SCHEME}://`,
     SMTP_HOST: 'localhost',
     SMTP_PORT: String(SMTP_PORT),
     SMTP_SECURE: 'false',
