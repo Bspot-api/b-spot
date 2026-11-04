@@ -24,19 +24,14 @@ describe('AdminService', () => {
     const user = { id: 'user-1', email: 'new@test.com', name: 'new' } as User;
     const admin = { id: 'admin-1', user, createdAt: new Date() } as Admin;
 
-    mockEm.findOne
-      .mockResolvedValueOnce(user)
-      .mockResolvedValueOnce(null);
+    mockEm.findOne.mockResolvedValueOnce(user).mockResolvedValueOnce(null);
     mockEm.create.mockReturnValue(admin);
     mockEm.persistAndFlush.mockResolvedValue(undefined);
 
     const result = await service.promote('user-1');
 
     expect(result).toBe(admin);
-    expect(mockEm.create).toHaveBeenCalledWith(
-      Admin,
-      expect.objectContaining({ user }),
-    );
+    expect(mockEm.create).toHaveBeenCalledWith(Admin, expect.objectContaining({ user }));
   });
 
   it('promote throws when user does not exist', async () => {
@@ -46,8 +41,8 @@ describe('AdminService', () => {
   });
 
   it('revoke throws when admin record is missing', async () => {
-    mockEm.transactional.mockImplementation(
-      (cb: (em: typeof mockEm) => Promise<void>) => cb(mockEm),
+    mockEm.transactional.mockImplementation((cb: (em: typeof mockEm) => Promise<void>) =>
+      cb(mockEm),
     );
     mockEm.find.mockResolvedValueOnce([{ id: 'other', user: { id: 'other-user' } }]);
 
@@ -56,8 +51,8 @@ describe('AdminService', () => {
 
   it('revoke blocks removal of the last admin', async () => {
     const admin = { id: 'admin-1', user: { id: 'user-1' } };
-    mockEm.transactional.mockImplementation(
-      (cb: (em: typeof mockEm) => Promise<void>) => cb(mockEm),
+    mockEm.transactional.mockImplementation((cb: (em: typeof mockEm) => Promise<void>) =>
+      cb(mockEm),
     );
     mockEm.find.mockResolvedValueOnce([admin]);
 
@@ -67,8 +62,8 @@ describe('AdminService', () => {
   it('revoke removes admin when others remain', async () => {
     const admin1 = { id: 'admin-1', user: { id: 'user-1' } };
     const admin2 = { id: 'admin-2', user: { id: 'user-2' } };
-    mockEm.transactional.mockImplementation(
-      (cb: (em: typeof mockEm) => Promise<void>) => cb(mockEm),
+    mockEm.transactional.mockImplementation((cb: (em: typeof mockEm) => Promise<void>) =>
+      cb(mockEm),
     );
     mockEm.find.mockResolvedValueOnce([admin1, admin2]);
 

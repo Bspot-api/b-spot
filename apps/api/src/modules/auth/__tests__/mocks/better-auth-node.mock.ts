@@ -1,5 +1,3 @@
-export const fromNodeHeaders = jest.fn(
-  (_headers: Record<string, string | string[] | undefined>) => new Headers(),
-);
+export const fromNodeHeaders = jest.fn(() => new Headers());
 
 export const toNodeHandler = jest.fn(() => jest.fn());

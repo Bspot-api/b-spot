@@ -99,9 +99,7 @@ describe('AdminController — admin CRUD integration', () => {
     it('filters by status query param', async () => {
       mockBrandSuggestionService.findByStatus.mockResolvedValue({ items: [suggestion], total: 1 });
 
-      await request(app.getHttpServer())
-        .get('/api/admin/brand-suggestions?status=new')
-        .expect(200);
+      await request(app.getHttpServer()).get('/api/admin/brand-suggestions?status=new').expect(200);
 
       expect(mockBrandSuggestionService.findByStatus).toHaveBeenCalledWith('new');
     });
@@ -172,9 +170,7 @@ describe('AdminController — admin CRUD integration', () => {
   it('GET /api/admin/admins returns list of admins', async () => {
     mockAdminService.listAdmins.mockResolvedValue([adminRecord]);
 
-    const response = await request(app.getHttpServer())
-      .get('/api/admin/admins')
-      .expect(200);
+    const response = await request(app.getHttpServer()).get('/api/admin/admins').expect(200);
 
     expect(response.body).toHaveLength(1);
     expect(response.body[0].userId).toBe('admin-user');

@@ -23,6 +23,22 @@ task — never generated.
     `COMPOSE_PROJECT_NAME=b-spot`, otherwise docker compose collides with
     the running `b-spot` containers.
   - Documents: `project-management/archive/20261103-2256-product-source-label/`.
+- Repair lint (`chore/repair-lint`): `pnpm lint` is green and read-only.
+  - Mobile: `@typescript-eslint` moves to 8, to match
+    `eslint-config-expo` 10. The 118 "rule not found" errors disappear.
+    The prettier ESLint packages are now declared explicitly instead of
+    relying on pnpm hoisting.
+  - API: a `tsconfig.eslint.json` lets ESLint parse the spec files and
+    `test/`, and the test files get prettier formatting.
+    `max-lines-per-function` is turned off for test files and migrations,
+    with the reasons written in `.eslintrc.js`. Dead code is removed.
+  - API production functions over 30 lines are split into private
+    helpers, with no behaviour change. 21 pinning tests guard the change.
+  - Scripts: `lint` no longer carries `--fix` in the API or e2e. Each
+    package has a `lint:fix`.
+  - The build is no longer red: `pnpm build` and `pnpm test` pass.
+  - Documents:
+    `project-management/archive/20261103-2256-repair-lint/`.
 
 ## 2026-11-03
 

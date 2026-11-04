@@ -6,7 +6,8 @@
   "scripts": {
     "e2e:web": "tsx env/run-web.ts",
     "fixtures": "tsx fixtures-server/server.ts",
-    "lint": "tsc --noEmit && eslint \"**/*.ts\" --fix"
+    "lint": "tsc --noEmit && eslint \"**/*.ts\"",
+    "lint:fix": "eslint \"**/*.ts\" --fix"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1",
