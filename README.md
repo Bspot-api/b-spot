@@ -31,7 +31,7 @@ B-Spot is an open-source mobile application (similar to Yuka) that empowers cons
 - **Old Stack** (archived): React web app + NestJS API for investment fund networks
 - **New Stack** (in development): Expo React Native mobile app + NestJS API for product scanning
 
-See [CLAUDE.md](CLAUDE.md) for detailed architecture and [specs/mobile-app-rewrite/](specs/mobile-app-rewrite/) for implementation plan.
+See [CLAUDE.md](CLAUDE.md) for detailed architecture and [project-management/](project-management/) for tasks and history.
 
 ## 🚀 Quick Start (New Architecture)
 
@@ -84,6 +84,124 @@ See [CLAUDE.md](CLAUDE.md) for detailed architecture and [specs/mobile-app-rewri
    pnpm dev:mobile # Mobile app only
    ```
 
+### Admin login on a phone
+
+Admins log in with a magic link. In the native app, the emailed link opens
+in the browser, which hands the session back to the app through its scheme
+(`bspot://auth/callback`, `bspot-dev://` in the dev build). The API trusts
+the schemes listed in `AUTH_APP_ORIGINS` (`apps/api/.env.example` lists
+both; production keeps the default, `bspot://`). The mobile `dev` and
+`start` scripts set `APP_VARIANT=development`, so the app asks for the
+`bspot-dev://` callback the dev build answers. Why the session travels in
+that callback, and what that costs: `docs/adr/0001-native-session-through-custom-scheme-callback.md`.
+
+## 🧪 End-to-end tests
+
+The critical journeys run against the real app, the real API and a real
+database. Only the four external APIs (Open Food Facts, Open Beauty Facts,
+recherche-entreprises, Pappers) are replaced by a local fixture server, so
+no run calls them or spends Pappers quota. Everything lives in `apps/e2e`.
+
+### Web (Playwright)
+
+One-time setup:
+
+```bash
+pnpm install
+pnpm --filter @b-spot/e2e exec playwright install chromium
+```
+
+Run, with Docker running:
+
+```bash
+pnpm e2e:web
+```
+
+The command does the following, then exits non-zero on any failure:
+
+1. Starts b-spot's `postgres` and `maildev` containers if they are not
+   running. A MailDev it starts listens on SMTP 1125 and web 1180, so it
+   does not clash with another stack on 1025/1080. It stops at the end
+   only the containers it started.
+2. Drops and recreates the `b_spot_e2e` database, then migrates and seeds
+   it. It never touches the development database `b_spot`.
+3. Builds the API and exports the web app against `http://localhost:3101`.
+4. Starts the fixture server (`:4010`), the API (`:3101`) and the web
+   build (`:8182`), runs Playwright, then stops them.
+
+Extra arguments go to Playwright, e.g. `pnpm e2e:web --project=web -g login`.
+The HTML report is written to `apps/e2e/playwright-report/`.
+
+### iOS (Maestro)
+
+One-time setup, on macOS with Xcode:
+
+```bash
+curl -fsSL "https://get.maestro.mobile.dev" | bash   # Maestro CLI
+xcrun simctl boot "iPhone 17 Pro Max"                # any iOS simulator
+cd apps/mobile && APP_VARIANT=development pnpm exec expo run:ios --no-bundler
+```
+
+The last command builds and installs the dev build (`com.bspot.mobile.dev`,
+scheme `bspot-dev`) on the booted simulator. Redo it only when a native
+dependency changes; `apps/mobile/ios/` is generated and git-ignored.
+
+Run, with Docker running and the simulator booted:
+
+```bash
+pnpm e2e:mobile
+```
+
+It brings up the same environment as the web suite (no web build), plus a
+Metro on `:8183` that serves the app's JavaScript with
+`EXPO_PUBLIC_API_URL=http://localhost:3101`, and a control server on
+`127.0.0.1:4011` that the flows call to reset the database or pre-fill the
+app's stored history, read the magic link from MailDev, expire a session
+or demote an admin. Then it runs the flows of `apps/e2e/maestro/flows/`
+and exits with Maestro's code. Each flow starts from a reset database and a
+wiped app. The auth flows (tag `auth`) log in the way a user does: the link
+opens in Safari, which hands the session to the app through
+`bspot-dev://auth/callback`; the flows accept iOS's "Ouvrir dans « B-Spot
+Dev » ?" prompt. The API runs Better-Auth's production origin checks in
+every environment, e2e included. The simulator has no camera: the scan journey opens the company
+page's deep link (`bspot-dev://company/<siren>`), and the brand suggestion
+opens its own screen's link. Extra arguments go to `maestro test`. Reports
+and screenshots land in `apps/e2e/maestro-results/`.
+
+Your own `apps/mobile/.env*` files do not affect the run, and it never
+touches them: the e2e Metro hides them from the bundle (see
+`apps/mobile/metro.config.js`). Before any flow, a preflight reads the
+bundle the dev build loads, and fails if it carries another
+`EXPO_PUBLIC_API_URL` than the e2e one.
+
+The API reads four optional base URLs: `OPEN_FOOD_FACTS_BASE_URL`,
+`OPEN_BEAUTY_FACTS_BASE_URL`, `RECHERCHE_ENTREPRISES_BASE_URL` and
+`PAPPERS_BASE_URL`. Unset, it uses the production URLs.
+
+### One run at a time, and nothing left behind
+
+The e2e environment exists once per machine: one `b_spot_e2e` database and
+the ports 4010, 4011, 3101, 8182 and 8183. So `pnpm e2e:web` and
+`pnpm e2e:mobile` take a lock before they start anything. It is one file,
+`b-spot-e2e.lock.json`, in the repository's git common directory (`.git/` of
+the main checkout), so every git worktree of the repo shares it. It holds
+the pid, the command, the worktree and the start time of the run that has
+it.
+
+- A second run waits, saying who holds the environment, then logs
+  `lock acquired after waiting …`. It gives up after 20 minutes
+  (`E2E_LOCK_WAIT_MINUTES` changes that), naming the holder.
+- A lock whose holder is no longer running is taken over, with a message.
+- Before starting its services, a run checks that no e2e port is taken. If
+  one is, it fails and names the process holding it. It never kills
+  anything.
+- Ctrl-C or `kill` (SIGINT or SIGTERM) stops everything the run started:
+  the API, the fixture and web servers, Metro, Playwright or Maestro, and
+  the containers it started itself (never ones that were already running).
+  Then it frees the lock and exits non-zero. Nothing is left behind.
+  Only `kill -9` escapes this; the next run then takes over the lock and
+  reports the ports still taken.
+
 ## 📁 Project Structure (New Architecture)
 
 ```
@@ -110,7 +228,7 @@ b-spot/
 │   │   │   └── common/       # Shared components
 │   │   └── 📁 api/           # Generated API client (from OpenAPI)
 │   └── app.json              # Expo configuration
-├── 📝 specs/                 # Feature specifications
+├── 📝 project-management/    # Tasks, specs and journal (chisel)
 │   └── mobile-app-rewrite/
 │       ├── spec.md           # Feature specification
 │       ├── plan.md           # Technical implementation plan
@@ -147,9 +265,9 @@ b-spot/
 ## 📚 Documentation
 
 - **[CLAUDE.md](CLAUDE.md)** - Complete developer guide with commands and architecture
-- **[specs/mobile-app-rewrite/spec.md](specs/mobile-app-rewrite/spec.md)** - Feature specification
-- **[specs/mobile-app-rewrite/plan.md](specs/mobile-app-rewrite/plan.md)** - Technical implementation plan
-- **[.specify/memory/constitution.md](.specify/memory/constitution.md)** - Project constitution and principles
+- **[project-management/archive/speckit-mobile-app-rewrite/spec.md](project-management/archive/speckit-mobile-app-rewrite/spec.md)** - Original rewrite specification (archived)
+- **[project-management/archive/speckit-mobile-app-rewrite/plan.md](project-management/archive/speckit-mobile-app-rewrite/plan.md)** - Original implementation plan (archived)
+- **[docs/constitution.md](docs/constitution.md)** - Project constitution and principles
 
 ## 🎯 Development Roadmap
 
@@ -185,7 +303,7 @@ b-spot/
 We welcome contributions! The project is currently in rebuild phase. Once the new mobile app is functional, we'll provide detailed contributing guidelines.
 
 For now, check out:
-- **[specs/mobile-app-rewrite/](specs/mobile-app-rewrite/)** - Implementation specifications
+- **[project-management/](project-management/)** - Tasks, specs and journal
 - **[CLAUDE.md](CLAUDE.md)** - Development guide
 
 ## 📄 License

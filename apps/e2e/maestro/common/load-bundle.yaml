@@ -1,0 +1,23 @@
+# Points the dev build at the e2e Metro and waits for the app's first screen.
+appId: ${APP_ID}
+---
+- runFlow:
+    file: open-link.yaml
+    env:
+      LINK: ${DEV_CLIENT_LINK}
+# First load after a wipe: the dev menu introduces itself, then opens. The
+# header reads "Se connecter", or the user's email after a relaunch.
+- extendedWaitUntil:
+    visible: "Continue|Se connecter|.+@e2e\\.test"
+    timeout: 180000
+- runFlow:
+    when:
+      visible: "Continue"
+    commands:
+      - tapOn: "Continue"
+      - tapOn:
+          id: "xmark"
+- extendedWaitUntil:
+    visible:
+      id: "nav-login-link"
+    timeout: 30000

@@ -1,0 +1,43 @@
+# An expired session sends the user back to logged-out, without a crash.
+appId: ${APP_ID}
+name: session-expiry
+tags:
+  - auth
+---
+- runFlow: ../common/start-clean.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: ${EXPIRY_EMAIL}
+- tapOn:
+    id: "nav-admin-link"
+- tapOn:
+    id: "admin-counter-new"
+- extendedWaitUntil:
+    visible:
+      id: "suggestions-empty"
+    timeout: 15000
+- runScript:
+    file: ../scripts/expire-sessions.js
+    env:
+      EMAIL: ${EXPIRY_EMAIL}
+- tapOn:
+    id: "suggestions-tab-approved"
+# The app sends the user to the login screen. (Its "session expirée" toast is
+# drawn under the iOS login modal, so it is not asserted here; the web suite
+# asserts it.)
+- extendedWaitUntil:
+    visible:
+      id: "login-email-input"
+    timeout: 15000
+# Close the login modal: back on the tabs, logged out.
+- swipe:
+    start: "50%, 15%"
+    end: "50%, 90%"
+- extendedWaitUntil:
+    visible:
+      id: "nav-login-link"
+      text: "Se connecter"
+    timeout: 15000
+- assertNotVisible:
+    id: "nav-admin-link"

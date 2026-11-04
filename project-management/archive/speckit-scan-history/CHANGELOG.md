@@ -1,0 +1,158 @@
+# Changelog: Historique des Scans
+
+All notable changes to this feature specification are documented here.
+
+Format: [Keep a Changelog](https://keepachangelog.com/)
+
+## [2026-05-30 07:00] - /speckit.implement — Phase 6 Polish
+
+### Changed
+
+- T017 : `eslint --fix` sur les fichiers modifiés — formatting corrigé dans `useBarcodeScanner.ts` et `history-utils.ts`
+- T018 : Erreurs pre-existantes (`@typescript-eslint/no-empty-object-type`) non régressées — aucune nouvelle erreur introduite
+- **Author**: AI (Claude)
+- **Files**: `useBarcodeScanner.ts`, `history-utils.ts`
+
+---
+
+## [2026-05-30 06:00] - /speckit.implement — Phase 5 US3
+
+### Changed
+
+- Tâche complétée : T016
+- Extraction de `buildUpdatedHistory` dans `history-utils.ts` (fonction pure, sans dépendances natives)
+- Mise à jour `transformIgnorePatterns` dans `apps/mobile/package.json` pour compatibilité pnpm + Jest
+- 6 tests unitaires `buildUpdatedHistory` passent (insert, dedup, rotation 50, persistance, corruption)
+- 3 tests API `scan.controller.history.spec.ts` passent (réponse vide, clamping limit/offset)
+- **Author**: AI (Claude)
+- **Files**: `history-utils.ts`, `useScanHistory.ts`, `useScanHistory.test.ts`, `package.json`
+
+---
+
+## [2026-05-30 05:00] - /speckit.implement — Phase 3 US1 + Phase 4 US2
+
+### Changed
+
+- Tâches complétées : T008, T009, T010, T011, T012, T013, T014, T015
+- T008 : `useScanHistory` hook (AsyncStorage, addEntry avec dedup + rotation 50)
+- T009 : Injection `addEntry` dans `useBarcodeScanner.ts` après scan réussi
+- T010 : Composant `ScanHistoryEmpty` (état vide + Ionicons)
+- T011 : Composant `ScanHistoryItem` (affichage + formatDate + prop onPress)
+- T012 : Composant `ScanHistoryList` (FlatList + keyExtractor + séparateur)
+- T013 : Screen `history.tsx` remplacé (loading/empty/list states)
+- T014+T015 : Navigation US2 intégrée dans T011+T013 (inséparable de l'affichage)
+- **Author**: AI (Claude)
+- **Files**: `useScanHistory.ts`, `useBarcodeScanner.ts`, `ScanHistoryEmpty.tsx`, `ScanHistoryItem.tsx`, `ScanHistoryList.tsx`, `history.tsx`
+
+---
+
+## [2026-05-30 04:00] - /speckit.implement — Phase 2 Foundational
+
+### Changed
+
+- Tâches complétées : T004, T005, T007 (T006 différé : nécessite serveur API)
+- T004 : Ajout de `GET /api/scan/history` dans `scan.controller.ts` (limit/offset, clamping, ScanHistoryResponseDto)
+- T005 : Test contrôleur `scan.controller.history.spec.ts` (réponse vide, clamping limit, clamping offset)
+- T007 : Interface `ScanHistoryEntry` dans `apps/mobile/src/features/history/types.ts`
+- **Author**: AI (Claude)
+- **Files**: `scan.controller.ts`, `scan.controller.history.spec.ts`, `history/types.ts`
+
+---
+
+## [2026-05-30 03:00] - /speckit.implement — Phase 1 Setup
+
+### Changed
+
+- Tâches complétées : T001, T002, T003
+- T001 : Création de la structure `apps/mobile/src/features/history/hooks/` et `components/`
+- T002 : Création de `apps/api/src/modules/scan/dto/scan-history.dto.ts` (ScanHistoryItemDto, ScanHistoryResponseDto)
+- T003 : Ajout de la méthode stub `getHistory()` dans `apps/api/src/modules/scan/scan.service.ts`
+- **Author**: AI (Claude)
+- **Files**: apps/api/src/modules/scan/dto/scan-history.dto.ts, apps/api/src/modules/scan/scan.service.ts
+
+---
+
+## [2026-05-30 00:00] - /speckit.specify
+
+### Added
+
+- Initial feature specification created from user description: "Historique des scans — affichage local des produits/entreprises scannés, navigation vers fiche entreprise, dédoublonnage"
+- **Author**: AI (Claude)
+- **Files**: spec.md, checklists/requirements.md
+
+## [2026-05-30 02:00] - /speckit.tasks
+
+### Added
+
+- Liste de 18 tâches générées sur 6 phases (Setup, Foundational, US1, US2, US3, Polish)
+- User stories couvertes : US1 (P1), US2 (P2), US3 (P3)
+- **Author**: AI (Claude)
+- **Files**: tasks.md
+
+---
+
+## [2026-05-30 01:00] - /speckit.plan
+
+### Added
+
+- Plan d'implémentation technique créé (plan.md)
+- Recherche et décisions techniques (research.md) : stratégie AsyncStorage, point d'injection, scaffolding API
+- Modèle de données (data-model.md) : ScanHistoryEntry (mobile local), ScanHistoryItemDto + ScanHistoryResponseDto (API)
+- Contrat OpenAPI (contracts/scan-history.yaml) : GET /api/scan/history avec pagination
+- Guide développeur (quickstart.md) : ordre d'implémentation et tests manuels
+- Constitution check : 6/6 principes validés, aucune violation
+- **Author**: AI (Claude)
+- **Files**: plan.md, research.md, data-model.md, contracts/scan-history.yaml, quickstart.md
+
+---
+
+<!--
+CHANGELOG GUIDELINES
+
+This changelog tracks all modifications to the feature specification documents.
+Each speckit command MUST add an entry when modifying files.
+
+## Entry Format
+
+## [YYYY-MM-DD HH:MM] - /speckit.<command>
+### Added | Changed | Fixed | Removed
+- Description of what was added/changed/fixed/removed
+- **Author**: Human | AI (Claude)
+- **Files affected**: spec.md, plan.md, etc.
+
+## Commands and their changelog actions
+
+| Command | Action | Section |
+|---------|--------|---------|
+| /speckit.specify | Create spec | Added |
+| /speckit.clarify | Clarify requirements | Changed |
+| /speckit.plan | Create plan | Added |
+| /speckit.tasks | Create tasks | Added |
+| /speckit.checklist | Create checklist | Added |
+| /speckit.implement | Complete task | Changed |
+| /speckit.analyze | Analysis report | Added (if issues found) |
+
+## Example entries
+
+## [2025-01-09 14:30] - /speckit.specify
+### Added
+- Initial feature specification created from user description
+- **Author**: AI (Claude)
+- **Files**: spec.md
+
+## [2025-01-09 15:00] - /speckit.clarify
+### Changed
+- Clarified authentication method: OAuth2 selected
+- Clarified data retention period: 90 days
+- **Author**: Human + AI (Claude)
+- **Files**: spec.md
+
+## [2025-01-09 16:00] - /speckit.plan
+### Added
+- Technical implementation plan created
+- Research document with technology decisions
+- Data model with 3 entities
+- API contracts for 5 endpoints
+- **Author**: AI (Claude)
+- **Files**: plan.md, research.md, data-model.md, contracts/
+-->

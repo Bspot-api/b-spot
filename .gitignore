@@ -12,6 +12,7 @@ node_modules/
 
 # Deployment secrets
 create-junction-tables.sql
+google-service-account.json
 
 # Production configurations with secrets  
 docker-compose.prod.yml
@@ -119,7 +120,6 @@ Thumbs.db
 *.sqlite3
 
 # Docker
-.dockerignore
 
 # Testing
 coverage/
@@ -149,4 +149,22 @@ seeds/
 # migrations/
 
 # Local development
-.local/ 
+.local/
+
+# Playwright MCP
+.playwright-mcp/
+# Deno (chisel CLI via deno x)
+deno.lock
+.agents/user.md
+
+# E2E (apps/e2e)
+apps/e2e/.web-build/
+apps/e2e/test-results/
+apps/e2e/playwright-report/
+
+# Expo continuous native generation (expo prebuild / expo run)
+apps/mobile/ios/
+apps/mobile/android/
+
+# Maestro results
+apps/e2e/maestro-results/

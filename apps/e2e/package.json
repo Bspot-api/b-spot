@@ -1,0 +1,29 @@
+{
+  "name": "@b-spot/e2e",
+  "version": "0.1.0",
+  "description": "B-Spot end-to-end suites: shared e2e environment, fixture server, Playwright web journeys, Maestro iOS flows",
+  "private": true,
+  "scripts": {
+    "e2e:web": "node --import tsx env/run-web.ts",
+    "e2e:mobile": "node --import tsx env/ios/run-mobile.ts",
+    "fixtures": "tsx fixtures-server/server.ts",
+    "lint": "tsc --noEmit && eslint \"**/*.ts\"",
+    "lint:fix": "eslint \"**/*.ts\" --fix",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test \"env/**/*.test.ts\""
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^20.10.6",
+    "@types/pg": "^8.20.0",
+    "@typescript-eslint/eslint-plugin": "^6.16.0",
+    "@typescript-eslint/parser": "^6.16.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.2",
+    "pg": "^8.21.0",
+    "prettier": "^3.1.1",
+    "tsx": "^4.23.15",
+    "typescript": "^5.3.3"
+  }
+}

@@ -1,0 +1,15 @@
+# Maestro workspace configuration of the iOS suite (`pnpm e2e:mobile`).
+# Every value the flows use arrives with `-e` from apps/e2e/env/maestro-env.ts.
+flows:
+  - "*.yaml"
+executionOrder:
+  continueOnFailure: true
+  flowsOrder:
+    - admin-entry-logged-out
+    - scan-deep-link
+    - brand-suggestion
+    - history
+    - login
+    - admin-entry
+    - session-expiry
+    - moderation

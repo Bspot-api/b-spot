@@ -1,0 +1,34 @@
+# Magic-link login → logged-in state, kept across a relaunch; native
+# sign-out ends the session on the API (none left in the database).
+appId: ${APP_ID}
+name: login
+tags:
+  - auth
+---
+- runFlow: ../common/start-clean.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: ${LOGIN_EMAIL}
+- assertVisible:
+    id: "nav-admin-link"
+- runFlow: ../common/relaunch.yaml
+- assertVisible:
+    id: "nav-login-link"
+    text: ${LOGIN_EMAIL}
+- tapOn:
+    id: "nav-admin-link"
+- tapOn:
+    id: "admin-sign-out"
+- extendedWaitUntil:
+    visible:
+      id: "nav-login-link"
+      text: "Se connecter"
+    timeout: 15000
+- assertNotVisible:
+    id: "nav-admin-link"
+- runScript:
+    file: ../scripts/count-sessions.js
+    env:
+      EMAIL: ${LOGIN_EMAIL}
+- assertTrue: ${output.sessionCount == 0}

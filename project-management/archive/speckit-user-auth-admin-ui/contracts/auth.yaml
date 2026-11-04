@@ -1,0 +1,95 @@
+openapi: "3.0.3"
+info:
+  title: B-Spot Auth Endpoints
+  version: "1.0.0"
+  description: >
+    Authentication endpoints managed by Better-Auth.
+    Session state is maintained via HTTP-only cookie (better-auth.session_token).
+    All requests from the mobile client must include credentials: 'include'.
+
+paths:
+  /api/auth/sign-in/magic-link:
+    post:
+      summary: Request a magic link login email
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+      responses:
+        "200":
+          description: Magic link sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Magic link sent"
+        "400":
+          description: Invalid email address
+
+  /api/auth/get-session:
+    get:
+      summary: Get current session
+      tags: [auth]
+      responses:
+        "200":
+          description: Session present
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionDto"
+        "401":
+          description: No active session (returns null body in practice)
+          content:
+            application/json:
+              schema:
+                nullable: true
+                example: null
+
+  /api/auth/sign-out:
+    delete:
+      summary: Sign out the current user
+      tags: [auth]
+      responses:
+        "200":
+          description: Signed out successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Signed out"
+        "401":
+          description: No active session
+
+components:
+  schemas:
+    SessionDto:
+      type: object
+      required: [user]
+      properties:
+        user:
+          type: object
+          required: [id, email, name]
+          properties:
+            id:
+              type: string
+              format: uuid
+            email:
+              type: string
+              format: email
+            name:
+              type: string

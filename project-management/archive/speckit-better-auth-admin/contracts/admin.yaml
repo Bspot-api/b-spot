@@ -1,0 +1,152 @@
+openapi: "3.0.3"
+info:
+  title: B-Spot Admin API
+  description: Admin management endpoints. All routes require a valid session + admin status.
+  version: "1.0.0"
+
+paths:
+  /api/admin/me:
+    get:
+      summary: Get current admin profile
+      description: Returns the authenticated admin's user info and admin record.
+      tags: [admin]
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Authenticated admin info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminProfile"
+        "401":
+          description: No session
+        "403":
+          description: Session valid but user is not an admin
+
+  /api/admin/admins:
+    get:
+      summary: List all admins
+      description: Returns all admin records with their associated user info.
+      tags: [admin]
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: List of admins
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminRecord"
+        "401":
+          description: No session
+        "403":
+          description: Not an admin
+
+  /api/admin/admins:
+    post:
+      summary: Promote a user to admin
+      description: >
+        Creates an admin record for the given userId.
+        The user must already exist in the `user` table.
+      tags: [admin]
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId]
+              properties:
+                userId:
+                  type: string
+                  example: "01970000-0000-7000-8000-000000000002"
+      responses:
+        "201":
+          description: Admin record created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminRecord"
+        "400":
+          description: User not found or already an admin
+        "401":
+          description: No session
+        "403":
+          description: Not an admin
+
+  /api/admin/admins/{userId}:
+    delete:
+      summary: Revoke admin status
+      description: >
+        Removes the admin record for the given userId.
+        Blocked if this is the last remaining admin (FR-006).
+      tags: [admin]
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Admin status revoked
+        "400":
+          description: Cannot revoke — this is the last admin
+        "404":
+          description: Admin record not found
+        "401":
+          description: No session
+        "403":
+          description: Not an admin
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: session_token
+
+  schemas:
+    AdminProfile:
+      type: object
+      properties:
+        adminId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        promotedAt:
+          type: string
+          format: date-time
+
+    AdminRecord:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+        user:
+          type: object
+          properties:
+            email:
+              type: string
+              format: email
+            name:
+              type: string
+        createdAt:
+          type: string
+          format: date-time

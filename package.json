@@ -12,11 +12,15 @@
     "build:api": "pnpm --filter api build",
     "test": "pnpm --recursive test",
     "lint": "pnpm --recursive lint",
+    "typecheck": "pnpm --recursive typecheck",
     "clean": "pnpm --recursive clean",
     "db:up": "docker-compose up -d",
     "db:down": "docker-compose down",
     "db:logs": "docker-compose logs -f postgres",
-    "generate:types": "pnpm --filter mobile generate:types"
+    "mail:logs": "docker-compose logs -f maildev",
+    "generate:types": "pnpm --filter mobile generate:types",
+    "e2e:web": "pnpm --filter @b-spot/e2e e2e:web",
+    "e2e:mobile": "pnpm --filter @b-spot/e2e e2e:mobile"
   },
   "devDependencies": {
     "@mikro-orm/cli": "^6.4.16",

@@ -1,0 +1,113 @@
+openapi: '3.0.3'
+info:
+  title: B-Spot Scan History API
+  version: '1.0.0'
+  description: >
+    Endpoint pour l'historique des scans.
+    Phase 1 : scaffoldé, retourne toujours une liste vide.
+    Phase 2 (avec auth) : retournera l'historique lié à l'utilisateur authentifié.
+
+paths:
+  /api/scan/history:
+    get:
+      tags:
+        - scan
+      summary: Retrieve scan history (scaffolded for future auth integration)
+      description: >
+        Retourne la liste paginée des scans enregistrés pour l'utilisateur.
+        En phase 1 (sans authentification), retourne toujours items=[] et total=0.
+        En phase 2 (avec authentification), retournera l'historique réel.
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+          description: Nombre maximum d'entrées à retourner
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Décalage pour la pagination
+      responses:
+        '200':
+          description: Liste paginée des scans
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanHistoryResponseDto'
+              example:
+                items: []
+                total: 0
+                limit: 50
+                offset: 0
+
+components:
+  schemas:
+    ScanHistoryItemDto:
+      type: object
+      required:
+        - barcode
+        - productName
+        - brandName
+        - companyName
+        - companySiren
+        - productSource
+        - scannedAt
+      properties:
+        barcode:
+          type: string
+          example: '3017620422003'
+          description: Code-barres EAN-8 ou EAN-13
+        productName:
+          type: string
+          example: 'Nutella'
+        brandName:
+          type: string
+          example: 'Ferrero'
+        companyName:
+          type: string
+          example: 'Ferrero France SAS'
+        companySiren:
+          type: string
+          example: '552032534'
+          description: SIREN 9 chiffres — clé de navigation vers la fiche entreprise
+        productSource:
+          type: string
+          enum:
+            - OFF
+            - OBF
+          description: 'OFF = Open Food Facts, OBF = Open Beauty Facts'
+        scannedAt:
+          type: string
+          format: date-time
+          example: '2026-05-30T14:22:00.000Z'
+
+    ScanHistoryResponseDto:
+      type: object
+      required:
+        - items
+        - total
+        - limit
+        - offset
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScanHistoryItemDto'
+        total:
+          type: integer
+          example: 0
+          description: Nombre total d'entrées (avant pagination)
+        limit:
+          type: integer
+          example: 50
+        offset:
+          type: integer
+          example: 0

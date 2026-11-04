@@ -1,0 +1,8 @@
+# Every flow starts here: seeded database, app data wiped (history, cookies),
+# the e2e bundle loaded from the e2e Metro.
+appId: ${APP_ID}
+---
+- runScript: ../scripts/reset.js
+- launchApp:
+    clearState: true
+- runFlow: load-bundle.yaml

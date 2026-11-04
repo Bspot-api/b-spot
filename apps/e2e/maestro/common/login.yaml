@@ -1,0 +1,25 @@
+# Logs ${EMAIL} in the way a user does: request a link in the app, open it
+# (Safari, as a mail client hands it over), let Safari hand the session back
+# to the app through bspot-dev://auth/callback, accepting iOS's prompt.
+appId: ${APP_ID}
+---
+- tapOn:
+    id: "nav-login-link"
+- tapOn:
+    id: "login-email-input"
+- inputText: ${EMAIL}
+- tapOn:
+    id: "login-submit"
+- assertVisible:
+    id: "login-sent"
+- runScript: ../scripts/magic-link.js
+- openLink: ${output.link}
+- extendedWaitUntil:
+    visible: "Ouvrir|Open"
+    timeout: 30000
+- tapOn: "Ouvrir|Open"
+- extendedWaitUntil:
+    visible:
+      id: "nav-login-link"
+      text: ${EMAIL}
+    timeout: 30000

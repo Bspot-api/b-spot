@@ -1,0 +1,9 @@
+# Opens ${LINK}, accepting iOS's "Open in B-Spot Dev?" prompt when it shows.
+appId: ${APP_ID}
+---
+- openLink: ${LINK}
+- runFlow:
+    when:
+      visible: "Ouvrir|Open"
+    commands:
+      - tapOn: "Ouvrir|Open"
