@@ -109,8 +109,8 @@ questionnaire directly. -->
 <!-- Questionnaire asks: lint / test / build / browser-check commands,
 prefilled from repo exploration + package.json where possible. -->
 
-- **Lint:** `pnpm lint` (the API's lint runs with `--fix`: commit what it
-  rewrites)
+- **Lint:** `pnpm lint` (read-only in every package; each package's
+  `pnpm lint:fix` applies the auto-fixes)
 - **Test:** `pnpm test`
 - **Build:** `pnpm build`
 - **Browser check:** `cd apps/mobile && pnpm web` + manual check (needs
