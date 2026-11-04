@@ -3,7 +3,7 @@
 Created by the Crewmate at the plan step, 2026-11-04. Spec:
 `project-management/tasks/20261103-2256-product-source-label.spec.md`.
 
-**Plan:** waiting for the Architect's reading.
+**Plan:** approved by the Architect, 2026-11-04 (see Rulings).
 
 ## Program Design
 
@@ -153,6 +153,17 @@ first and releases it at the end, failure included. Logs go to
   I run eslint on my own files only (`pnpm --filter @b-spot/e2e exec tsc
   --noEmit` plus eslint on the touched paths, and the mobile eslint on its
   touched paths), and revert anything a `--fix` rewrites outside my diff.
+
+### Rulings — Architect, 2026-11-04
+
+- **History already on devices:** accepted. Entries stored as `'OFF'` stay
+  as they are, with no migration. The journal entry says so.
+- **Contract check:** it lives in `apps/e2e/checks/`, in the `environment`
+  project, and runs under `pnpm e2e:web`.
+- **"In the history":** read as the stored entry, plus the company page
+  reopened from it.
+- **`apps/e2e` importing `apps/mobile/src/api/types.ts`:** accepted. The
+  copied list is only a fallback, and it must be recorded if used.
 
 ## Diff-Review Findings
 
