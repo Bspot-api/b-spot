@@ -1,6 +1,6 @@
 # Magic-link login works in the native app
 
-**Status:** ready
+**Status:** in-progress
 
 ---
 
