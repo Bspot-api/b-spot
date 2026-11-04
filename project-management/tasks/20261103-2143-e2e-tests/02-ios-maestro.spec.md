@@ -1,6 +1,6 @@
 # 02 — iOS journeys with Maestro
 
-**Status:** ready
+**Status:** in-progress
 **Blocked by:** 01 — Web journeys with Playwright (the shared e2e
 environment and the stable selectors)
 
