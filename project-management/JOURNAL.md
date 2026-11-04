@@ -5,6 +5,22 @@ task — never generated.
 
 ## 2026-11-04
 
+- Split the admin suggestions screen (`refactor/split-admin-suggestions`):
+  `apps/mobile/app/admin/suggestions.tsx` goes from 359 to 96 lines, with
+  no behaviour change.
+  - The new `src/features/admin/` feature holds three components
+    (`SuggestionCard`, `SuggestionStatusTabs`, `SuggestionEditSheet`), the
+    `useSuggestionEditor` hook (the edit state and the save), and the pure
+    `suggestion-draft.ts`, which has a unit test.
+  - Proof: `pnpm e2e:web` green before and after (25 passed), testIDs
+    identical; `pnpm lint`, `pnpm test`, `pnpm build` green.
+  - Rulings: PascalCase component files (matching the neighbours, against
+    `docs/agent-rules/common.md`); JSX components over 30 lines accepted.
+  - Open: mobile `tsc --noEmit` is red on every existing test file (no jest
+    types); the spec's context still says 336 lines.
+  - Documents:
+    `project-management/archive/20261103-2256-split-admin-suggestions/`.
+
 - e2e mobile ignores the local `.env` (`fix/e2e-mobile-local-env`):
   `pnpm e2e:mobile` now passes 4/4 even when the developer has an
   `apps/mobile/.env*` with another `EXPO_PUBLIC_API_URL`.
