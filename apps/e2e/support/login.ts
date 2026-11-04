@@ -13,10 +13,17 @@ export async function requestMagicLink(page: Page, email: string): Promise<strin
   return fetchLatestMagicLink({ email, since });
 }
 
-/** Opens a magic link in another tab of the same browser, like a mail client would. */
+/**
+ * Opens a magic link in another tab of the same browser, like a mail client
+ * would. The link must land back on the web app, not on the API's own origin
+ * (which has no page at `/`).
+ */
 export async function openMagicLink(page: Page, link: string): Promise<void> {
   const mailTab = await page.context().newPage();
   await mailTab.goto(link);
+  expect(new URL(mailTab.url()).origin, 'the magic link lands on the web app').toBe(
+    new URL(page.url()).origin,
+  );
   await mailTab.close();
 }
 

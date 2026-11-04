@@ -5,6 +5,15 @@ task — never generated.
 
 ## 2026-11-04
 
+- Web magic link lands on the web app (`fix/web-magic-link-callback`): in
+  production the emailed link opened `api.b-spot.org/` ("Cannot GET /")
+  although login worked, because the web sent no `callbackURL` and
+  Better-Auth fell back to `/` on the API's origin. The web now calls back
+  to `window.location.origin`. The API must trust that origin through
+  `CORS_ORIGIN` (now in `apps/api/.env.example`; production already has
+  `https://b-spot.org`). The e2e login helper asserts the link lands on
+  the web app, which failed before the fix.
+
 - e2e runs take the lock themselves and clean up when killed
   (`chore/e2e-runner-lock`).
   - **The lock.** `pnpm e2e:web` and `pnpm e2e:mobile` take an exclusive
