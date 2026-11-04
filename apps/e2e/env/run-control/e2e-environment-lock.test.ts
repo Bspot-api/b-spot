@@ -50,14 +50,15 @@ describe('resolveLockWaitMs', () => {
     assert.equal(resolveLockWaitMs(), 20 * 60_000);
   });
 
-  it('honours E2E_LOCK_WAIT_MINUTES, and ignores a value that is not a number', () => {
+  it('honours E2E_LOCK_WAIT_MINUTES', () => {
     process.env[LOCK_WAIT_VARIABLE] = '0.5';
-    const actualOverride = resolveLockWaitMs();
+
+    assert.equal(resolveLockWaitMs(), 30_000);
+  });
+
+  it('fails fast on a value that is not a number of minutes', () => {
     process.env[LOCK_WAIT_VARIABLE] = 'soon';
 
-    const actualFallback = resolveLockWaitMs();
-
-    assert.equal(actualOverride, 30_000);
-    assert.equal(actualFallback, 20 * 60_000);
+    assert.throws(() => resolveLockWaitMs(), /E2E_LOCK_WAIT_MINUTES.*"soon"/);
   });
 });

@@ -36,10 +36,15 @@ async function interruptProbe(signals: readonly NodeJS.Signals[]): Promise<Probe
   return { exitCode: await exited, lines: lines.filter((line) => line.startsWith('cleanup')) };
 }
 
-const EXPECTED_ORDER = ['cleanup third', 'cleanup second', 'cleanup first'];
+const EXPECTED_ORDER = [
+  'cleanup third',
+  'cleanup second',
+  'cleanup first',
+  'cleanup refused a late child',
+];
 
 describe('onInterrupt', () => {
-  it('runs the cleanups last-registered-first on SIGINT, then exits 130', async () => {
+  it('runs the cleanups last-registered-first on SIGINT, refuses late starts, exits 130', async () => {
     const actualRun = await interruptProbe(['SIGINT']);
 
     assert.deepEqual(actualRun.lines, EXPECTED_ORDER);

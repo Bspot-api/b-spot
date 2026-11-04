@@ -1,5 +1,5 @@
 import { ChildProcess, spawn } from 'node:child_process';
-import { onInterrupt } from './run-control/interrupt';
+import { assertNotInterrupted, onInterrupt } from './run-control/interrupt';
 
 const STOP_GRACE_MS = 5_000;
 
@@ -12,15 +12,22 @@ function buildChildEnv(options: CommandOptions): NodeJS.ProcessEnv {
   return { ...process.env, ...options.env };
 }
 
-function terminateChild(child: ChildProcess): Promise<void> {
+/**
+ * Sends SIGTERM through `sendSignal` (to the child, or to its process group),
+ * then SIGKILL after a grace period; resolves once `child` exited.
+ */
+export function terminateWithGrace(
+  child: ChildProcess,
+  sendSignal: (signal: NodeJS.Signals) => void,
+): Promise<void> {
   if (child.exitCode !== null || child.signalCode !== null) return Promise.resolve();
   return new Promise((resolve) => {
-    const force = setTimeout(() => child.kill('SIGKILL'), STOP_GRACE_MS);
+    const force = setTimeout(() => sendSignal('SIGKILL'), STOP_GRACE_MS);
     child.once('exit', () => {
       clearTimeout(force);
       resolve();
     });
-    child.kill('SIGTERM');
+    sendSignal('SIGTERM');
   });
 }
 
@@ -29,7 +36,7 @@ function terminateChild(child: ChildProcess): Promise<void> {
  * directly, but a SIGTERM sent to pnpm alone does not.
  */
 function stopOnInterrupt(child: ChildProcess): void {
-  const unregister = onInterrupt(() => terminateChild(child));
+  const unregister = onInterrupt(() => terminateWithGrace(child, (signal) => child.kill(signal)));
   child.once('exit', unregister);
 }
 
@@ -39,6 +46,7 @@ export function runCommandForExitCode(
   args: readonly string[],
   options: CommandOptions,
 ): Promise<number> {
+  assertNotInterrupted(`"${command} ${args.join(' ')}"`);
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd: options.cwd,
@@ -69,6 +77,7 @@ export function captureCommand(
   args: readonly string[],
   options: CommandOptions,
 ): Promise<string> {
+  assertNotInterrupted(`"${command} ${args.join(' ')}"`);
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd: options.cwd,

@@ -13,19 +13,30 @@ export type Cleanup = () => Promise<void>;
 const INTERRUPT_SIGNALS = ['SIGINT', 'SIGTERM'] as const;
 /** `compose stop` alone may wait 10 s per container. */
 const CLEANUP_DEADLINE_MS = 45_000;
+/** A process killed by signal n exits 128 + n (the shell convention). */
+const SIGNAL_EXIT_CODE_BASE = 128;
 
 const cleanups: Cleanup[] = [];
 let receivedSignal: NodeJS.Signals | undefined;
 let isInstalled = false;
 
 /** 130 for SIGINT, 143 for SIGTERM. */
-export function exitCodeForSignal(signal: NodeJS.Signals): number {
-  return 128 + os.constants.signals[signal];
+export function computeSignalExitCode(signal: NodeJS.Signals): number {
+  return SIGNAL_EXIT_CODE_BASE + os.constants.signals[signal];
 }
 
 /** The signal that interrupted this run, if any. */
-export function interruptSignal(): NodeJS.Signals | undefined {
+export function getInterruptSignal(): NodeJS.Signals | undefined {
   return receivedSignal;
+}
+
+/**
+ * Refuses to start `what` once the run is interrupted: the cleanups already
+ * running would not know it, and it would outlive the run.
+ */
+export function assertNotInterrupted(what: string): void {
+  if (receivedSignal)
+    throw new Error(`[e2e] not starting ${what}: the run is stopping (${receivedSignal})`);
 }
 
 async function runCleanups(): Promise<void> {
@@ -51,7 +62,7 @@ async function handleSignal(signal: NodeJS.Signals): Promise<void> {
   ]);
   if (!isDone)
     console.error(`[e2e] cleanup still running after ${CLEANUP_DEADLINE_MS} ms; exiting`);
-  process.exit(exitCodeForSignal(signal));
+  process.exit(computeSignalExitCode(signal));
 }
 
 function installHandlers(): void {

@@ -8,6 +8,7 @@ import path from 'node:path';
 import { REPO_ROOT } from '../e2e-env';
 import { HeldLock, LockHolder, acquireLock } from './e2e-lock';
 
+/** The lock file's name inside the git common directory. */
 export const LOCK_FILE_NAME = 'b-spot-e2e.lock.json';
 /** Overrides the lock's path (experiments and tests). */
 export const LOCK_FILE_VARIABLE = 'E2E_LOCK_FILE';
@@ -15,6 +16,7 @@ export const LOCK_FILE_VARIABLE = 'E2E_LOCK_FILE';
 export const LOCK_WAIT_VARIABLE = 'E2E_LOCK_WAIT_MINUTES';
 const DEFAULT_WAIT_MINUTES = 20;
 const POLL_MS = 2_000;
+const MS_PER_MINUTE = 60_000;
 
 function findGitCommonDir(): string {
   const args = ['rev-parse', '--path-format=absolute', '--git-common-dir'];
@@ -34,11 +36,14 @@ export function resolveE2eLockPath(): string {
   }
 }
 
-/** The bounded wait: `$E2E_LOCK_WAIT_MINUTES`, 20 minutes by default. */
+/** The bounded wait: `$E2E_LOCK_WAIT_MINUTES`, 20 minutes by default; a bad value fails fast. */
 export function resolveLockWaitMs(): number {
-  const minutes = Number(process.env[LOCK_WAIT_VARIABLE] ?? DEFAULT_WAIT_MINUTES);
-  const isValid = Number.isFinite(minutes) && minutes >= 0;
-  return (isValid ? minutes : DEFAULT_WAIT_MINUTES) * 60_000;
+  const value = process.env[LOCK_WAIT_VARIABLE];
+  const minutes = value === undefined ? DEFAULT_WAIT_MINUTES : Number(value);
+  if (!Number.isFinite(minutes) || minutes < 0) {
+    throw new Error(`[e2e] ${LOCK_WAIT_VARIABLE} must be a number of minutes, got "${value}"`);
+  }
+  return minutes * MS_PER_MINUTE;
 }
 
 /** This run as a lock holder, e.g. `pnpm e2e:web --project=web`. */

@@ -7,15 +7,11 @@
  */
 import path from 'node:path';
 import {
-  API_PORT,
   API_ROOT,
   API_URL,
-  CONTROL_PORT,
+  E2E_PORTS,
   E2E_ROOT,
-  FIXTURES_PORT,
   FIXTURES_URL,
-  METRO_PORT,
-  WEB_PORT,
   WEB_URL,
   buildApiEnv,
 } from './e2e-env';
@@ -24,15 +20,13 @@ import { planContainers, startContainers, stopContainers } from './docker';
 import { runCommand } from './process';
 import { acquireE2eEnvironmentLock } from './run-control/e2e-environment-lock';
 import { HeldLock } from './run-control/e2e-lock';
-import { exitCodeForSignal, interruptSignal, onInterrupt } from './run-control/interrupt';
+import { computeSignalExitCode, getInterruptSignal, onInterrupt } from './run-control/interrupt';
 import { assertPortsFree } from './run-control/port-preflight';
 import { RunningService, ServiceDefinition, spawnService } from './services';
 import { buildWebApp } from './web/web-build';
 
 const GUARD = path.join(E2E_ROOT, 'env', 'block-external-hosts.ts');
 const API_MAIN = path.join(API_ROOT, 'dist', 'src', 'main.js');
-/** Every port an e2e run listens on; none may be taken before it starts. */
-const E2E_PORTS = [FIXTURES_PORT, CONTROL_PORT, API_PORT, WEB_PORT, METRO_PORT] as const;
 
 export interface E2eEnvironmentOptions {
   /** Export the web app and serve it on the e2e web port (web suite only). */
@@ -120,8 +114,8 @@ async function bringUpAndRun(
 
 /** The interrupt's exit code once a signal arrived, whatever the suite or a killed step said. */
 function settleExitCode(code: number): number {
-  const signal = interruptSignal();
-  return signal ? exitCodeForSignal(signal) : code;
+  const signal = getInterruptSignal();
+  return signal ? computeSignalExitCode(signal) : code;
 }
 
 /**
@@ -140,7 +134,7 @@ export async function withE2eEnvironment(
   try {
     return settleExitCode(await bringUpAndRun(options, started, run));
   } catch (error) {
-    if (interruptSignal()) return settleExitCode(1);
+    if (getInterruptSignal()) return settleExitCode(1);
     throw error;
   } finally {
     await teardown();

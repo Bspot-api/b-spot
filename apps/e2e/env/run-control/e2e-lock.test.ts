@@ -77,10 +77,10 @@ describe('acquireLock on a free lock', () => {
   it('acquires a free lock and writes its holder', async () => {
     const inputOptions = buildOptions();
 
-    const actualLock = await acquireLock(inputOptions);
+    await acquireLock(inputOptions);
 
     assert.deepEqual(readLock(), inputOptions.holder);
-    assert.equal(actualLock.waitedMs >= 0, true);
+    assert.doesNotMatch(messages.join('\n'), /waiting/);
   });
 });
 
@@ -128,9 +128,8 @@ describe('acquireLock on a live holder', () => {
     writeLock(buildHolder({ startedAt: '2026-11-04T10:00:00Z' }));
     setTimeout(() => fs.rmSync(lockPath), 150);
 
-    const actualLock = await acquireLock(buildOptions({ waitLimitMs: 5_000 }));
+    await acquireLock(buildOptions({ waitLimitMs: 5_000 }));
 
-    assert.equal(actualLock.waitedMs > 0, true);
     assert.match(messages.join('\n'), /lock acquired after waiting/);
   });
 });

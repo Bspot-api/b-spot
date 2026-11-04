@@ -16,7 +16,7 @@ async function contend(lockPath: string, goAt: number): Promise<void> {
     worktree: process.cwd(),
     startedAt: new Date().toISOString(),
   };
-  const attempt = attemptLock(lockPath, holder, (message) => console.error(message));
+  const attempt = attemptLock({ path: lockPath, holder, log: console.error });
   console.log(attempt.isAcquired ? 'won' : 'lost');
   await sleep(HOLD_MS);
 }

@@ -1,10 +1,10 @@
 import { ChildProcess, spawn } from 'node:child_process';
 import { sleep } from '../support/wait';
-import { onInterrupt } from './run-control/interrupt';
+import { terminateWithGrace } from './process';
+import { assertNotInterrupted, onInterrupt } from './run-control/interrupt';
 
 const READY_STEP_MS = 500;
 const READY_TIMEOUT_MS = 120_000;
-const STOP_GRACE_MS = 5_000;
 
 /** A long-running process of the e2e environment, ready once `readyUrl` answers. */
 export interface ServiceDefinition {
@@ -55,27 +55,21 @@ function killGroup(pid: number, signal: NodeJS.Signals): void {
 }
 
 /** Kills the service's whole process group (pnpm/tsx spawn children of their own). */
-function stopChild(name: string, child: ChildProcess): Promise<void> {
-  if (child.pid === undefined) return Promise.resolve();
+async function stopChild(name: string, child: ChildProcess): Promise<void> {
+  if (child.pid === undefined) return;
   const pid = child.pid;
   if (child.exitCode !== null || child.signalCode !== null) {
     // The leader is gone; what it spawned may still run in its group.
     killGroup(pid, 'SIGTERM');
-    return Promise.resolve();
+    return;
   }
-  return new Promise((resolve) => {
-    const force = setTimeout(() => killGroup(pid, 'SIGKILL'), STOP_GRACE_MS);
-    child.once('exit', () => {
-      clearTimeout(force);
-      console.log(`[e2e] ${name} stopped`);
-      resolve();
-    });
-    killGroup(pid, 'SIGTERM');
-  });
+  await terminateWithGrace(child, (signal) => killGroup(pid, signal));
+  console.log(`[e2e] ${name} stopped`);
 }
 
 /** Starts a service in its own process group and waits until it answers. */
 export async function spawnService(definition: ServiceDefinition): Promise<RunningService> {
+  assertNotInterrupted(definition.name);
   console.log(`[e2e] starting ${definition.name}`);
   const child = spawn(definition.command, definition.args, {
     cwd: definition.cwd,

@@ -16,7 +16,9 @@ import {
 
 export type { LockHolder } from './lock-file';
 
-const NOTICE_EVERY_MS = 60_000;
+const MS_PER_SECOND = 1_000;
+const SECONDS_PER_MINUTE = 60;
+const NOTICE_EVERY_MS = SECONDS_PER_MINUTE * MS_PER_SECOND;
 
 export interface LockOptions {
   path: string;
@@ -29,14 +31,16 @@ export interface LockOptions {
 /** A held lock; `release` is synchronous and idempotent. */
 export interface HeldLock {
   release: () => void;
-  waitedMs: number;
 }
+
+/** What one try needs: the lock, who takes it, where to say a stale lock was taken over. */
+export type LockAttemptOptions = Pick<LockOptions, 'path' | 'holder' | 'log'>;
 
 /** One try: acquired, or blocked by `holder` (undefined when the lock just vanished). */
 export type LockAttempt = { isAcquired: true } | { isAcquired: false; holder: HolderReading };
 
 /** A holder is alive while its pid exists (EPERM: it exists under another user). */
-export function isHolderAlive(holder: LockHolder): boolean {
+function isHolderAlive(holder: LockHolder): boolean {
   try {
     process.kill(holder.pid, 0);
     return true;
@@ -56,11 +60,7 @@ function isStale(holder: HolderReading): holder is LockHolder | 'unreadable' {
 }
 
 /** Tries the lock once, taking over a stale one. */
-export function attemptLock(
-  lockPath: string,
-  holder: LockHolder,
-  log: (message: string) => void,
-): LockAttempt {
+export function attemptLock({ path: lockPath, holder, log }: LockAttemptOptions): LockAttempt {
   if (tryCreateLock(lockPath, holder)) return { isAcquired: true };
   const current = readHolder(lockPath);
   if (!isStale(current)) return { isAcquired: false, holder: current };
@@ -74,16 +74,17 @@ export function attemptLock(
 }
 
 function formatDuration(ms: number): string {
-  const seconds = Math.round(ms / 1000);
-  return `${Math.floor(seconds / 60)}m${String(seconds % 60).padStart(2, '0')}s`;
+  const seconds = Math.round(ms / MS_PER_SECOND);
+  const minutes = Math.floor(seconds / SECONDS_PER_MINUTE);
+  return `${minutes}m${String(seconds % SECONDS_PER_MINUTE).padStart(2, '0')}s`;
 }
 
 function holdLock(options: LockOptions, waitedMs: number): HeldLock {
   if (waitedMs > 0) options.log(`[e2e] lock acquired after waiting ${formatDuration(waitedMs)}`);
-  return { release: () => removeOwnLock(options.path, options.holder), waitedMs };
+  return { release: () => removeOwnLock(options.path, options.holder) };
 }
 
-function giveUp(options: LockOptions, holder: HolderReading): Error {
+function buildGiveUpError(options: LockOptions, holder: HolderReading): Error {
   const limit = formatDuration(options.waitLimitMs);
   return new Error(
     `[e2e] gave up after ${limit}: the e2e environment is still held by ${describeHolder(holder)}; ` +
@@ -97,9 +98,10 @@ export async function acquireLock(options: LockOptions): Promise<HeldLock> {
   let lastNoticeAt = Number.NEGATIVE_INFINITY;
   let hasWaited = false;
   for (;;) {
-    const attempt = attemptLock(options.path, options.holder, options.log);
+    const attempt = attemptLock(options);
     if (attempt.isAcquired) return holdLock(options, hasWaited ? Date.now() - startedAt : 0);
-    if (Date.now() - startedAt >= options.waitLimitMs) throw giveUp(options, attempt.holder);
+    if (Date.now() - startedAt >= options.waitLimitMs)
+      throw buildGiveUpError(options, attempt.holder);
     if (Date.now() - lastNoticeAt >= NOTICE_EVERY_MS) {
       const limit = formatDuration(options.waitLimitMs);
       options.log(
