@@ -3,7 +3,7 @@
 Created by the Crewmate at the plan step, 2026-11-04. Spec:
 `project-management/tasks/20261103-2256-split-admin-suggestions.spec.md`.
 
-**Plan:** waiting for the Architect's reading.
+**Plan:** approved by the Architect, 2026-11-04 (see Rulings).
 
 ## Program Design
 
@@ -199,6 +199,18 @@ Steps 3 to 5 each run mobile lint, `tsc --noEmit` and jest, then commit.
 - Pure helpers are tested like `history-utils.ts`
   (`src/features/history/hooks/__tests__/useScanHistory.test.ts`): plain
   jest, no rendering.
+
+### Rulings — Architect, 2026-11-04
+
+- **File naming:** PascalCase for components, to match the existing
+  `src/features/*/components/`, and kebab-case for pure helpers.
+  `docs/agent-rules/common.md` says kebab-case; that gap between the rule
+  and the codebase is reported to the human, not settled here.
+- **Scope:** extracting the status tabs and `useSuggestionEditor` as well
+  is accepted. They are pure moves.
+- **30-line functions:** the route function and the card's JSX may stay
+  above 30 lines. This task's criterion is the 300-line file limit.
+- **Spec dependency line:** updated, since the merge is done.
 
 ## Diff-Review Findings
 

@@ -40,7 +40,7 @@ holds the screen, the list item and the edit BottomSheet.
 
 ## Slices & Dependencies
 
-- Blocked by: the merge of `fix/web-ux-bugs`, which edits the same file.
+- Blocked by: none. The merge of `fix/web-ux-bugs` is done (2026-11-03).
 
 ## Notes
 
