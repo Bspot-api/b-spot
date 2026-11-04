@@ -100,24 +100,16 @@ describe('ScanController (E2E)', () => {
     });
 
     it('returns 400 when barcode is missing', async () => {
-      await request(app.getHttpServer())
-        .post('/api/scan')
-        .send({})
-        .expect(400);
+      await request(app.getHttpServer()).post('/api/scan').send({}).expect(400);
     });
 
     it('returns 400 when barcode is too short', async () => {
-      await request(app.getHttpServer())
-        .post('/api/scan')
-        .send({ barcode: '123' })
-        .expect(400);
+      await request(app.getHttpServer()).post('/api/scan').send({ barcode: '123' }).expect(400);
     });
 
     it('returns 404 when product is not found', async () => {
       const { NotFoundException } = await import('@nestjs/common');
-      scanServiceMock.scanProduct.mockRejectedValue(
-        new NotFoundException('Produit introuvable'),
-      );
+      scanServiceMock.scanProduct.mockRejectedValue(new NotFoundException('Produit introuvable'));
 
       await request(app.getHttpServer())
         .post('/api/scan')

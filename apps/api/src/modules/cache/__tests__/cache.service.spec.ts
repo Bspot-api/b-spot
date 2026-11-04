@@ -125,7 +125,10 @@ describe('CacheService', () => {
       pappersCacheRepoMock.findOne.mockResolvedValue(null);
       await service.setCachedPappers('552108011', { legalName: 'Nestlé France' });
       expect(pappersCacheRepoMock.create).toHaveBeenCalledWith(
-        expect.objectContaining({ siren: '552108011', responseData: { legalName: 'Nestlé France' } }),
+        expect.objectContaining({
+          siren: '552108011',
+          responseData: { legalName: 'Nestlé France' },
+        }),
       );
       expect(mockEm.persistAndFlush).toHaveBeenCalled();
     });
