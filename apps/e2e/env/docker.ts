@@ -65,23 +65,25 @@ async function isMailDevReady(): Promise<boolean> {
   return true;
 }
 
-/** Starts Postgres and MailDev; returns the services this run started itself. */
-export async function startContainers(): Promise<string[]> {
+/**
+ * Lists the containers this run must start (those not running yet), and
+ * points the run at an already-running MailDev's ports. Known before
+ * `startContainers`, so an interrupted start still stops exactly these.
+ */
+export async function planContainers(): Promise<string[]> {
   const running = await listRunningServices();
-  const toStart = SERVICES.filter((service) => !running.includes(service));
   if (running.includes('maildev')) await adoptRunningMailDev();
-  try {
-    if (toStart.length > 0) await runCompose(['up', '-d', ...toStart]);
-    await waitUntil('postgres', isPostgresReady);
-    await waitUntil('maildev', isMailDevReady);
-  } catch (error) {
-    await stopContainers(toStart);
-    throw error;
-  }
-  return toStart;
+  return SERVICES.filter((service) => !running.includes(service));
 }
 
-/** Stops only what `startContainers` started. */
+/** Starts `toStart` and waits until Postgres and MailDev answer; the caller stops them. */
+export async function startContainers(toStart: readonly string[]): Promise<void> {
+  if (toStart.length > 0) await runCompose(['up', '-d', ...toStart]);
+  await waitUntil('postgres', isPostgresReady);
+  await waitUntil('maildev', isMailDevReady);
+}
+
+/** Stops only the containers `planContainers` said this run starts. */
 export async function stopContainers(started: readonly string[]): Promise<void> {
   if (started.length === 0) return;
   await runCompose(['stop', ...started]);

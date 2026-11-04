@@ -178,6 +178,30 @@ The API reads four optional base URLs: `OPEN_FOOD_FACTS_BASE_URL`,
 `OPEN_BEAUTY_FACTS_BASE_URL`, `RECHERCHE_ENTREPRISES_BASE_URL` and
 `PAPPERS_BASE_URL`. Unset, it uses the production URLs.
 
+### One run at a time, and nothing left behind
+
+The e2e environment exists once per machine: one `b_spot_e2e` database and
+the ports 4010, 4011, 3101, 8182 and 8183. So `pnpm e2e:web` and
+`pnpm e2e:mobile` take a lock before they start anything. It is one file,
+`b-spot-e2e.lock.json`, in the repository's git common directory (`.git/` of
+the main checkout), so every git worktree of the repo shares it. It holds
+the pid, the command, the worktree and the start time of the run that has
+it.
+
+- A second run waits, saying who holds the environment, then logs
+  `lock acquired after waiting …`. It gives up after 20 minutes
+  (`E2E_LOCK_WAIT_MINUTES` changes that), naming the holder.
+- A lock whose holder is no longer running is taken over, with a message.
+- Before starting its services, a run checks that no e2e port is taken. If
+  one is, it fails and names the process holding it. It never kills
+  anything.
+- Ctrl-C or `kill` (SIGINT or SIGTERM) stops everything the run started:
+  the API, the fixture and web servers, Metro, Playwright or Maestro, and
+  the containers it started itself (never ones that were already running).
+  Then it frees the lock and exits non-zero. Nothing is left behind.
+  Only `kill -9` escapes this; the next run then takes over the lock and
+  reports the ports still taken.
+
 ## 📁 Project Structure (New Architecture)
 
 ```

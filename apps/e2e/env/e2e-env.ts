@@ -7,6 +7,14 @@ export const FIXTURES_PORT = 4010;
 /** iOS suite only: the Metro the dev build loads its JS from, and the control server. */
 export const METRO_PORT = 8183;
 export const CONTROL_PORT = 4011;
+/** Every port an e2e run listens on; none may be taken before it starts. */
+export const E2E_PORTS: readonly number[] = [
+  FIXTURES_PORT,
+  CONTROL_PORT,
+  API_PORT,
+  WEB_PORT,
+  METRO_PORT,
+];
 /**
  * MailDev ports. When b-spot's MailDev is not already running, the e2e run
  * starts it on its own host ports (another stack may hold 1025/1080); when it

@@ -1,9 +1,10 @@
 import { ChildProcess, spawn } from 'node:child_process';
 import { sleep } from '../support/wait';
+import { terminateWithGrace } from './process';
+import { assertNotInterrupted, onInterrupt } from './run-control/interrupt';
 
 const READY_STEP_MS = 500;
 const READY_TIMEOUT_MS = 120_000;
-const STOP_GRACE_MS = 5_000;
 
 /** A long-running process of the e2e environment, ready once `readyUrl` answers. */
 export interface ServiceDefinition {
@@ -17,7 +18,10 @@ export interface ServiceDefinition {
   readyBody?: string;
 }
 
-/** A started service; `stop` kills its process group and resolves once it exited. */
+/**
+ * A started service; `stop` kills its process group and resolves once it
+ * exited. It is idempotent, and also runs when the run is interrupted.
+ */
 export interface RunningService {
   name: string;
   stop: () => Promise<void>;
@@ -51,22 +55,21 @@ function killGroup(pid: number, signal: NodeJS.Signals): void {
 }
 
 /** Kills the service's whole process group (pnpm/tsx spawn children of their own). */
-function stopChild(name: string, child: ChildProcess): Promise<void> {
-  if (child.exitCode !== null || child.pid === undefined) return Promise.resolve();
+async function stopChild(name: string, child: ChildProcess): Promise<void> {
+  if (child.pid === undefined) return;
   const pid = child.pid;
-  return new Promise((resolve) => {
-    const force = setTimeout(() => killGroup(pid, 'SIGKILL'), STOP_GRACE_MS);
-    child.once('exit', () => {
-      clearTimeout(force);
-      console.log(`[e2e] ${name} stopped`);
-      resolve();
-    });
+  if (child.exitCode !== null || child.signalCode !== null) {
+    // The leader is gone; what it spawned may still run in its group.
     killGroup(pid, 'SIGTERM');
-  });
+    return;
+  }
+  await terminateWithGrace(child, (signal) => killGroup(pid, signal));
+  console.log(`[e2e] ${name} stopped`);
 }
 
 /** Starts a service in its own process group and waits until it answers. */
 export async function spawnService(definition: ServiceDefinition): Promise<RunningService> {
+  assertNotInterrupted(definition.name);
   console.log(`[e2e] starting ${definition.name}`);
   const child = spawn(definition.command, definition.args, {
     cwd: definition.cwd,
@@ -74,9 +77,12 @@ export async function spawnService(definition: ServiceDefinition): Promise<Runni
     stdio: 'inherit',
     detached: true,
   });
+  let stopping: Promise<void> | undefined;
+  const stopOnce = (): Promise<void> => (stopping ??= stopChild(definition.name, child));
+  const unregister = onInterrupt(stopOnce);
   const running: RunningService = {
     name: definition.name,
-    stop: () => stopChild(definition.name, child),
+    stop: () => stopOnce().finally(unregister),
   };
   try {
     await waitUntilReady(definition, child);
