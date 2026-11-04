@@ -179,15 +179,37 @@ Steps 3 to 5 each run mobile lint, `tsc --noEmit` and jest, then commit.
 ## Worklog
 
 - 2026-11-04 — plan written; `pnpm install` at the worktree root passed.
+- 2026-11-04 — code, in the approved order, one commit per green step.
+  - Baseline: testID list saved (ten literals and the tab template);
+    `pnpm e2e:web` green on the untouched code, 25 passed.
+  - `suggestion-draft.test.ts` red (module missing), then green with
+    `suggestion-draft.ts`: 4 tests.
+  - Card, then tabs, then hook and sheet moved. The JSX was copied from the
+    old file's lines, not retyped. The four edit `useState`s became one
+    `SuggestionDraft` state in the hook.
+  - `tsc --noEmit` on mobile reports errors only in the existing
+    `__tests__` files (no jest types in the tsconfig); that predates the
+    task and is unchanged. Zero errors outside the test files after each
+    step.
+  - Gates: `pnpm lint` exit 0, 8 warnings, none in the touched files;
+    `pnpm test` exit 0 (mobile 27 tests, API 110); `pnpm build` exit 0;
+    testID diff empty; `pnpm e2e:web` twice, 25 passed each time,
+    moderation's four journeys included. Every e2e run took the shared
+    lock and released it through a `trap`.
+  - Line counts: route 96, `SuggestionCard` 111, `SuggestionEditSheet` 133,
+    `SuggestionStatusTabs` 38, `useSuggestionEditor` 49,
+    `suggestion-draft` 35, its test 54.
 
 ## Implementation Checkboxes
 
-- [ ] testID list saved; e2e baseline green on the untouched code
-- [ ] `suggestion-draft.ts` and its unit test
-- [ ] `SuggestionCard` extracted
-- [ ] `SuggestionStatusTabs` extracted
-- [ ] `useSuggestionEditor` and `SuggestionEditSheet` extracted
-- [ ] gates green: lint, test, build, line counts, testID comparison, e2e
+- [x] testID list saved; e2e baseline green on the untouched code
+- [x] `suggestion-draft.ts` and its unit test
+- [x] `SuggestionCard` extracted
+- [x] `SuggestionStatusTabs` extracted
+- [x] `useSuggestionEditor` and `SuggestionEditSheet` extracted
+- [x] gates green: lint, test, build, line counts, testID comparison, e2e
+- [ ] `code-review` run, findings answered
+- [ ] close: criteria ticked, journal, archive
 
 ## Notes & Snippets
 
