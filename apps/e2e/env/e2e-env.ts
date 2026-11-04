@@ -20,6 +20,8 @@ export const WEB_URL = `http://localhost:${WEB_PORT}`;
 export const FIXTURES_URL = `http://localhost:${FIXTURES_PORT}`;
 export const MAILDEV_URL = `http://localhost:${MAILDEV_WEB_PORT}`;
 export const METRO_URL = `http://localhost:${METRO_PORT}`;
+/** Set to `1` on the e2e Metro: apps/mobile/metro.config.js then hides apps/mobile/.env*. */
+export const IGNORE_DOTENV_FILES_VARIABLE = 'B_SPOT_E2E_IGNORE_DOTENV_FILES';
 /** 127.0.0.1, where the control server listens (never an IPv6 `localhost`). */
 export const CONTROL_URL = `http://127.0.0.1:${CONTROL_PORT}`;
 
