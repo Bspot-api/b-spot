@@ -1,0 +1,32 @@
+# Unknown product → brand suggestion submitted. The camera is bypassed by the
+# suggestion screen's own route, with the params the scanner pushes.
+appId: ${APP_ID}
+name: brand-suggestion
+---
+- runFlow: ../common/start-clean.yaml
+- runFlow:
+    file: ../common/open-link.yaml
+    env:
+      LINK: ${SUGGESTION_LINK}
+- extendedWaitUntil:
+    visible:
+      id: "suggestion-brand-input"
+      text: ${SUGGESTION_BRAND}
+    timeout: 30000
+- tapOn:
+    id: "suggestion-notes-input"
+- inputText: ${SUGGESTION_NOTES}
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "suggestion-submit"
+- tapOn:
+    id: "suggestion-submit"
+- extendedWaitUntil:
+    visible: "Merci !"
+    timeout: 15000
+- tapOn: "OK"
+- runScript: ../scripts/find-suggestion.js
+- assertTrue: ${output.suggestionCount == 1}
+- assertTrue: ${output.suggestionBrand == SUGGESTION_BRAND}
+- assertTrue: ${output.suggestionBarcode == SUGGESTION_BARCODE}
