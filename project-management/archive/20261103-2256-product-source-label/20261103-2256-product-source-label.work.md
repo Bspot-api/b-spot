@@ -155,6 +155,12 @@ first and releases it at the end, failure included. Logs go to
   - Not fixed here: the fix belongs to `apps/e2e/env/docker.ts`, outside
     this task's scope.
 
+- 2026-11-04, Crewmate: close.
+  - Criteria ticked in the spec.
+  - Journal entry added.
+  - Spec and work document archived under
+    `project-management/archive/20261103-2256-product-source-label/`.
+
 ## Implementation Checkboxes
 
 - [x] Contract check `apps/e2e/checks/api-contract.spec.ts` written, red
@@ -166,7 +172,7 @@ first and releases it at the end, failure included. Logs go to
 - [x] `pnpm e2e:web` green (under the lock)
 - [x] Lint on the touched files: e2e green; mobile red on the pre-existing ESLint config debt only
 - [x] `code-review` run, findings recorded
-- [ ] Close: criteria ticked, journal entry, archive, retro
+- [x] Close: criteria ticked, journal entry, archive, retro (proposals in the close report)
 
 ## Notes & Snippets
 
