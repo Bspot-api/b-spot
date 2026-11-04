@@ -91,6 +91,7 @@ export default function RootLayout() {
               presentation: 'modal',
             }}
           />
+          <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
           <Stack.Screen
             name="admin/suggestions"
             options={{

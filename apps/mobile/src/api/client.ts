@@ -10,6 +10,7 @@ import type {
   SuggestionStatus,
   UpdateSuggestionFieldsDto,
 } from './types';
+import { getAuthRequestInit, getMagicLinkCallbackURL } from './authTransport';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3001';
 const API_TIMEOUT = parseInt(process.env.EXPO_PUBLIC_API_TIMEOUT ?? '10000', 10);
@@ -27,14 +28,16 @@ export class ApiError extends Error {
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+  const auth = await getAuthRequestInit();
 
   try {
     const response = await fetch(`${API_URL}${path}`, {
       ...options,
-      credentials: 'include',
+      credentials: auth.credentials,
       signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
+        ...auth.headers,
         ...options?.headers,
       },
     });
@@ -87,10 +90,12 @@ export async function getSession(): Promise<SessionDto | null> {
   return apiFetch<SessionDto | null>('/api/auth/get-session');
 }
 
+/** Native sends the app's callback; the web sends none, as before. */
 export async function signInMagicLink(email: string): Promise<void> {
+  const callbackURL = getMagicLinkCallbackURL();
   await apiFetch<unknown>('/api/auth/sign-in/magic-link', {
     method: 'POST',
-    body: JSON.stringify({ email }),
+    body: JSON.stringify(callbackURL ? { email, callbackURL } : { email }),
   });
 }
 
