@@ -3,10 +3,24 @@ import { ProductService } from '../product/product.service';
 import { CompanyService } from '../company/company.service';
 import { BrandService } from '../brand/brand.service';
 import { BrandDiscoveryService } from '../brand/brand-discovery.service';
-import { BrandStatus } from '../brand/brand.entity';
+import { Brand, BrandStatus } from '../brand/brand.entity';
 import { BrandSuggestionService } from '../brand-suggestion/brand-suggestion.service';
+import type { ProductDto } from '../product/dto/product.dto';
 import type { BrandScanResultDto, ScanResultDto } from './dto/scan.dto';
 import type { ScanHistoryResponseDto } from './dto/scan-history.dto';
+
+const QUOTA_UNAVAILABLE_MESSAGE =
+  'Données entreprise temporairement indisponibles (quota Pappers atteint)';
+const PENDING_BRAND_MESSAGE = 'Correspondance marque trouvée, en attente de validation';
+
+type ResolvedBrandResolution = 'existing' | 'auto_active' | 'auto_pending';
+
+interface BrandLookup {
+  brand: Brand | null;
+  brandResolution: ResolvedBrandResolution;
+  discoveryConfidence?: number;
+  discoveryMessage?: string;
+}
 
 @Injectable()
 export class ScanService {
@@ -42,63 +56,12 @@ export class ScanService {
       };
     }
 
-    let brand = await this.brandService.findBrandByName(productDto.brandName);
-    let brandResolution: ScanResultDto['brandResolution'] = 'existing';
-    let discoveryConfidence: number | undefined;
-
-    if (!brand) {
-      this.logger.warn(`Brand not found in DB: "${productDto.brandName}" — trying auto discovery`);
-      const discovery = await this.brandDiscoveryService.discoverAndPersistBrand(
-        productDto.brandName,
-      );
-      brand = discovery.brand ?? null;
-      discoveryConfidence = discovery.confidence;
-      if (discovery.resolution === 'auto_active') brandResolution = 'auto_active';
-      if (discovery.resolution === 'auto_pending') brandResolution = 'auto_pending';
-
-      if (!brand) {
-        const suggestion = await this.brandSuggestionService.createFromScan(productDto);
-        return {
-          product: productDto,
-          dataFreshness: 'unavailable',
-          message:
-            discovery.message ??
-            `Marque "${productDto.brandName}" non référencée et non résolue automatiquement`,
-          brandResolution: 'needs_user_input',
-          discoveryConfidence,
-          userActionRequired: 'submit_brand_suggestion',
-          brandSuggestionId: suggestion?.id,
-        };
-      }
-    }
+    const lookup = await this.resolveBrand(productDto.brandName);
+    if (!lookup.brand) return this.suggestUnresolvedBrand(productDto, productDto.brandName, lookup);
 
     // Step 4: Fetch company from Pappers (cache-first)
-    const company = await this.companyService.getOrCreateCompany(brand.siren);
-    if (!company) {
-      return {
-        product: productDto,
-        dataFreshness: 'unavailable',
-        message: 'Données entreprise temporairement indisponibles (quota Pappers atteint)',
-        brandResolution,
-        brandStatus: brand.status,
-        discoveryConfidence,
-      };
-    }
-
-    const companyDto = this.companyService.toDto(company);
-
-    return {
-      product: productDto,
-      company: companyDto,
-      dataFreshness: 'fresh',
-      brandResolution,
-      brandStatus: brand.status,
-      discoveryConfidence,
-      message:
-        brand.status === BrandStatus.PENDING
-          ? 'Correspondance marque trouvée, en attente de validation'
-          : undefined,
-    };
+    const companyResult = await this.buildCompanyResult(lookup.brand, lookup);
+    return { product: productDto, ...companyResult };
   }
 
   async scanBySiren(siren: string, brandName?: string): Promise<BrandScanResultDto> {
@@ -131,35 +94,65 @@ export class ScanService {
   }
 
   async scanByBrandName(brandName: string): Promise<BrandScanResultDto> {
-    let brand = await this.brandService.findBrandByName(brandName);
-    let brandResolution: BrandScanResultDto['brandResolution'] = 'existing';
-    let discoveryConfidence: number | undefined;
-
-    if (!brand) {
-      this.logger.warn(`Brand not found in DB: "${brandName}" — trying auto discovery`);
-      const discovery = await this.brandDiscoveryService.discoverAndPersistBrand(brandName);
-      brand = discovery.brand ?? null;
-      discoveryConfidence = discovery.confidence;
-      if (discovery.resolution === 'auto_active') brandResolution = 'auto_active';
-      if (discovery.resolution === 'auto_pending') brandResolution = 'auto_pending';
-
-      if (!brand) {
-        return {
-          dataFreshness: 'unavailable',
-          message:
-            discovery.message ??
-            `Marque "${brandName}" non trouvée avec certitude. Essayez un nom plus précis.`,
-          brandResolution: 'needs_user_input',
-          discoveryConfidence,
-        };
-      }
+    const lookup = await this.resolveBrand(brandName);
+    if (!lookup.brand) {
+      return {
+        dataFreshness: 'unavailable',
+        message:
+          lookup.discoveryMessage ??
+          `Marque "${brandName}" non trouvée avec certitude. Essayez un nom plus précis.`,
+        brandResolution: 'needs_user_input',
+        discoveryConfidence: lookup.discoveryConfidence,
+      };
     }
 
+    return this.buildCompanyResult(lookup.brand, lookup);
+  }
+
+  private async suggestUnresolvedBrand(
+    productDto: ProductDto,
+    brandName: string,
+    lookup: BrandLookup,
+  ): Promise<ScanResultDto> {
+    const suggestion = await this.brandSuggestionService.createFromScan(productDto);
+    return {
+      product: productDto,
+      dataFreshness: 'unavailable',
+      message:
+        lookup.discoveryMessage ??
+        `Marque "${brandName}" non référencée et non résolue automatiquement`,
+      brandResolution: 'needs_user_input',
+      discoveryConfidence: lookup.discoveryConfidence,
+      userActionRequired: 'submit_brand_suggestion',
+      brandSuggestionId: suggestion?.id,
+    };
+  }
+
+  private async resolveBrand(brandName: string): Promise<BrandLookup> {
+    const brand = await this.brandService.findBrandByName(brandName);
+    if (brand) return { brand, brandResolution: 'existing' };
+
+    this.logger.warn(`Brand not found in DB: "${brandName}" — trying auto discovery`);
+    const discovery = await this.brandDiscoveryService.discoverAndPersistBrand(brandName);
+    let brandResolution: ResolvedBrandResolution = 'existing';
+    if (discovery.resolution === 'auto_active') brandResolution = 'auto_active';
+    if (discovery.resolution === 'auto_pending') brandResolution = 'auto_pending';
+
+    return {
+      brand: discovery.brand ?? null,
+      brandResolution,
+      discoveryConfidence: discovery.confidence,
+      discoveryMessage: discovery.message,
+    };
+  }
+
+  private async buildCompanyResult(brand: Brand, lookup: BrandLookup): Promise<BrandScanResultDto> {
+    const { brandResolution, discoveryConfidence } = lookup;
     const company = await this.companyService.getOrCreateCompany(brand.siren);
     if (!company) {
       return {
         dataFreshness: 'unavailable',
-        message: 'Données entreprise temporairement indisponibles (quota Pappers atteint)',
+        message: QUOTA_UNAVAILABLE_MESSAGE,
         brandResolution,
         brandStatus: brand.status,
         discoveryConfidence,
@@ -172,10 +165,7 @@ export class ScanService {
       brandResolution,
       brandStatus: brand.status,
       discoveryConfidence,
-      message:
-        brand.status === BrandStatus.PENDING
-          ? 'Correspondance marque trouvée, en attente de validation'
-          : undefined,
+      message: brand.status === BrandStatus.PENDING ? PENDING_BRAND_MESSAGE : undefined,
     };
   }
 }
