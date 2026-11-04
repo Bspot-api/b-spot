@@ -9,3 +9,7 @@ executionOrder:
     - scan-deep-link
     - brand-suggestion
     - history
+    - login
+    - admin-entry
+    - session-expiry
+    - moderation

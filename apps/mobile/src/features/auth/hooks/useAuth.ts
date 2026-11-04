@@ -2,6 +2,7 @@ import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { getSession, getAdminMe, signOut as apiSignOut } from '../../../api/client';
 import { ApiError } from '../../../api/client';
 import type { Session, AdminProfile } from '../types';
+import { clearSessionCookie } from '../sessionStore';
 
 const STALE_TIME = 5 * 60 * 1000;
 
@@ -33,7 +34,8 @@ export function useAuth() {
     staleTime: STALE_TIME,
   });
 
-  const adminProfileData = adminQuery.data ?? null;
+  // The cached profile outlives an ended session; without a session there is no admin.
+  const adminProfileData = session ? (adminQuery.data ?? null) : null;
   const adminProfile: AdminProfile | null = adminProfileData
     ? {
         adminId: adminProfileData.adminId,
@@ -44,8 +46,14 @@ export function useAuth() {
       }
     : null;
 
+  /** Ends the session on the API; the local session ends even if that call fails. */
   async function signOut() {
-    await apiSignOut();
+    try {
+      await apiSignOut();
+    } catch (error) {
+      console.warn('[auth] sign-out request failed; clearing the local session anyway', error);
+    }
+    await clearSessionCookie();
     await queryClient.invalidateQueries({ queryKey: ['auth'] });
   }
 

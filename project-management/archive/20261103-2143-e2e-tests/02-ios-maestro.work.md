@@ -432,7 +432,7 @@ Options:
 
 Human, via the Architect:
 - **Native magic-link login:** fixed in its own task,
-  `project-management/tasks/20261104-1358-native-magic-link-login.spec.md`.
+  `project-management/archive/20261104-1358-native-magic-link-login.spec.md`.
   This slice delivers no iOS auth flow (login, admin entry, moderation,
   expired session). The slice spec's `ios-journeys-pass` is amended.
   Leave the harness ready for those flows: the control server's

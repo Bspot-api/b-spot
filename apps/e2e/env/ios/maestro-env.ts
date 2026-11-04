@@ -2,7 +2,7 @@
  * Every value a Maestro flow uses, passed with `maestro test -e`, so no
  * port, scheme, email or fixture name is typed in YAML.
  */
-import { CONTROL_URL, DEV_SCHEME, IOS_BUNDLE_ID, METRO_URL } from '../e2e-env';
+import { API_URL, CONTROL_URL, DEV_SCHEME, E2E_USERS, IOS_BUNDLE_ID, METRO_URL } from '../e2e-env';
 import {
   FERRERO_FIXTURE,
   KNOWN_FOOD,
@@ -27,11 +27,25 @@ function buildSuggestionLink(): string {
   });
 }
 
+/** The suggestions the moderation flow submits, then approves, edits, rejects and deletes. */
+const MODERATION_SUGGESTIONS = {
+  MODERATION_TO_APPROVE: 'Approve Fixture',
+  MODERATION_TO_EDIT: 'Edit Fixture',
+  MODERATION_EDITED: 'Edited Fixture',
+  MODERATION_TO_REJECT: 'Reject Fixture',
+  MODERATION_TO_DELETE: 'Delete Fixture',
+} as const;
+
 /** The `-e` variables of a Maestro run. */
 export function buildMaestroEnv(): Record<string, string> {
   return {
     APP_ID: IOS_BUNDLE_ID,
+    API_URL,
     CONTROL_URL,
+    LOGIN_EMAIL: E2E_USERS.login,
+    MODERATION_EMAIL: E2E_USERS.moderation,
+    EXPIRY_EMAIL: E2E_USERS.expiry,
+    ...MODERATION_SUGGESTIONS,
     DEV_CLIENT_LINK: `${DEV_SCHEME}://expo-development-client/?url=${encodeURIComponent(METRO_URL)}`,
     FOOD_COMPANY_LINK: buildDeepLink(`company/${FERRERO_FIXTURE.siren}`),
     FOOD_COMPANY_NAME: FERRERO_FIXTURE.legalName,

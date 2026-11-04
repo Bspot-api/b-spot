@@ -1,6 +1,6 @@
 # Magic-link login works in the native app
 
-**Status:** in-progress
+**Status:** done
 
 ---
 
@@ -9,7 +9,7 @@
 ## Context
 
 Found while planning slice 02 of
-[End-to-end tests for the critical journeys](../archive/20261103-2143-e2e-tests.spec.md),
+[End-to-end tests for the critical journeys](20261103-2143-e2e-tests.spec.md),
 from reading the code and Better-Auth's source. It has not yet been seen
 on a device. The session is a Better-Auth cookie. `signInMagicLink` sends
 no `callbackURL`, so the emailed link verifies in whatever opens it
@@ -40,16 +40,28 @@ because `NODE_ENV=test` skips the check.
 
 ## Acceptance Criteria
 
-- [ ] **native-login** — on the iOS simulator, requesting a link, then
+- [x] **native-login** — on the iOS simulator, requesting a link, then
   opening it, leaves the app logged in (a Maestro flow passes).
-- [ ] **native-sign-out** — native sign-out returns 2xx against the API
+  Evidence: the Maestro flow `login`, which logs in through Safari and
+  the `bspot-dev://auth/callback` link, passed in two consecutive full
+  `pnpm e2e:mobile` runs (8/8 each).
+- [x] **native-sign-out** — native sign-out returns 2xx against the API
   running with `NODE_ENV=production` settings for origin checks.
-- [ ] **web-login-unchanged** — the web magic-link login journey of
-  `pnpm e2e:web` passes.
-- [ ] **ios-auth-journeys** — the four iOS auth rows of the e2e parent
-  spec's journeys table have passing Maestro flows.
-- [ ] **suite-green** — `pnpm lint`, `pnpm test`, `pnpm build`, `pnpm e2e:web`
-  pass.
+  Evidence: the production origin checks are forced on (see Amendments).
+  `checks/native-auth.spec.ts` gets 403 with no Origin, 403 with
+  `evil://`, then 200 with `expo-origin: bspot-dev://`. The Maestro flow
+  `login` signs out from the app, after which the user has 0 sessions
+  left.
+- [x] **web-login-unchanged** — the web magic-link login journey of
+  `pnpm e2e:web` passes. Evidence: `pnpm e2e:web` passed 27 tests, with
+  origin checks now enforced.
+- [x] **ios-auth-journeys** — the four iOS auth rows of the e2e parent
+  spec's journeys table have passing Maestro flows. Evidence: `login`,
+  `admin-entry` (including the demoted admin), `moderation` and
+  `session-expiry` passed in both full runs.
+- [x] **suite-green** — `pnpm lint`, `pnpm test`, `pnpm build`, `pnpm e2e:web`
+  pass. Evidence: lint has 0 errors (8 old warnings); tests pass (API 114,
+  mobile 37, e2e 6); the build passes; e2e:web passed 27 tests.
 
 ## Seams
 
@@ -73,6 +85,22 @@ Prefer the maintained integration unless the plan shows a blocker.
 
 - Blocked by: slice 02 of the e2e task (`02-ios-maestro`), whose Maestro
   harness the auth flows reuse.
+
+## Amendments — 2026-11-04
+
+- **Callback seam**: the web keeps sending no `callbackURL`, as
+  `web-login-unchanged` requires. The native callback uses the build's
+  scheme: `bspot://` in production, `bspot-dev://` in dev and e2e builds.
+- **`native-sign-out`**: met with Better-Auth's production origin checks
+  forced on in every environment (`disableOriginCheck: false`), rather
+  than by running the API with `NODE_ENV=production`. That setting would
+  also enable rate limiting and break the suites.
+- **Integration**: only the server half of `@better-auth/expo` is used, by
+  the human's decision. Its client half does not handle a magic link
+  opened from Mail, and it would add a native module.
+- **Security**: the session token travels in the custom-scheme callback
+  URL. The human accepted and documented this for an admin-only login.
+  Universal links come later.
 
 ## References
 
