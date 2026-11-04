@@ -1,6 +1,6 @@
 # Split the admin suggestions screen under 300 lines
 
-**Status:** in-progress
+**Status:** done
 
 ---
 
@@ -25,10 +25,15 @@ holds the screen, the list item and the edit BottomSheet.
 
 ## Acceptance Criteria
 
-- [ ] **under-limit** — every touched file is 300 lines or fewer.
-- [ ] **behaviour-unchanged** — the e2e moderation journey passes
-  unchanged (`pnpm e2e:web`).
-- [ ] **suite-green** — `pnpm test` and `pnpm build` pass.
+- [x] **under-limit** — every touched file is 300 lines or fewer.
+  Route 96, card 111, edit sheet 133, tabs 38, editor hook 49, draft
+  helpers 35, their test 54 (`wc -l`, 2026-11-04).
+- [x] **behaviour-unchanged** — the e2e moderation journey passes
+  unchanged (`pnpm e2e:web`). Green before the first move and twice after
+  the last commit, 25 passed each time; `apps/e2e` untouched; testID list
+  identical before and after.
+- [x] **suite-green** — `pnpm test` and `pnpm build` pass. Both exit 0
+  after the review fixes (mobile 27 tests, API 110); `pnpm lint` exit 0.
 
 ## Seams
 

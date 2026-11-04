@@ -213,7 +213,7 @@ Steps 3 to 5 each run mobile lint, `tsc --noEmit` and jest, then commit.
 - [x] `useSuggestionEditor` and `SuggestionEditSheet` extracted
 - [x] gates green: lint, test, build, line counts, testID comparison, e2e
 - [x] `code-review` run, findings answered
-- [ ] close: criteria ticked, journal, archive
+- [x] close: criteria ticked, journal, archive
 
 ## Notes & Snippets
 
