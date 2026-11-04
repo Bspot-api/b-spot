@@ -200,17 +200,45 @@ The worktree's `apps/mobile/.env` held `EXPO_PUBLIC_API_URL=http://localhost:300
   checked `--no-dev` as an alternative. A full `pnpm e2e:mobile` with the
   blockList probe and a 3001 `.env` passed 4/4. Probe changes reverted;
   the worktree's `.env` removed.
+- 2026-11-04 (code) — Run logs are in the scratchpad `mobile-env/` folder
+  named in "Evidence".
+  - **Pure guard, test-first.** It was red (module missing), then green:
+    6/6 under `tsx --test`. Lint asked for one prettier line break.
+  - **Preflight wired, fix absent, 3001 `.env`.** The run failed before any
+    flow (`run2-red-preflight.log`) with: "the iOS bundle carries
+    EXPO_PUBLIC_API_URL=http://localhost:3001, not http://localhost:3101.
+    Expo bundles apps/mobile/.env* …". Dropping `transform.bytecode` gives
+    JS text, as planned.
+  - **Fix, 3001 `.env`.** Two runs, 4/4 in 2m 1s and 4/4 in 1m 56s
+    (`run3`, `run4`); the preflight logged
+    `bundle uses EXPO_PUBLIC_API_URL=http://localhost:3101`.
+  - **No `.env`.** 4/4 in 1m 56s (`run5`).
+  - **Killed runs**, with `.env` (3001) and `.env.development.local` (3002)
+    present. Once with SIGINT to the pnpm process, once with SIGINT to its
+    whole process group, as Ctrl-C does, both after the first flow passed
+    (`run6`, `run7`). Exit 130 both times.
+    - Checksums before and after were identical (`6d05eeee…` for `.env`,
+      `e16af5a1…` for `.env.development.local`).
+    - `git status --ignored apps/mobile` was unchanged (`.expo/` and
+      `expo-env.d.ts` were already there, written by `expo start`).
+  - **Found along the way, out of scope.** A killed run leaves Metro, the
+    API and the fixture server running. `run-mobile.ts` has no signal
+    handler, and `spawnService` starts each service detached in its own
+    process group, so the `finally` teardown never runs on SIGINT. This
+    already happened before the task. I stopped the orphans by hand.
+  - **Gates.** `pnpm lint` 0, `pnpm test` 0 (the `apps/e2e` suite passes
+    6/6), `pnpm build` 0, `pnpm e2e:web` 25 passed. README sentence added.
 
 ## Implementation Checkboxes
 
-- [ ] Pure guard `bundle-api-url.ts` + its test, test script in `apps/e2e`
-- [ ] Preflight `bundle-preflight.ts` wired in `run-mobile.ts`; red run with a 3001 `.env` names the cause
-- [ ] Fix: `metro.config.js` blockList gate, `metro.ts` env + corrected comment, `e2e-env.ts` constant
-- [ ] `local-env-ignored`: two green runs with a 3001 `.env`
-- [ ] `without-env-still-passes`: one green run with no `.env`
-- [ ] `developer-files-untouched`: killed-run checksum check
-- [ ] README sentence
-- [ ] Gates: lint, test, build, `e2e:web`
+- [x] Pure guard `bundle-api-url.ts` + its test, test script in `apps/e2e`
+- [x] Preflight `bundle-preflight.ts` wired in `run-mobile.ts`; red run with a 3001 `.env` names the cause
+- [x] Fix: `metro.config.js` blockList gate, `metro.ts` env + corrected comment, `e2e-env.ts` constant
+- [x] `local-env-ignored`: two green runs with a 3001 `.env`
+- [x] `without-env-still-passes`: one green run with no `.env`
+- [x] `developer-files-untouched`: killed-run checksum check
+- [x] README sentence
+- [x] Gates: lint, test, build, `e2e:web`
 
 ## Notes & Snippets
 

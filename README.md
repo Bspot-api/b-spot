@@ -152,6 +152,12 @@ page's deep link (`bspot-dev://company/<siren>`), and the brand suggestion
 opens its own screen's link. Extra arguments go to `maestro test`. Reports
 and screenshots land in `apps/e2e/maestro-results/`.
 
+Your own `apps/mobile/.env*` files do not affect the run, and it never
+touches them: the e2e Metro hides them from the bundle (see
+`apps/mobile/metro.config.js`). Before any flow, a preflight reads the
+bundle the dev build loads, and fails if it carries another
+`EXPO_PUBLIC_API_URL` than the e2e one.
+
 The API reads four optional base URLs: `OPEN_FOOD_FACTS_BASE_URL`,
 `OPEN_BEAUTY_FACTS_BASE_URL`, `RECHERCHE_ENTREPRISES_BASE_URL` and
 `PAPPERS_BASE_URL`. Unset, it uses the production URLs.
