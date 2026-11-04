@@ -5,6 +5,34 @@ task — never generated.
 
 ## 2026-11-04
 
+- Native magic-link login (`feat/native-magic-link-login`): an admin can
+  now log in on the phone.
+  - **How it works.** The emailed link opens in the browser, and the API's
+    `@better-auth/expo` server plugin (`expo()`) redirects to
+    `bspot://auth/callback?cookie=…`. The app keeps the session cookie in
+    the Keychain (`expo-secure-store`). It sends the cookie in a `cookie`
+    header, with `expo-origin` standing in for the Origin header.
+  - **Native sign-out works in production.** Better-Auth's production
+    origin checks now run in every environment, e2e included.
+  - **Trusted schemes.** `AUTH_APP_ORIGINS` names them; it defaults to
+    `bspot://`, and dev and e2e add `bspot-dev://`.
+  - **The web is unchanged.**
+  - **ADR `docs/adr/0001-…`** records the accepted risk: the session
+    travels in a custom-scheme URL.
+  - **Tests.** Four new iOS Maestro flows: login (with relaunch and
+    sign-out), admin entry (including the demoted admin), session expiry,
+    and moderation. A new HTTP check, `checks/native-auth.spec.ts`.
+  - **Found along the way:**
+    - the signed cookie arrived mangled through the deep link's param
+      decoding about half the time (fixed);
+    - the Admin tab outlived an expired session on native (fixed);
+    - the "session expirée" toast is hidden under the iOS login modal
+      (open).
+  - Proof: `pnpm e2e:mobile` 8/8 twice in a row, plus once with a 3001
+    `apps/mobile/.env`; `pnpm e2e:web` 27 passed; lint, test and build
+    green.
+  - Documents: `project-management/archive/20261104-1358-native-magic-link-login.*`.
+
 - Split the admin suggestions screen (`refactor/split-admin-suggestions`):
   `apps/mobile/app/admin/suggestions.tsx` goes from 359 to 96 lines, with
   no behaviour change.

@@ -1,7 +1,7 @@
 # Magic-link login works in the native app — work
 
 Created by the Crewmate at the plan step, 2026-11-04. Spec:
-`project-management/tasks/20261104-1358-native-magic-link-login.spec.md`.
+`project-management/archive/20261104-1358-native-magic-link-login.spec.md` (archived at the close).
 
 **Plan:** approved by the Architect, 2026-11-04, with the human's rulings (see Rulings).
 
@@ -429,22 +429,76 @@ released by `trap`) and logs to `…/scratchpad/native-login/`.
   harness. Ran `pnpm install`. Probe Maestro flow under the lock (passed in
   57 s: the defect is confirmed); the probe files were removed. Offline
   Better-Auth probe with and without `expo()`. No implementation code.
+- 2026-11-04 (code): `pnpm install` again after the Architect merged
+  `feat/e2e-tests` (`a33d836`, split admin suggestions). Commits:
+  - `d2771c3`: API. `trusted-origins.ts` (4 Jest tests, red, then green),
+    `expo()`, `disableOriginCheck: false`, `AUTH_APP_ORIGINS`,
+    `@better-auth/expo` pinned to 1.6.12 (`better-auth` stays 1.6.12).
+  - `86109b4`: `checks/native-auth.spec.ts` and `support/native-client.ts`
+    (node:http; Node's fetch adds `sec-fetch-mode`, which Better-Auth's
+    CSRF check reads as a browser). `pnpm e2e:web`: 27 passed. Its red side
+    is the offline probe above (no `?cookie=`, the 403 skipped under test).
+  - `d6f923d`: `sessionCookie.ts`, with tests red, then green.
+  - `80b2118`: the session store, the auth transport, `client.ts`,
+    `useAuth.signOut`, `app/auth/callback.tsx`, and `APP_VARIANT` in the
+    mobile scripts. No new dev build was needed.
+  - `d5473cf` and `8ff4095`: the Maestro flows, and the fixes they forced.
+  - `efddec1`: README and ADR.
+  - `c4824c7`: review fixes.
+- Plan revisions met while coding:
+  - **The signed cookie arrived mangled about half the time.** The deep
+    link's params come back decoded, so a signature holding `%2B` reached
+    the app as `+`, or as a space, and get-session answered null. Login
+    passed or failed depending on the random signature: 2 of 4 flows
+    failed in the first full auth run. `extractSessionCookie` now restores
+    the exact encoding, with a unit test for each case.
+  - **The Admin tab stayed after an expired session.** `useAuth` kept the
+    cached admin profile when the session was gone. This bug was hidden on
+    the web, because the web journey reloads the page. The profile now
+    counts only with a session.
+  - **The "session expirée" toast is drawn under the iOS login modal.** The
+    native `session-expiry` flow asserts the login screen and the
+    logged-out tabs instead; the web suite still asserts the toast. So
+    the invalid-link message uses a native alert (`showFeedback`), not a
+    toast, then opens the login screen.
+  - **Moderation selectors.** On iOS a card's children are flattened, so
+    `childOf` the card matches nothing, and `rightOf` picks the topmost
+    icon. The card's four action buttons now carry accessibility labels
+    such as "Modifier Edit Fixture", which also helps screen readers, and
+    the flow taps by those labels. `hideKeyboard` swiped the edit sheet
+    away, so Return closes the keyboard instead.
+  - **`load-bundle.yaml` also accepts the email in the header**, for
+    relaunching a logged-in app.
+  - **Runs.** A run with `--include-tags` needs a config without
+    `flowsOrder`, so development runs passed a scratchpad config. The full
+    suite always uses `config.yaml`.
+- Runs, logs in the scratchpad under `native-login/`:
+  - auth flows red, then green (`mobile-auth-1` to `-4`, `mobile-mod-5`
+    and `-6`);
+  - full `pnpm e2e:mobile` 8/8 twice in a row (`mobile-full-1`, `-2`);
+  - `pnpm e2e:web` 27 passed (`web-2`);
+  - `pnpm lint` 0 errors, `pnpm test` (API 114, mobile 37, e2e 6),
+    `pnpm build` green;
+  - one more `pnpm e2e:mobile` after the review fixes (`c4824c7`), with a
+    worktree `apps/mobile/.env` holding
+    `EXPO_PUBLIC_API_URL=http://localhost:3001`: 8/8, and the preflight
+    saw 3101 (`mobile-dotenv`). The file was removed afterwards.
 
 ## Implementation Checkboxes
 
-- [ ] API: `trusted-origins.ts` + spec, `expo()` plugin, `disableOriginCheck: false`, `AUTH_APP_ORIGINS`, `.env.example`
-- [ ] e2e: `checks/native-auth.spec.ts`, `E2E_USERS` native-check user, `AUTH_APP_ORIGINS` in `buildApiEnv`; green `pnpm e2e:web`
-- [ ] Mobile: `sessionCookie.ts` + tests
-- [ ] Mobile: session store, auth transport, `client.ts`, `useAuth.signOut`, `app/auth/callback.tsx`
-- [ ] Control-server routes, `countSessionsOf`, Maestro env, scripts, `common/login.yaml`, `common/relaunch.yaml`
-- [ ] Flow `login` (incl. sign-out session count)
-- [ ] Flow `admin-entry`
-- [ ] Flow `session-expiry`
-- [ ] Flow `moderation`
-- [ ] Two consecutive green `pnpm e2e:mobile`; green `pnpm e2e:web`
-- [ ] `pnpm e2e:mobile` with a worktree `apps/mobile/.env` at 3001 (then removed)
-- [ ] Gates: `pnpm lint`, `pnpm test`, `pnpm build`
-- [ ] README "iOS (Maestro)" and auth notes
+- [x] API: `trusted-origins.ts` + spec, `expo()` plugin, `disableOriginCheck: false`, `AUTH_APP_ORIGINS`, `.env.example`
+- [x] e2e: `checks/native-auth.spec.ts`, `E2E_USERS` native-check user, `AUTH_APP_ORIGINS` in `buildApiEnv`; green `pnpm e2e:web`
+- [x] Mobile: `sessionCookie.ts` + tests
+- [x] Mobile: session store, auth transport, `client.ts`, `useAuth.signOut`, `app/auth/callback.tsx`
+- [x] Control-server routes, `countSessionsOf`, Maestro env, scripts, `common/login.yaml`, `common/relaunch.yaml`
+- [x] Flow `login` (incl. sign-out session count)
+- [x] Flow `admin-entry`
+- [x] Flow `session-expiry`
+- [x] Flow `moderation`
+- [x] Two consecutive green `pnpm e2e:mobile`; green `pnpm e2e:web`
+- [x] `pnpm e2e:mobile` with a worktree `apps/mobile/.env` at 3001 (then removed)
+- [x] Gates: `pnpm lint`, `pnpm test`, `pnpm build`
+- [x] README "iOS (Maestro)" and auth notes
 
 ## Notes & Snippets
 
@@ -499,4 +553,58 @@ Architect:
 
 ## Diff-Review Findings
 
-_(filled at the review step)_
+`code-review` on `b2eb364...HEAD`, two fresh sub-agents, 2026-11-04. Fixes
+in `c4824c7`.
+
+### Standards
+
+- **`apps/api/src/modules/auth/` has 13 entries** (`CLAUDE.md`, "max 10
+  sub-files per folder"). **Answered:** it already had 12 before this
+  task. Moving `trusted-origins.ts` elsewhere would split the auth config
+  across folders, and splitting the module is a refactor of its own.
+  Reported to the Architect as a separate item.
+- **Hard-coded strings** (git-workflow, "no hardcoded strings"). **Fixed:**
+  `APP_ORIGIN_HEADER`, `DEFAULT_APP_SCHEME`, `INVALID_LINK_TITLE` and
+  `SPINNER_COLOR` are now named constants. In the e2e check, `expo-origin`
+  stays a literal: the e2e package never imports the app.
+- **`firstValue` does not start with a verb** (common.md). **Fixed:**
+  renamed `pickFirstValue`.
+- **`queryKey: ['auth']` written in three places.** **Answered:** this is
+  the existing pattern of `_layout.tsx` and `useAuth`, and the callback
+  follows it. A shared key constant would be a refactor of all the query
+  keys.
+- **A failed Keychain read cached `null` for the whole process.**
+  **Fixed:** it is logged and retried on the next request.
+- **The four control-server scripts look alike.** **Answered:** they are
+  one-call GraalJS scripts, and Maestro gives them no module system (the
+  same answer as slice 02).
+- **`readSessionCookie` in the e2e check is a simpler parser than the
+  app's.** **Answered:** the check pins the API's contract (the redirect
+  carries the cookie, sign-out needs the origin). The app's parsing is
+  covered by its unit tests and by the Maestro flows.
+- **Native `getMagicLinkCallbackURL` never returns `undefined`.**
+  **Answered:** the signature is shared with the web file, which does
+  return `undefined`.
+- **The session cookie is a bare `string`, and `sessionStore.web.ts` only
+  holds no-ops.** **Answered:** these are judgement calls, kept small on
+  purpose.
+- **`console.warn` on a failed sign-out.** **Answered:** the app has no
+  error-reporting service. The warning only shows in development.
+
+### Spec
+
+- **`apps/api/.env.example` lists `bspot-dev://`**, and a production
+  `.env` copied from it would trust the dev scheme. **Fixed:** the comment
+  says "DEVELOPMENT ONLY", and why. Production must leave the variable
+  unset (default `bspot://`). That is the Architect's ruling, and the code
+  default enforces it.
+- **`expo()` trusts `exp://` under `NODE_ENV=development`**, and this was
+  not written down. **Fixed:** the ADR's consequences now say it.
+- **Scope:**
+  - the moderation flow also covers reject, as the web suite does;
+  - the accessibility labels serve the flow;
+  - the stale admin profile fix serves the expiry and demotion journeys.
+  **Answered:** all three are kept.
+- **The criteria were not yet ticked when the review ran.** **Answered:**
+  they are ticked at the close, with their evidence; see the Worklog.
+
