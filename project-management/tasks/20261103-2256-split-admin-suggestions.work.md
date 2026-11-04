@@ -199,6 +199,10 @@ Steps 3 to 5 each run mobile lint, `tsc --noEmit` and jest, then commit.
   - Line counts: route 96, `SuggestionCard` 111, `SuggestionEditSheet` 133,
     `SuggestionStatusTabs` 38, `useSuggestionEditor` 49,
     `suggestion-draft` 35, its test 54.
+- 2026-11-04 — review. Two fixes (uppercase style constants, `void` return
+  types on the hook's functions), the rest answered under Diff-Review
+  Findings. Gates rerun after the fixes: lint, test, build exit 0; testID
+  diff empty; `pnpm e2e:web` twice, 25 passed each time.
 
 ## Implementation Checkboxes
 
@@ -208,7 +212,7 @@ Steps 3 to 5 each run mobile lint, `tsc --noEmit` and jest, then commit.
 - [x] `SuggestionStatusTabs` extracted
 - [x] `useSuggestionEditor` and `SuggestionEditSheet` extracted
 - [x] gates green: lint, test, build, line counts, testID comparison, e2e
-- [ ] `code-review` run, findings answered
+- [x] `code-review` run, findings answered
 - [ ] close: criteria ticked, journal, archive
 
 ## Notes & Snippets
@@ -236,4 +240,68 @@ Steps 3 to 5 each run mobile lint, `tsc --noEmit` and jest, then commit.
 
 ## Diff-Review Findings
 
-_(filled at the review step)_
+`code-review` since 0f08d93 (the plan approval), 2026-11-04, two fresh
+sub-agents. Standards: no hard breach; six soft standard points, four
+judgement-call smells. Spec: no missing requirement; no behaviour difference
+found in a line-by-line comparison with the old file; scope and seam
+divergences, already ruled by the Architect.
+
+### Standards
+
+- **Style constants not UPPERCASE** (`docs/agent-rules/common.md`, Naming:
+  UPPERCASE for constants) — `inputStyle`, `cancelButtonStyle`,
+  `saveButtonStyle` in `SuggestionEditSheet.tsx`, carried over from the old
+  file. **Fixed** in 94633fa: `INPUT_STYLE`, `CANCEL_BUTTON_STYLE`,
+  `SAVE_BUTTON_STYLE`.
+- **Missing return types** (`common.md`, "declare the type of each
+  function, parameters and return value") — `startEdit`, `saveEdit` in the
+  hook; `confirmReject`, `confirmDelete`, the components. **Fixed** for the
+  two new hook functions (`: void`, 94633fa). **Answered** for the rest: the
+  card's helpers are moved verbatim, and no component of
+  `src/features/*/components/` declares a return type; adding them here
+  alone would make the feature inconsistent with its neighbours.
+- **Test naming and Arrange-Act-Assert** (`common.md`, Testing) —
+  **answered**: the test follows the existing `useScanHistory.test.ts`
+  style (`makeEntry`, act inside `expect`), the only pure-helper test in the
+  mobile app.
+- **File order** (`common.md`, "exported component, subcomponents,
+  helpers, static content, types") — **answered**: props interface and
+  constants above the component is the order of every existing feature
+  component (`ScanHistoryItem.tsx`); a judgement call, kept.
+- **No unit test for `useSuggestionEditor`** (`common.md`, unit tests per
+  public function) — **answered**: the mobile package has no React testing
+  library; the hook's logic is the two pure functions, which are tested;
+  the constitution's testing principle makes admin-only tests optional; the
+  edit journey of the e2e covers the wiring.
+- **Commit format** (`docs/agent-rules/git-workflow.md`) — not a violation:
+  `emoji type(scope): …` is the repo's established format.
+- **Smell: Data Clumps / Middle Man** — the route maps six editor members
+  onto the sheet's props. **Answered**: deliberate; it keeps the sheet
+  presentational and its props named after what it shows, as approved in
+  the program design.
+- **Smell: Duplicated Code** — `EMPTY_DRAFT` repeats the empty shape.
+  **Answered**: it is the initial state before any edit, a different
+  meaning from an item's draft; a three-line constant.
+- **Smell: Primitive Obsession** — `onChangeDraft('brandName', value)` four
+  times. **Answered**: typed by `keyof SuggestionDraft`; a per-field
+  callback map would add code for no gain.
+- **Smell: Repeated Switches** — the three `item.status !== …` conditions
+  in the card. **Answered**: moved verbatim; reshaping them is a behaviour
+  risk outside this task's scope.
+
+### Spec
+
+- **Scope beyond the spec's Included line** — tabs, editor hook, draft
+  helpers and their test were extracted, and `hooks/` sits beside
+  `components/`. **Answered**: ruled in scope by the Architect (Rulings);
+  none adds behaviour. The spec's Scope section does not record the ruling:
+  left to the Architect.
+- **Four edit `useState`s became one draft object** — a small rewrite, not
+  a pure move. **Answered**: the reviewer found no timing or payload
+  difference; the e2e edit journey passes.
+- **Seams beyond the spec** — the spec names the item and sheet props; the
+  program design adds the `SuggestionEditor` interface and the draft
+  helpers. **Answered**: approved with the plan; reported to the Architect.
+- **Stale context** — the spec says 336 lines, the file was 359 at
+  0f08d93. **Reported** to the Architect (🧑 zone, not the Crewmate's to
+  edit).
