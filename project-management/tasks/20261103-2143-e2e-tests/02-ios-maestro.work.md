@@ -5,7 +5,7 @@ Created by the Crewmate at the plan step, 2026-11-04. Spec:
 (parent: `project-management/tasks/20261103-2143-e2e-tests.spec.md`, whose
 "The critical journeys" table marks the iOS rows).
 
-**Plan:** waiting for the Architect's reading. Two findings below block
+**Plan:** approved by the Architect, 2026-11-04, with the human's rulings (see Rulings).
 part of the iOS rows as written and need the human (see "Findings that
 contradict the spec").
 
@@ -377,6 +377,37 @@ Options:
 - Risk to probe first: whether `openLink` with a custom scheme shows an
   "Open in B-Spot Dev?" system prompt on iOS 26.5; if so, `launch.yaml`
   taps "Open" when visible.
+
+### Rulings — 2026-11-04
+
+Human, via the Architect:
+- **Native magic-link login:** fixed in its own task,
+  `project-management/tasks/20261104-1358-native-magic-link-login.spec.md`.
+  This slice delivers no iOS auth flow (login, admin entry, moderation,
+  expired session). The slice spec's `ios-journeys-pass` is amended.
+  Leave the harness ready for those flows: the control server's
+  expire-session, revoke-admin and magic-link endpoints may land now if
+  they are cheap, otherwise later.
+- **iOS history:** pre-fill the app's AsyncStorage on the simulator from
+  the runner, then check the list and the tap through to the company page.
+- **Dev build:** a local `APP_VARIANT=development expo run:ios` is
+  approved. `apps/mobile/ios/` and `apps/mobile/android/` go into
+  `.gitignore`.
+
+Architect:
+- **The shared starter refactor comes first, in its own commit**,
+  followed by two green `pnpm e2e:web` runs. The branch is already merged
+  with `feat/e2e-tests` (715679b), which brings in the product-source,
+  repair-lint and web UX fixes work. `pnpm lint` is now read-only and
+  green: keep it green.
+- **Port 4011** for the control server joins the shared e2e resources,
+  under the same lock.
+- **Compose project name:** pin it in `apps/e2e/env/docker.ts` (or the
+  shared starter), so runs from a worktree attach to the running `b-spot`
+  containers instead of conflicting with them. The product-source
+  Crewmate hit this.
+- **The "Open in B-Spot Dev?" prompt:** handle it in the launch subflow if
+  it shows.
 
 ## Diff-Review Findings
 
