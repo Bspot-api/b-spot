@@ -74,6 +74,22 @@ Prefer the maintained integration unless the plan shows a blocker.
 - Blocked by: slice 02 of the e2e task (`02-ios-maestro`), whose Maestro
   harness the auth flows reuse.
 
+## Amendments — 2026-11-04
+
+- **Callback seam**: the web keeps sending no `callbackURL`, as
+  `web-login-unchanged` requires. The native callback uses the build's
+  scheme: `bspot://` in production, `bspot-dev://` in dev and e2e builds.
+- **`native-sign-out`**: met with Better-Auth's production origin checks
+  forced on in every environment (`disableOriginCheck: false`), rather
+  than by running the API with `NODE_ENV=production`. That setting would
+  also enable rate limiting and break the suites.
+- **Integration**: only the server half of `@better-auth/expo` is used, by
+  the human's decision. Its client half does not handle a magic link
+  opened from Mail, and it would add a native module.
+- **Security**: the session token travels in the custom-scheme callback
+  URL. The human accepted and documented this for an admin-only login.
+  Universal links come later.
+
 ## References
 
 - `project-management/archive/20261103-2143-e2e-tests/02-ios-maestro.work.md`,

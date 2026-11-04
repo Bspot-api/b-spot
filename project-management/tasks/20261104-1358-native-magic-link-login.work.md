@@ -3,7 +3,7 @@
 Created by the Crewmate at the plan step, 2026-11-04. Spec:
 `project-management/tasks/20261104-1358-native-magic-link-login.spec.md`.
 
-**Plan:** waiting for the Architect's reading.
+**Plan:** approved by the Architect, 2026-11-04, with the human's rulings (see Rulings).
 
 ## Program Design
 
@@ -463,6 +463,39 @@ released by `trap`) and logs to `…/scratchpad/native-login/`.
   null, and the flow starts logged out as before. If that ever proves
   flaky, `start-clean` can open `bspot-dev://auth/callback?error=reset`, or
   the app can clear the store on a null session. To decide while coding.
+
+### Rulings — 2026-11-04
+
+Human, via the Architect:
+- **Server-only `@better-auth/expo`**: approved. Use the API `expo()`
+  plugin, pinned to 1.6.12, with a small hand-written mobile side. No
+  `expoClient` and no new native module.
+- **Session token in the custom-scheme callback URL**: accepted for this
+  admin-only login, and documented. Write the risk as an ADR in
+  `docs/adr/`, as §G of `.agents/project.md` asks. Universal links (https)
+  come later, in a task that needs a domain.
+- **Copy for an invalid or expired link**: approved as proposed: "Ce lien de
+  connexion n'est plus valide. Demandez-en un nouveau.", then the login
+  screen.
+
+Architect:
+- **Trusted schemes** (`AUTH_APP_ORIGINS`): `bspot://` by default.
+  `bspot-dev://` only where the env sets it (dev, e2e), never in production
+  by default.
+- **Origin checks** (`disableOriginCheck: false`): forced on in every
+  environment, rather than running e2e with `NODE_ENV=production`. This
+  meets `native-sign-out`. The spec is amended.
+- **Session cookie**: stored in the Keychain through SecureStore, never in
+  AsyncStorage. Surviving a reinstall within the 7-day session is
+  accepted. That Safari keeps the same session is accepted.
+- **Native sign-out**: always clears the local session, even if the API
+  call fails.
+- **`APP_VARIANT=development`** in the mobile `dev` and `start` scripts: yes.
+  Say so in the README.
+- **Sequencing**: the branch already carries the merged split of the admin
+  suggestions screen (`src/features/admin/`). Write the moderation flow
+  against it, last, as planned.
+- **Web**: unchanged. It sends no `callbackURL`, and polling stays.
 
 ## Diff-Review Findings
 
