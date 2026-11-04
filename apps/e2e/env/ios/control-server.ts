@@ -5,13 +5,13 @@
  * API knows it.
  */
 import http from 'node:http';
-import { CONTROL_PORT } from './e2e-env';
-import { seedScanHistory } from './simulator';
-import { findSuggestionsByNotes, resetMutableState } from '../support/db';
-import { STORED_FOOD_SCAN } from '../support/stored-history';
+import { CONTROL_PORT } from '../e2e-env';
+import { findSuggestionsByNotes, resetMutableState } from '../../support/db';
+import { STORED_FOOD_SCAN, seedScanHistory } from './stored-history';
 
 type Route = (url: URL) => Promise<unknown>;
 
+/** The running control server; `stop` closes it. */
 export interface ControlServer {
   stop: () => Promise<void>;
 }
@@ -27,7 +27,7 @@ function buildRoutes(udid: string): Record<string, Route> {
   };
 }
 
-async function answer(
+async function handleControlRequest(
   routes: Record<string, Route>,
   req: http.IncomingMessage,
   res: http.ServerResponse,
@@ -50,7 +50,7 @@ async function answer(
 /** Starts the control server on 127.0.0.1 for the device `udid`. */
 export function startControlServer(udid: string): Promise<ControlServer> {
   const routes = buildRoutes(udid);
-  const server = http.createServer((req, res) => void answer(routes, req, res));
+  const server = http.createServer((req, res) => void handleControlRequest(routes, req, res));
   return new Promise((resolve, reject) => {
     server.once('error', reject);
     server.listen(CONTROL_PORT, '127.0.0.1', () => {

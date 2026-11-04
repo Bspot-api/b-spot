@@ -2,8 +2,12 @@
  * Every value a Maestro flow uses, passed with `maestro test -e`, so no
  * port, scheme, email or fixture name is typed in YAML.
  */
-import { CONTROL_URL, DEV_SCHEME, IOS_BUNDLE_ID, METRO_URL } from './e2e-env';
-import { FERRERO_FIXTURE, KNOWN_FOOD, UNKNOWN_BRAND_PRODUCT } from '../fixtures-server/catalogue';
+import { CONTROL_URL, DEV_SCHEME, IOS_BUNDLE_ID, METRO_URL } from '../e2e-env';
+import {
+  FERRERO_FIXTURE,
+  KNOWN_FOOD,
+  UNKNOWN_BRAND_PRODUCT,
+} from '../../fixtures-server/catalogue';
 
 /** A SIREN the Pappers fixture does not know (it answers 404). */
 const UNKNOWN_SIREN = '000000000';

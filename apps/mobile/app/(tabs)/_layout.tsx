@@ -38,7 +38,6 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Scanner',
-          tabBarButtonTestID: 'nav-scanner-link',
           tabBarIcon: ({ color, size }) => <Ionicons name="camera" color={color} size={size} />,
         }}
       />

@@ -10,14 +10,14 @@ import { resetE2eDatabase } from './database';
 import { startContainers, stopContainers } from './docker';
 import { runCommand } from './process';
 import { RunningService, ServiceDefinition, spawnService } from './services';
-import { buildWebApp } from './web-build';
+import { buildWebApp } from './web/web-build';
 
 const GUARD = path.join(E2E_ROOT, 'env', 'block-external-hosts.ts');
 const API_MAIN = path.join(API_ROOT, 'dist', 'src', 'main.js');
 
 export interface E2eEnvironmentOptions {
-  /** Export the web app and serve it on the e2e web port. */
-  web: boolean;
+  /** Export the web app and serve it on the e2e web port (web suite only). */
+  hasWebApp: boolean;
 }
 
 const FIXTURE_SERVER: ServiceDefinition = {
@@ -41,22 +41,22 @@ const API_SERVER: ServiceDefinition = {
 const WEB_SERVER: ServiceDefinition = {
   name: 'web static server',
   command: 'pnpm',
-  args: ['exec', 'tsx', 'env/static-server.ts'],
+  args: ['exec', 'tsx', 'env/web/static-server.ts'],
   cwd: E2E_ROOT,
   readyUrl: WEB_URL,
 };
 
-async function prepare(options: E2eEnvironmentOptions): Promise<void> {
+async function prepareBuilds(options: E2eEnvironmentOptions): Promise<void> {
   await resetE2eDatabase();
   await runCommand('pnpm', ['run', 'build'], { cwd: API_ROOT });
-  if (options.web) await buildWebApp();
+  if (options.hasWebApp) await buildWebApp();
 }
 
 async function startServices(
   options: E2eEnvironmentOptions,
   running: RunningService[],
 ): Promise<void> {
-  const definitions = options.web
+  const definitions = options.hasWebApp
     ? [FIXTURE_SERVER, API_SERVER, WEB_SERVER]
     : [FIXTURE_SERVER, API_SERVER];
   for (const definition of definitions) running.push(await spawnService(definition));
@@ -77,7 +77,7 @@ export async function withE2eEnvironment(
   const startedContainers = await startContainers();
   const running: RunningService[] = [];
   try {
-    await prepare(options);
+    await prepareBuilds(options);
     await startServices(options, running);
     return await run();
   } finally {

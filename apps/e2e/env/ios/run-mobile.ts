@@ -4,14 +4,23 @@
  * build loads its JS from and the control server, runs the Maestro flows,
  * tears down what it started, and exits with Maestro's code.
  */
+import { existsSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
-import { E2E_ROOT, MAESTRO_RESULTS_DIR, MAESTRO_ROOT } from './e2e-env';
-import { withE2eEnvironment } from './environment';
+import { E2E_ROOT, MAESTRO_RESULTS_DIR, MAESTRO_ROOT } from '../e2e-env';
+import { withE2eEnvironment } from '../environment';
+import { runCommandForExitCode } from '../process';
 import { startControlServer } from './control-server';
 import { buildMaestroEnv } from './maestro-env';
 import { startMetro } from './metro';
-import { runCommandForExitCode } from './process';
-import { assertDevBuildInstalled, findBootedSimulator, resolveMaestroBinary } from './simulator';
+import { assertDevBuildInstalled, findBootedSimulator } from './simulator';
+
+/** Where Maestro's installer puts the CLI; the PATH is the fallback. */
+const MAESTRO_HOME_BINARY = path.join(os.homedir(), '.maestro', 'bin', 'maestro');
+
+function resolveMaestroBinary(): string {
+  return existsSync(MAESTRO_HOME_BINARY) ? MAESTRO_HOME_BINARY : 'maestro';
+}
 
 function runMaestro(udid: string): Promise<number> {
   const variables = Object.entries(buildMaestroEnv()).flatMap(([key, value]) => [
@@ -42,7 +51,7 @@ async function main(): Promise<number> {
   const device = await findBootedSimulator();
   await assertDevBuildInstalled(device.udid);
   console.log(`[e2e] iOS simulator: ${device.name} (${device.udid})`);
-  return withE2eEnvironment({ web: false }, () => runFlows(device.udid));
+  return withE2eEnvironment({ hasWebApp: false }, () => runFlows(device.udid));
 }
 
 main()

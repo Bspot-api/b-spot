@@ -2,7 +2,7 @@ import { ChildProcess, spawn } from 'node:child_process';
 import { sleep } from '../support/wait';
 
 const READY_STEP_MS = 500;
-const DEFAULT_READY_TIMEOUT_MS = 120_000;
+const READY_TIMEOUT_MS = 120_000;
 const STOP_GRACE_MS = 5_000;
 
 /** A long-running process of the e2e environment, ready once `readyUrl` answers. */
@@ -15,9 +15,9 @@ export interface ServiceDefinition {
   readyUrl: string;
   /** Optional check of the ready answer's body (e.g. Metro's status text). */
   readyBody?: string;
-  readyTimeoutMs?: number;
 }
 
+/** A started service; `stop` kills its process group and resolves once it exited. */
 export interface RunningService {
   name: string;
   stop: () => Promise<void>;
@@ -31,7 +31,7 @@ async function isAnswering(definition: ServiceDefinition): Promise<boolean> {
 }
 
 async function waitUntilReady(definition: ServiceDefinition, child: ChildProcess): Promise<void> {
-  const deadline = Date.now() + (definition.readyTimeoutMs ?? DEFAULT_READY_TIMEOUT_MS);
+  const deadline = Date.now() + READY_TIMEOUT_MS;
   while (Date.now() < deadline) {
     if (child.exitCode !== null) {
       throw new Error(`[e2e] ${definition.name} exited with code ${child.exitCode} before ready`);

@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "e2e:web": "tsx env/run-web.ts",
-    "e2e:mobile": "tsx env/run-mobile.ts",
+    "e2e:mobile": "tsx env/ios/run-mobile.ts",
     "fixtures": "tsx fixtures-server/server.ts",
     "lint": "tsc --noEmit && eslint \"**/*.ts\"",
     "lint:fix": "eslint \"**/*.ts\" --fix"

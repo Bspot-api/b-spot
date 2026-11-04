@@ -11,7 +11,7 @@ function runPlaywright(): Promise<number> {
   return runCommandForExitCode('pnpm', args, { cwd: E2E_ROOT });
 }
 
-withE2eEnvironment({ web: true }, runPlaywright)
+withE2eEnvironment({ hasWebApp: true }, runPlaywright)
   .then((code) => process.exit(code))
   .catch((error: unknown) => {
     console.error('[e2e] environment failed:', error);

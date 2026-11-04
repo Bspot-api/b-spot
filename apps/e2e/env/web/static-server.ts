@@ -1,7 +1,7 @@
 import { createReadStream, existsSync, statSync } from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
-import { WEB_BUILD_DIR, WEB_PORT } from './e2e-env';
+import { WEB_BUILD_DIR, WEB_PORT } from '../e2e-env';
 
 const CONTENT_TYPES: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',

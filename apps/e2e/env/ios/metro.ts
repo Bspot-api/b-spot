@@ -1,5 +1,5 @@
-import { API_URL, METRO_PORT, METRO_URL, MOBILE_ROOT } from './e2e-env';
-import { RunningService, spawnService } from './services';
+import { API_URL, METRO_PORT, METRO_URL, MOBILE_ROOT } from '../e2e-env';
+import { RunningService, spawnService } from '../services';
 
 /**
  * Starts the Metro the iOS dev build loads its JavaScript from. The dev
