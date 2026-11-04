@@ -1,5 +1,6 @@
 import { ChildProcess, spawn } from 'node:child_process';
 import { sleep } from '../support/wait';
+import { onInterrupt } from './run-control/interrupt';
 
 const READY_STEP_MS = 500;
 const READY_TIMEOUT_MS = 120_000;
@@ -17,7 +18,10 @@ export interface ServiceDefinition {
   readyBody?: string;
 }
 
-/** A started service; `stop` kills its process group and resolves once it exited. */
+/**
+ * A started service; `stop` kills its process group and resolves once it
+ * exited. It is idempotent, and also runs when the run is interrupted.
+ */
 export interface RunningService {
   name: string;
   stop: () => Promise<void>;
@@ -52,8 +56,13 @@ function killGroup(pid: number, signal: NodeJS.Signals): void {
 
 /** Kills the service's whole process group (pnpm/tsx spawn children of their own). */
 function stopChild(name: string, child: ChildProcess): Promise<void> {
-  if (child.exitCode !== null || child.pid === undefined) return Promise.resolve();
+  if (child.pid === undefined) return Promise.resolve();
   const pid = child.pid;
+  if (child.exitCode !== null || child.signalCode !== null) {
+    // The leader is gone; what it spawned may still run in its group.
+    killGroup(pid, 'SIGTERM');
+    return Promise.resolve();
+  }
   return new Promise((resolve) => {
     const force = setTimeout(() => killGroup(pid, 'SIGKILL'), STOP_GRACE_MS);
     child.once('exit', () => {
@@ -74,9 +83,12 @@ export async function spawnService(definition: ServiceDefinition): Promise<Runni
     stdio: 'inherit',
     detached: true,
   });
+  let stopping: Promise<void> | undefined;
+  const stopOnce = (): Promise<void> => (stopping ??= stopChild(definition.name, child));
+  const unregister = onInterrupt(stopOnce);
   const running: RunningService = {
     name: definition.name,
-    stop: () => stopChild(definition.name, child),
+    stop: () => stopOnce().finally(unregister),
   };
   try {
     await waitUntilReady(definition, child);
