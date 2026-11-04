@@ -10,11 +10,6 @@ const mockEm = {
   persistAndFlush: jest.fn().mockResolvedValue(undefined),
 };
 
-const makePappersCacheRepo = (overrides: Partial<typeof pappersCacheRepoMock> = {}) => ({
-  ...pappersCacheRepoMock,
-  ...overrides,
-});
-
 const pappersCacheRepoMock = {
   findOne: jest.fn(),
   create: jest.fn((data: Partial<PappersCache>) => ({ ...data })),
