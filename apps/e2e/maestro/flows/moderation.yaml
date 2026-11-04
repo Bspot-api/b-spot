@@ -1,0 +1,81 @@
+# An admin moderates suggestions: approve, edit, reject and delete (the last
+# two through the native confirmation alert). A card's buttons are named after
+# its brand ("Modifier Edit Fixture"), as a screen reader reads them.
+appId: ${APP_ID}
+name: moderation
+tags:
+  - auth
+---
+- runFlow: ../common/start-clean.yaml
+- runScript: ../scripts/create-suggestions.js
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: ${MODERATION_EMAIL}
+- tapOn:
+    id: "nav-admin-link"
+- tapOn:
+    id: "admin-counter-new"
+- extendedWaitUntil:
+    visible: ${MODERATION_TO_APPROVE}
+    timeout: 15000
+# Approve: the card leaves "new" and shows under "approved".
+- tapOn:
+    id: "suggestion-approve"
+    text: "Approuver ${MODERATION_TO_APPROVE}"
+- extendedWaitUntil:
+    notVisible: ${MODERATION_TO_APPROVE}
+    timeout: 15000
+# Edit through the bottom sheet.
+- tapOn:
+    id: "suggestion-edit"
+    text: "Modifier ${MODERATION_TO_EDIT}"
+- tapOn:
+    id: "suggestion-edit-brand-input"
+- eraseText: 40
+- inputText: ${MODERATION_EDITED}
+# Return closes the keyboard (hideKeyboard would swipe the sheet away).
+- pressKey: Enter
+- tapOn:
+    id: "suggestion-edit-save"
+- extendedWaitUntil:
+    visible: ${MODERATION_EDITED}
+    timeout: 15000
+- assertNotVisible: ${MODERATION_TO_EDIT}
+# Reject, confirmed in the native alert.
+- tapOn:
+    id: "suggestion-reject"
+    text: "Rejeter ${MODERATION_TO_REJECT}"
+- extendedWaitUntil:
+    visible: "Rejeter la suggestion .*"
+    timeout: 10000
+- tapOn:
+    text: "Rejeter"
+    index: 1
+- extendedWaitUntil:
+    notVisible: ${MODERATION_TO_REJECT}
+    timeout: 15000
+# Delete, confirmed in the native alert.
+- tapOn:
+    id: "suggestion-delete"
+    text: "Supprimer ${MODERATION_TO_DELETE}"
+- extendedWaitUntil:
+    visible: "Supprimer définitivement .*"
+    timeout: 10000
+- tapOn:
+    text: "Supprimer"
+    index: 1
+- extendedWaitUntil:
+    notVisible: ${MODERATION_TO_DELETE}
+    timeout: 15000
+# The approved and rejected ones are under their tabs.
+- tapOn:
+    id: "suggestions-tab-approved"
+- extendedWaitUntil:
+    visible: ${MODERATION_TO_APPROVE}
+    timeout: 15000
+- tapOn:
+    id: "suggestions-tab-rejected"
+- extendedWaitUntil:
+    visible: ${MODERATION_TO_REJECT}
+    timeout: 15000

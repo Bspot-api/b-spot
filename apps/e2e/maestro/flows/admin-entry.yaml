@@ -1,0 +1,29 @@
+# An admin sees the admin entry; once demoted server-side, the same user,
+# still logged in, does not.
+appId: ${APP_ID}
+name: admin-entry
+tags:
+  - auth
+---
+- runFlow: ../common/start-clean.yaml
+- runFlow:
+    file: ../common/login.yaml
+    env:
+      EMAIL: ${LOGIN_EMAIL}
+- tapOn:
+    id: "nav-admin-link"
+- extendedWaitUntil:
+    visible:
+      id: "admin-profile-email"
+      text: ${LOGIN_EMAIL}
+    timeout: 15000
+- runScript:
+    file: ../scripts/revoke-admin.js
+    env:
+      EMAIL: ${LOGIN_EMAIL}
+- runFlow: ../common/relaunch.yaml
+- assertVisible:
+    id: "nav-login-link"
+    text: ${LOGIN_EMAIL}
+- assertNotVisible:
+    id: "nav-admin-link"

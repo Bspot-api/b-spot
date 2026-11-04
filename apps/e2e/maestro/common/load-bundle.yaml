@@ -5,9 +5,10 @@ appId: ${APP_ID}
     file: open-link.yaml
     env:
       LINK: ${DEV_CLIENT_LINK}
-# First load after a wipe: the dev menu introduces itself, then opens.
+# First load after a wipe: the dev menu introduces itself, then opens. The
+# header reads "Se connecter", or the user's email after a relaunch.
 - extendedWaitUntil:
-    visible: "Continue|Se connecter"
+    visible: "Continue|Se connecter|.+@e2e\\.test"
     timeout: 180000
 - runFlow:
     when:

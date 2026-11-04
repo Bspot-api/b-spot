@@ -6,7 +6,14 @@
  */
 import http from 'node:http';
 import { CONTROL_PORT } from '../e2e-env';
-import { findSuggestionsByNotes, resetMutableState } from '../../support/db';
+import {
+  countSessionsOf,
+  expireSessionsOf,
+  findSuggestionsByNotes,
+  resetMutableState,
+  revokeAdminRole,
+} from '../../support/db';
+import { fetchLatestMagicLink } from '../../support/maildev';
 import { STORED_FOOD_SCAN, seedScanHistory } from './stored-history';
 
 type Route = (url: URL) => Promise<unknown>;
@@ -16,10 +23,31 @@ export interface ControlServer {
   stop: () => Promise<void>;
 }
 
+function readEmail(url: URL): string {
+  const email = url.searchParams.get('email');
+  if (!email) throw new Error('missing ?email=');
+  return email;
+}
+
 function buildRoutes(udid: string): Record<string, Route> {
+  /** Mail older than the last reset belongs to an earlier flow (its token is gone). */
+  let lastResetAt = new Date();
   return {
     /** Back to the seeded database, like the web suite's per-test reset. */
-    'POST /reset': () => resetMutableState(),
+    'POST /reset': async () => {
+      lastResetAt = new Date();
+      await resetMutableState();
+    },
+    /** The newest magic link MailDev received for `?email=` since the last reset. */
+    'GET /magic-link': async (url) => ({
+      link: await fetchLatestMagicLink({ email: readEmail(url), since: lastResetAt }),
+    }),
+    /** Moves the sessions of `?email=` into the past. */
+    'POST /sessions/expire': async (url) => ({ count: await expireSessionsOf(readEmail(url)) }),
+    /** How many sessions `?email=` still has. */
+    'GET /sessions': async (url) => ({ count: await countSessionsOf(readEmail(url)) }),
+    /** Demotes `?email=`, who stays logged in as a regular user. */
+    'POST /admins/revoke': (url) => revokeAdminRole(readEmail(url)),
     /** Stored history holding the known food product (the app must be stopped). */
     'POST /history/seed': () => seedScanHistory(udid, [STORED_FOOD_SCAN]),
     /** The stored brand suggestions whose notes equal `?notes=`. */

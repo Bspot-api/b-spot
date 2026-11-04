@@ -78,6 +78,18 @@ export function expireSessionsOf(email: string): Promise<number> {
   });
 }
 
+/** How many sessions a user has (a native sign-out that reached the API leaves none). */
+export function countSessionsOf(email: string): Promise<number> {
+  return withClient(async (client) => {
+    const result = await client.query<{ count: string }>(
+      `SELECT count(*) AS count FROM session
+       WHERE "userId" = (SELECT id FROM "user" WHERE email = $1)`,
+      [email],
+    );
+    return Number(result.rows[0].count);
+  });
+}
+
 /** Removes a user's admin row: the user stays logged in, as a regular user. */
 export function revokeAdminRole(email: string): Promise<void> {
   return withClient(async (client) => {

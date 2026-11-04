@@ -1,0 +1,6 @@
+# Stops and relaunches the app without wiping its data (the session stays).
+appId: ${APP_ID}
+---
+- stopApp
+- launchApp
+- runFlow: load-bundle.yaml
