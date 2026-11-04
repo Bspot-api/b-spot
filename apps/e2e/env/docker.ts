@@ -12,12 +12,21 @@ const WAIT_LIMIT_MS = 60_000;
 /** Host ports for b-spot's MailDev when the e2e run starts it (compose variables). */
 const MAILDEV_PORT_ENV = { SMTP_PORT: String(SMTP_PORT), SMTP_PORT_WEB: String(MAILDEV_WEB_PORT) };
 
+/**
+ * Pinned compose project name: a run from a git worktree (whose folder is not
+ * `b-spot`) attaches to the running b-spot containers instead of clashing.
+ */
+const COMPOSE_PROJECT = ['-p', 'b-spot'] as const;
+
 function runCompose(args: readonly string[]): Promise<void> {
-  return runCommand('docker', ['compose', ...args], { cwd: REPO_ROOT, env: MAILDEV_PORT_ENV });
+  return runCommand('docker', ['compose', ...COMPOSE_PROJECT, ...args], {
+    cwd: REPO_ROOT,
+    env: MAILDEV_PORT_ENV,
+  });
 }
 
 function captureCompose(args: readonly string[]): Promise<string> {
-  return captureCommand('docker', ['compose', ...args], { cwd: REPO_ROOT });
+  return captureCommand('docker', ['compose', ...COMPOSE_PROJECT, ...args], { cwd: REPO_ROOT });
 }
 
 async function listRunningServices(): Promise<string[]> {
