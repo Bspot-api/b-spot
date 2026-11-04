@@ -1,3 +1,5 @@
+import { IGNORE_DOTENV_FILES_VARIABLE } from '../e2e-env';
+
 /**
  * Reads which `EXPO_PUBLIC_API_URL` a served Expo dev bundle carries. Two
  * forms exist in an Expo 54 dev bundle:
@@ -27,6 +29,6 @@ export function describeApiUrlMismatch(urls: readonly string[], expected: string
   return (
     `[e2e] the iOS bundle carries EXPO_PUBLIC_API_URL=${others.join(', ')}, not ${expected}. ` +
     `Expo bundles apps/mobile/.env* in development and its values win; the e2e Metro must ` +
-    `hide them (B_SPOT_E2E_IGNORE_DOTENV_FILES in apps/mobile/metro.config.js).`
+    `hide them (${IGNORE_DOTENV_FILES_VARIABLE} in apps/mobile/metro.config.js).`
   );
 }
