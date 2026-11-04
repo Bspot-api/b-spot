@@ -42,10 +42,14 @@ Generate code, corrections, and refactorings that comply with the basic principl
   - Type definitions
   - Interface names
   - Class names
+  - React components and their file names (e.g., `UserProfile.tsx`, as in
+    `apps/mobile/src/features/*/components/`)
 - Use **kebab-case** for:
-  - Components
   - Directory names (e.g., `components/auth-wizard`)
-  - Component file names (e.g., `user-profile.tsx`)
+  - Non-component helper files (e.g., `history-utils.ts`)
+- Expo Router route files under `apps/mobile/app/` follow the URL they
+  serve (e.g., `login.tsx`, `company/[id].tsx`), whatever the rules above
+  say.
 - Use **camelCase** for:
   - Variables
   - Functions
