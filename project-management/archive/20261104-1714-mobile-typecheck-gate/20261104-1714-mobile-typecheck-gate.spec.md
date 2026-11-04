@@ -1,6 +1,6 @@
 # A typecheck gate for the whole repo
 
-**Status:** in-progress
+**Status:** done
 
 ---
 
@@ -32,15 +32,15 @@ with no `any` (`CLAUDE.md`, "Code Quality Standards").
 
 ## Acceptance Criteria
 
-- [ ] **typecheck-green** — `pnpm typecheck` exits 0 from the repo root.
-- [ ] **typecheck-catches** — a deliberate type error in an app file
+- [x] **typecheck-green** — `pnpm typecheck` exits 0 from the repo root.
+- [x] **typecheck-catches** — a deliberate type error in an app file
   (`apps/mobile/app/**` or `src/**`) makes `pnpm typecheck` fail. Shown
   once, then reverted.
-- [ ] **strict-kept** — no `strict`, `noImplicitAny` or `strictNullChecks`
+- [x] **strict-kept** — no `strict`, `noImplicitAny` or `strictNullChecks`
   flag is turned off, and no new `any` or `@ts-ignore` is added.
-- [ ] **gate-declared** — §F of `.agents/project.md` lists the typecheck
+- [x] **gate-declared** — §F of `.agents/project.md` lists the typecheck
   command.
-- [ ] **suite-green** — `pnpm lint`, `pnpm test` and `pnpm build` pass.
+- [x] **suite-green** — `pnpm lint`, `pnpm test` and `pnpm build` pass.
 
 ## Seams
 
@@ -54,3 +54,7 @@ with no `any` (`CLAUDE.md`, "Code Quality Standards").
 
 - 2026-11-04, Architect: proposed by the Crewmate of the admin
   suggestions split. The human asked for it to be launched.
+- 2026-11-04, Crewmate: measured 103 errors, not about 93, all missing
+  Jest types; no real type error in app code. The API and e2e were
+  already at 0 errors (e2e's `lint` already ran `tsc`). The Context above
+  is left as approved; the work document has the measurements.

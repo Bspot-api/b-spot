@@ -9,6 +9,7 @@
     "fixtures": "tsx fixtures-server/server.ts",
     "lint": "tsc --noEmit && eslint \"**/*.ts\"",
     "lint:fix": "eslint \"**/*.ts\" --fix",
+    "typecheck": "tsc --noEmit",
     "test": "tsx --test \"env/**/*.test.ts\""
   },
   "devDependencies": {

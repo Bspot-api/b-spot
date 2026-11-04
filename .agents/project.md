@@ -111,6 +111,9 @@ prefilled from repo exploration + package.json where possible. -->
 
 - **Lint:** `pnpm lint` (read-only in every package; each package's
   `pnpm lint:fix` applies the auto-fixes)
+- **Typecheck:** `pnpm typecheck` (`tsc --noEmit` in every package, test
+  files included; mobile route types are only as fresh as the last
+  `expo start`, which writes the gitignored `.expo/types`)
 - **Test:** `pnpm test`
 - **Build:** `pnpm build`
 - **Browser check:** `cd apps/mobile && pnpm web` + manual check (needs
