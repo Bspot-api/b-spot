@@ -5,6 +5,26 @@ task — never generated.
 
 ## 2026-11-04
 
+- Typecheck gate (`chore/typecheck-gate`): `pnpm typecheck` runs
+  `tsc --noEmit` in api, mobile and e2e, and exits 0.
+  - Mobile was at 103 errors, all in its 7 test files and all missing
+    Jest types. `@types/jest` in the mobile devDependencies fixes them;
+    no source, test or tsconfig file changed, and no real type error
+    was hiding in the app.
+  - The API script uses `tsconfig.eslint.json`, the only API config that
+    also covers the specs and `test/`: narrowing it for ESLint narrows the
+    typecheck too.
+  - Proof: a deliberate `number = 'string'` in a mobile `src/` file fails
+    the gate with TS2322, then reverted. `pnpm lint`, `pnpm test`,
+    `pnpm build` green.
+  - Declared in §F of `.agents/project.md` and in the pre-PR checks of
+    `docs/agent-rules/git-workflow.md`.
+  - Open: route types come from the gitignored `.expo/types`, so `app/**`
+    route paths are only checked where `expo start` has run; e2e's `lint`
+    still runs its own `tsc`; `CLAUDE.md` does not list the command yet.
+  - Documents:
+    `project-management/archive/20261104-1714-mobile-typecheck-gate/`.
+
 - Split the admin suggestions screen (`refactor/split-admin-suggestions`):
   `apps/mobile/app/admin/suggestions.tsx` goes from 359 to 96 lines, with
   no behaviour change.
