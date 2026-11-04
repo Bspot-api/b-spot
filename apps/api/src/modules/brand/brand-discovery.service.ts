@@ -26,6 +26,17 @@ interface EntrepriseSearchResponse {
   results?: EntrepriseSearchResult[];
 }
 
+interface DiscoveryCandidate {
+  siren: string;
+  name: string;
+  raw: EntrepriseSearchResult;
+}
+
+interface ScoredCandidate {
+  candidate: DiscoveryCandidate;
+  confidence: number;
+}
+
 export type BrandDiscoveryResolution = 'auto_active' | 'auto_pending' | 'needs_user_input' | 'none';
 
 export interface BrandDiscoveryResult {
@@ -53,22 +64,10 @@ export class BrandDiscoveryService {
 
     const candidates = await this.searchCompanies(query);
     if (candidates.length === 0) {
-      return {
-        resolution: 'needs_user_input',
-        confidence: 0,
-        matchedQuery: query,
-        message: 'Aucune entreprise candidate trouvée pour cette marque',
-      };
+      return this.needsUserInput(query, 0, 'Aucune entreprise candidate trouvée pour cette marque');
     }
 
-    const scored = candidates
-      .map((candidate) => ({
-        candidate,
-        confidence: this.computeConfidence(query, candidate, candidates.length),
-      }))
-      .sort((a, b) => b.confidence - a.confidence);
-
-    const best = scored[0];
+    const best = this.rankCandidates(query, candidates)[0];
     if (!best) return { resolution: 'none' };
 
     const validated = await this.pappersService.getCompanyBySiren(best.candidate.siren);
@@ -76,36 +75,47 @@ export class BrandDiscoveryService {
       this.logger.warn(
         `Discovery candidate rejected (Pappers unavailable): ${best.candidate.siren}`,
       );
-      return {
-        resolution: 'needs_user_input',
-        confidence: best.confidence,
-        matchedQuery: query,
-        message: 'Impossible de valider l’entreprise candidate',
-      };
+      return this.needsUserInput(
+        query,
+        best.confidence,
+        'Impossible de valider l’entreprise candidate',
+      );
     }
 
     if (best.confidence < PENDING_THRESHOLD) {
-      return {
-        resolution: 'needs_user_input',
-        confidence: best.confidence,
-        matchedQuery: query,
-        message: 'Confiance insuffisante pour créer un mapping automatique',
-      };
+      return this.needsUserInput(
+        query,
+        best.confidence,
+        'Confiance insuffisante pour créer un mapping automatique',
+      );
     }
 
+    return this.persistDiscoveredBrand(query, best);
+  }
+
+  private needsUserInput(query: string, confidence: number, message: string): BrandDiscoveryResult {
+    return { resolution: 'needs_user_input', confidence, matchedQuery: query, message };
+  }
+
+  private rankCandidates(query: string, candidates: DiscoveryCandidate[]): ScoredCandidate[] {
+    return candidates
+      .map((candidate) => ({
+        candidate,
+        confidence: this.computeConfidence(query, candidate, candidates.length),
+      }))
+      .sort((a, b) => b.confidence - a.confidence);
+  }
+
+  private async persistDiscoveredBrand(
+    query: string,
+    best: ScoredCandidate,
+  ): Promise<BrandDiscoveryResult> {
     const status = best.confidence >= ACTIVE_THRESHOLD ? BrandStatus.ACTIVE : BrandStatus.PENDING;
 
     const existing = await this.brandRepo.findOne({
       name: { $ilike: query },
     });
-    if (existing) {
-      return {
-        resolution: existing.status === BrandStatus.PENDING ? 'auto_pending' : 'auto_active',
-        confidence: existing.confidence,
-        brand: existing,
-        matchedQuery: query,
-      };
-    }
+    if (existing) return this.existingBrandResult(query, existing);
 
     const created = this.brandRepo.create({
       name: query,
@@ -128,9 +138,16 @@ export class BrandDiscoveryService {
     };
   }
 
-  private async searchCompanies(
-    query: string,
-  ): Promise<Array<{ siren: string; name: string; raw: EntrepriseSearchResult }>> {
+  private existingBrandResult(query: string, existing: Brand): BrandDiscoveryResult {
+    return {
+      resolution: existing.status === BrandStatus.PENDING ? 'auto_pending' : 'auto_active',
+      confidence: existing.confidence,
+      brand: existing,
+      matchedQuery: query,
+    };
+  }
+
+  private async searchCompanies(query: string): Promise<DiscoveryCandidate[]> {
     const url = new URL(`${readExternalApiUrls().rechercheEntreprises}${ENTREPRISE_SEARCH_PATH}`);
     url.searchParams.set('q', query);
     url.searchParams.set('per_page', '5');
@@ -147,20 +164,19 @@ export class BrandDiscoveryService {
       const results = data.results ?? [];
 
       return results
-        .map((result) => {
-          const siren = typeof result.siren === 'string' ? result.siren.trim() : '';
-          const name = this.extractCompanyName(result);
-          if (!/^\d{9}$/.test(siren) || !name) return null;
-          return { siren, name, raw: result };
-        })
-        .filter(
-          (row): row is { siren: string; name: string; raw: EntrepriseSearchResult } =>
-            row !== null,
-        );
+        .map((result) => this.toCandidate(result))
+        .filter((row): row is DiscoveryCandidate => row !== null);
     } catch (error) {
       this.logger.error(`Entreprise search failed for query "${query}"`, error);
       return [];
     }
+  }
+
+  private toCandidate(result: EntrepriseSearchResult): DiscoveryCandidate | null {
+    const siren = typeof result.siren === 'string' ? result.siren.trim() : '';
+    const name = this.extractCompanyName(result);
+    if (!/^\d{9}$/.test(siren) || !name) return null;
+    return { siren, name, raw: result };
   }
 
   private extractCompanyName(result: EntrepriseSearchResult): string {

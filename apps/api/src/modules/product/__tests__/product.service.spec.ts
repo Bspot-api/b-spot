@@ -278,12 +278,10 @@ describe('ProductService', () => {
     });
 
     it('calls the production Open Food Facts URL when no base URL is set', async () => {
-      const fetchSpy = jest
-        .spyOn(global, 'fetch')
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ status: 1, product: {} }),
-        } as Response);
+      const fetchSpy = jest.spyOn(global, 'fetch').mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ status: 1, product: {} }),
+      } as Response);
 
       await service.fetchFromOpenFoodFacts('3017620422003');
 
@@ -294,12 +292,10 @@ describe('ProductService', () => {
 
     it('calls the configured Open Food Facts base URL', async () => {
       process.env.OPEN_FOOD_FACTS_BASE_URL = 'http://localhost:4010/off';
-      const fetchSpy = jest
-        .spyOn(global, 'fetch')
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ status: 1, product: {} }),
-        } as Response);
+      const fetchSpy = jest.spyOn(global, 'fetch').mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ status: 1, product: {} }),
+      } as Response);
 
       await service.fetchFromOpenFoodFacts('3017620422003');
 

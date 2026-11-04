@@ -10,11 +10,6 @@ const mockEm = {
   persistAndFlush: jest.fn().mockResolvedValue(undefined),
 };
 
-const makePappersCacheRepo = (overrides: Partial<typeof pappersCacheRepoMock> = {}) => ({
-  ...pappersCacheRepoMock,
-  ...overrides,
-});
-
 const pappersCacheRepoMock = {
   findOne: jest.fn(),
   create: jest.fn((data: Partial<PappersCache>) => ({ ...data })),
@@ -125,7 +120,10 @@ describe('CacheService', () => {
       pappersCacheRepoMock.findOne.mockResolvedValue(null);
       await service.setCachedPappers('552108011', { legalName: 'Nestlé France' });
       expect(pappersCacheRepoMock.create).toHaveBeenCalledWith(
-        expect.objectContaining({ siren: '552108011', responseData: { legalName: 'Nestlé France' } }),
+        expect.objectContaining({
+          siren: '552108011',
+          responseData: { legalName: 'Nestlé France' },
+        }),
       );
       expect(mockEm.persistAndFlush).toHaveBeenCalled();
     });

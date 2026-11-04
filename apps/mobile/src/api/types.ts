@@ -1,4 +1,7 @@
-export type ProductSource = 'OPEN_FOOD_FACTS' | 'OPEN_BEAUTY_FACTS';
+/** The API's `ProductSource` values: OFF = Open Food Facts, OBF = Open Beauty Facts. */
+export const PRODUCT_SOURCES = ['OFF', 'OBF'] as const;
+
+export type ProductSource = (typeof PRODUCT_SOURCES)[number];
 
 export interface ProductDto {
   barcode: string;

@@ -63,39 +63,40 @@ export class PappersService {
 
     try {
       const response = await fetch(url);
-      const success = response.ok;
-      const endpoint = '/v2/entreprise';
-
-      if (!success) {
-        const errorText = await response.text();
-        await this.cacheService.logApiCall(
-          ExternalApi.PAPPERS,
-          endpoint,
-          `siren=${siren}`,
-          false,
-          errorText,
-        );
+      if (!response.ok) {
+        await this.logPappersFailure(siren, await response.text());
         this.logger.error(`Pappers API error for SIREN ${siren}: ${response.status}`);
         return null;
       }
 
-      const data = (await response.json()) as PappersResponse;
-      await this.cacheService.logApiCall(ExternalApi.PAPPERS, endpoint, `siren=${siren}`, true);
-      await this.cacheService.setCachedPappers(siren, data as Record<string, unknown>);
-      await this.cacheService.checkPappersQuota();
-
-      return this.parseResponse(siren, data);
+      return await this.handleApiSuccess(siren, (await response.json()) as PappersResponse);
     } catch (err) {
-      await this.cacheService.logApiCall(
-        ExternalApi.PAPPERS,
-        '/v2/entreprise',
-        `siren=${siren}`,
-        false,
-        String(err),
-      );
+      await this.logPappersFailure(siren, String(err));
       this.logger.error(`Pappers fetch failed for SIREN ${siren}`, err);
       return null;
     }
+  }
+
+  private async handleApiSuccess(siren: string, data: PappersResponse): Promise<CompanyData> {
+    await this.cacheService.logApiCall(
+      ExternalApi.PAPPERS,
+      PAPPERS_COMPANY_PATH,
+      `siren=${siren}`,
+      true,
+    );
+    await this.cacheService.setCachedPappers(siren, data as Record<string, unknown>);
+    await this.cacheService.checkPappersQuota();
+    return this.parseResponse(siren, data);
+  }
+
+  private async logPappersFailure(siren: string, error: string): Promise<void> {
+    await this.cacheService.logApiCall(
+      ExternalApi.PAPPERS,
+      PAPPERS_COMPANY_PATH,
+      `siren=${siren}`,
+      false,
+      error,
+    );
   }
 
   private parseResponse(siren: string, data: PappersResponse): CompanyData {

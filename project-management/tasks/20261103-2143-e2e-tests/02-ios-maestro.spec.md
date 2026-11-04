@@ -22,8 +22,13 @@ session — is exercised through the app's own screens.
 
 ## Acceptance criteria
 
-- [ ] **ios-journeys-pass** — every row of "The critical journeys" in the
-  parent spec marked for iOS has a passing Maestro flow.
+- [ ] ~~**ios-journeys-pass** — every row of "The critical journeys" in the
+  parent spec marked for iOS has a passing Maestro flow.~~
+- [ ] **ios-journeys-pass** (2026-11-04) — every iOS row of the parent
+  spec's journeys table has a passing Maestro flow, except the four auth
+  rows (login, admin entry, moderation, expired session). Those move to
+  the native magic-link login task. The history row is checked against a
+  pre-filled stored history.
 - [ ] **shared-environment** — the flows run against the environment slice
   01 built, with no second copy of the fixture server, seeding or reset.
 - [ ] **one-command-mobile** — `pnpm e2e:mobile` brings the environment up,

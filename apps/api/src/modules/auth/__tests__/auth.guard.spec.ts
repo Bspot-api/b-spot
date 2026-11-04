@@ -25,9 +25,9 @@ describe('AuthGuard', () => {
     mockGetSession.mockResolvedValue(null);
     const { switchToHttp } = createContext();
 
-    await expect(
-      guard.canActivate({ switchToHttp } as ExecutionContext),
-    ).rejects.toThrow(UnauthorizedException);
+    await expect(guard.canActivate({ switchToHttp } as ExecutionContext)).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('sets session on request when session is valid', async () => {
@@ -35,9 +35,7 @@ describe('AuthGuard', () => {
     mockGetSession.mockResolvedValue(session);
     const { switchToHttp, request } = createContext({ cookie: 'session_token=abc' });
 
-    await expect(
-      guard.canActivate({ switchToHttp } as ExecutionContext),
-    ).resolves.toBe(true);
+    await expect(guard.canActivate({ switchToHttp } as ExecutionContext)).resolves.toBe(true);
     expect(request.session).toEqual(session);
   });
 });
