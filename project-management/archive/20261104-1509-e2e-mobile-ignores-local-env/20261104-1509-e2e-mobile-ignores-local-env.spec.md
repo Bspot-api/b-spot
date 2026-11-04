@@ -94,3 +94,7 @@ says the process env wins over `.env`, is wrong.
   - `suite-green`: lint, test and build passed, and `e2e:web` passed 25.
   - The human should confirm the undocumented hook (see "Rulings" in the
     work document).
+- 2026-11-04, Architect — the human confirmed relying on the undocumented
+  hook (`resolver.blockList` gated for e2e, guarded by the bundle
+  preflight) over the documented `--no-dev`, which would change what runs
+  under test.

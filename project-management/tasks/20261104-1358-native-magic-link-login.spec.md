@@ -9,7 +9,7 @@
 ## Context
 
 Found while planning slice 02 of
-[End-to-end tests for the critical journeys](20261103-2143-e2e-tests.spec.md),
+[End-to-end tests for the critical journeys](../archive/20261103-2143-e2e-tests.spec.md),
 from reading the code and Better-Auth's source. It has not yet been seen
 on a device. The session is a Better-Auth cookie. `signInMagicLink` sends
 no `callbackURL`, so the emailed link verifies in whatever opens it
@@ -76,7 +76,7 @@ Prefer the maintained integration unless the plan shows a blocker.
 
 ## References
 
-- `project-management/tasks/20261103-2143-e2e-tests/02-ios-maestro.work.md`,
+- `project-management/archive/20261103-2143-e2e-tests/02-ios-maestro.work.md`,
   findings: the full analysis.
 - `project-management/archive/speckit-user-auth-admin-ui/spec.md`: the
   login user stories.
