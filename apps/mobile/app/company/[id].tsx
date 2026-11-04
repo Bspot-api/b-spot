@@ -14,13 +14,14 @@ import { CompanyHeader } from '../../src/features/company/components/CompanyHead
 import { ExecutivesList } from '../../src/features/company/components/ExecutivesList';
 import { ShareholdersList } from '../../src/features/company/components/ShareholdersList';
 import { useCompanyData } from '../../src/features/company/hooks/useCompanyData';
+import type { ProductSource } from '../../src/api/types';
 
 export default function CompanyDetailScreen() {
   const { id, brandStatus, brandResolution, productSource } = useLocalSearchParams<{
     id: string;
     brandStatus?: string;
     brandResolution?: string;
-    productSource?: 'OFF' | 'OBF' | 'OPEN_FOOD_FACTS' | 'OPEN_BEAUTY_FACTS';
+    productSource?: ProductSource;
   }>();
   const siren = Array.isArray(id) ? id[0] : id;
   const resolvedBrandStatus = Array.isArray(brandStatus) ? brandStatus[0] : brandStatus;

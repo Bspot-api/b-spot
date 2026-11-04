@@ -6,6 +6,7 @@ import {
   OMBRELIS_FIXTURE,
 } from '../fixtures-server/catalogue';
 import { searchBarcode } from '../support/search';
+import { PRODUCT_SOURCE_LABELS } from '../support/product-source-labels';
 import { TEST_IDS } from '../support/test-ids';
 import { expect, test } from '../support/test';
 
@@ -23,6 +24,9 @@ test('scanning a known food product shows its owner, executives and shareholders
   await expect(page.getByTestId(TEST_IDS.executiveItem).first()).toContainText('Camille Fixture');
   await expect(page.getByTestId(TEST_IDS.shareholderItem)).toHaveCount(1);
   await expect(page.getByTestId(TEST_IDS.shareholderItem)).toContainText('Holding Fixture');
+  await expect(page.getByTestId(TEST_IDS.companyProductSource)).toHaveText(
+    PRODUCT_SOURCE_LABELS.food,
+  );
 });
 
 test('scanning a known cosmetic falls back to Open Beauty Facts', async ({ page }) => {
@@ -33,14 +37,13 @@ test('scanning a known cosmetic falls back to Open Beauty Facts', async ({ page 
   await expect(page.getByTestId(TEST_IDS.executiveItem)).toContainText('Sacha Fixture');
 });
 
-// Blocked by a mobile defect found by this suite (reported to the Architect, not fixed here):
-// the API sends `source: 'OBF'`, but `useBarcodeScanner` compares it with 'OPEN_BEAUTY_FACTS'
-// (the type in `apps/mobile/src/api/types.ts`), so every product is labelled "alimentaire".
-test.fixme('a cosmetic is labelled as a cosmetic product on its company page', async ({ page }) => {
+test('a cosmetic is labelled as a cosmetic product on its company page', async ({ page }) => {
   await searchBarcode(page, KNOWN_COSMETIC.barcode);
 
   await expect(page).toHaveURL(new RegExp(`/company/${OMBRELIS_FIXTURE.siren}`));
-  await expect(page.getByTestId(TEST_IDS.companyProductSource)).toHaveText('Produit cosmetique');
+  await expect(page.getByTestId(TEST_IDS.companyProductSource)).toHaveText(
+    PRODUCT_SOURCE_LABELS.cosmetic,
+  );
 });
 
 test('a barcode no source knows says the product was not found', async ({ page }) => {

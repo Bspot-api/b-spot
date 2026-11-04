@@ -3,6 +3,27 @@
 Project history, newest first. Written by hand, one dated entry per
 task — never generated.
 
+## 2026-11-04
+
+- Product source label (`fix/product-source-label`): cosmetics are now
+  labelled "Produit cosmetique" on their company page.
+  - The app now uses the API's `'OFF' | 'OBF'` source values. Before, the
+    scanner compared the API's `'OBF'` with `'OPEN_BEAUTY_FACTS'`, so every
+    product was stored and shown as food. The API did not change.
+  - The app's `ProductSource` derives from `PRODUCT_SOURCES`. A new e2e
+    check, `apps/e2e/checks/api-contract.spec.ts`, compares that list
+    with the enums the API's OpenAPI schema declares.
+  - The cosmetic-label e2e test is no longer `fixme`. The suite now also
+    checks the food label, and that a cosmetic reopened from the history
+    keeps its label.
+  - Device history is not migrated: entries scanned before this fix are
+    all stored as `'OFF'`, cosmetics included, and nothing tells them
+    apart, so old cosmetic entries stay labelled as food.
+  - Found along the way: from a git worktree, `pnpm e2e:web` needs
+    `COMPOSE_PROJECT_NAME=b-spot`, otherwise docker compose collides with
+    the running `b-spot` containers.
+  - Documents: `project-management/archive/20261103-2256-product-source-label/`.
+
 ## 2026-11-03
 
 - e2e-tests, slice 01 (web, Playwright): `pnpm e2e:web` is a new command,

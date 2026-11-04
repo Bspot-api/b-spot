@@ -1,5 +1,11 @@
-import { FERRERO_FIXTURE, KNOWN_FOOD } from '../fixtures-server/catalogue';
+import {
+  FERRERO_FIXTURE,
+  KNOWN_COSMETIC,
+  KNOWN_FOOD,
+  OMBRELIS_FIXTURE,
+} from '../fixtures-server/catalogue';
 import { searchBarcode } from '../support/search';
+import { PRODUCT_SOURCE_LABELS } from '../support/product-source-labels';
 import { TEST_IDS } from '../support/test-ids';
 import { expect, test } from '../support/test';
 
@@ -21,4 +27,17 @@ test('the history lists the product just looked up and leads back to its company
   await item.click();
   await expect(page).toHaveURL(new RegExp(`/company/${FERRERO_FIXTURE.siren}`));
   await expect(page.getByTestId(TEST_IDS.companyLegalName)).toHaveText(FERRERO_FIXTURE.legalName);
+});
+
+test('a cosmetic reopened from the history keeps its cosmetic label', async ({ page }) => {
+  await searchBarcode(page, KNOWN_COSMETIC.barcode);
+  await expect(page).toHaveURL(new RegExp(`/company/${OMBRELIS_FIXTURE.siren}`));
+
+  await page.goto('/history');
+  await page.getByTestId(TEST_IDS.historyItem).click();
+
+  await expect(page).toHaveURL(new RegExp(`/company/${OMBRELIS_FIXTURE.siren}`));
+  await expect(page.getByTestId(TEST_IDS.companyProductSource)).toHaveText(
+    PRODUCT_SOURCE_LABELS.cosmetic,
+  );
 });

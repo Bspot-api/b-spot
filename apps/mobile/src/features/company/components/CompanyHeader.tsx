@@ -1,10 +1,10 @@
 import { Pressable, Text, View } from 'react-native';
-import type { CompanyDto } from '../../../api/types';
+import type { CompanyDto, ProductSource } from '../../../api/types';
 
 interface CompanyHeaderProps {
   company: CompanyDto;
   onShare: () => void;
-  productSource?: 'OFF' | 'OBF' | 'OPEN_FOOD_FACTS' | 'OPEN_BEAUTY_FACTS';
+  productSource?: ProductSource;
 }
 
 export function CompanyHeader({ company, onShare, productSource }: CompanyHeaderProps) {
@@ -73,6 +73,6 @@ function formatDate(value: string): string {
   }).format(date);
 }
 
-function isBeautySource(source: 'OFF' | 'OBF' | 'OPEN_FOOD_FACTS' | 'OPEN_BEAUTY_FACTS'): boolean {
-  return source === 'OBF' || source === 'OPEN_BEAUTY_FACTS';
+function isBeautySource(source: ProductSource): boolean {
+  return source === 'OBF';
 }

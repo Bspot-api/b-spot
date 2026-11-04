@@ -53,7 +53,7 @@ export function useBarcodeScanner(): UseBarcodeScanner {
 
         if (result.company) {
           setState('success');
-          const productSource = result.product.source === 'OPEN_BEAUTY_FACTS' ? 'OBF' : 'OFF';
+          const productSource = result.product.source;
           await addEntry({
             barcode: result.product.barcode,
             productName: result.product.name,

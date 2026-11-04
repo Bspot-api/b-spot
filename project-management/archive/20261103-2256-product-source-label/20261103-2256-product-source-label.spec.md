@@ -1,6 +1,6 @@
 # Cosmetics are labelled as food products
 
-**Status:** in-progress
+**Status:** done
 
 ---
 
@@ -30,14 +30,24 @@ found by slice 01 of the e2e task, whose cosmetic-label test is
 
 ## Acceptance Criteria
 
-- [ ] **cosmetic-labelled** — scanning the e2e catalogue's known cosmetic
+- [x] **cosmetic-labelled** — scanning the e2e catalogue's known cosmetic
   shows the cosmetic label on its company page (the e2e test passes,
-  no longer fixme).
-- [ ] **food-unchanged** — a food product still shows "Produit
-  alimentaire".
-- [ ] **types-match-api** — the app's product source type is the one the
-  API's OpenAPI schema declares (generated or checked against it).
-- [ ] **suite-green** — `pnpm test` and `pnpm e2e:web` pass.
+  no longer fixme). Met: `scan.spec.ts` › "a cosmetic is labelled as a
+  cosmetic product on its company page" passes. It was red without the fix.
+- [x] **food-unchanged** — a food product still shows "Produit
+  alimentaire". Met: the food scan test in `scan.spec.ts` now asserts it,
+  green before and after the fix.
+- [x] **types-match-api** — the app's product source type is the one the
+  API's OpenAPI schema declares (generated or checked against it). Met:
+  `apps/e2e/checks/api-contract.spec.ts` compares `PRODUCT_SOURCES` with
+  the `/api-json` enums of `ProductDto.source` and
+  `ScanHistoryItemDto.productSource`. It runs under `pnpm e2e:web`.
+- [x] **suite-green** — `pnpm test` and `pnpm e2e:web` pass.
+  Met:
+  - `pnpm test`: mobile 23/23, API 89/89.
+  - `pnpm e2e:web`: 25/25, three runs.
+  - From a git worktree, `pnpm e2e:web` needs `COMPOSE_PROJECT_NAME=b-spot`
+    (see the work document's Worklog).
 
 ## Seams
 
