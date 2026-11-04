@@ -21,7 +21,7 @@ function setupSwagger(app: INestApplication): void {
   SwaggerModule.setup('api', app, document);
 }
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
   // Enable CORS for mobile app access
