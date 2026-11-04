@@ -349,20 +349,61 @@ Options:
   magic-link and origin-check sources. Machine checked: no dev build
   installed.
 
+- 2026-11-04 (code) — Shared starter first: `env/environment.ts`
+  (`withE2eEnvironment`) and `env/services.ts` (`spawnService`) replace
+  Playwright's `webServer`; compose runs with `-p b-spot` from any
+  worktree. Two green `pnpm e2e:web` runs (25 passed each), commit
+  `d2f6e84`. Dev build: `APP_VARIANT=development expo run:ios
+  --no-bundler` built and installed on the first attempt (no signing, no
+  prompt). A Maestro probe against an e2e Metro settled the launch
+  sequence (see revisions). Native testIDs `8fc6315`; runner, control
+  server and flows `b5f931f` — the four flows passed on their first full
+  run; a run with `-e "FOOD_COMPANY_NAME=NOT THE OWNER"` failed the two
+  flows that assert it and exited 1, with every process stopped. README
+  `📝` commit. Then two more consecutive green `pnpm e2e:mobile` runs
+  (4/4, 2m01 and 2m21) and two green `pnpm e2e:web` runs (25 passed);
+  `pnpm lint` 0 errors, `pnpm test` and `pnpm build` green.
+- Plan revisions met while coding (all within the approved design):
+  - **Launch sequence.** iOS shows "Ouvrir dans « B-Spot Dev » ?" (the
+    simulator is in French) on the first custom-scheme link:
+    `common/open-link.yaml` taps `Ouvrir|Open` when visible, for every
+    link. After a wipe the dev menu shows its onboarding ("Continue"),
+    then opens itself: `common/load-bundle.yaml` taps "Continue", then its
+    close button (`id: xmark`).
+  - **Flow start.** The reset and the clean launch are the first step of
+    each flow (`runFlow: ../common/start-clean.yaml`) rather than an
+    `onFlowStart` hook: same effect, one place to read.
+  - **No separate smoke flow.** `admin-entry-logged-out` runs first and is
+    the smoke check (launch, bundle, header and tab testIDs). It checks the
+    logged-out half only; the admin half moves with the login task.
+  - **No Metro warm-up request.** The first bundle takes ~6 s; the launch
+    wait is 180 s.
+  - **Control server routes.** Only the routes the flows use landed:
+    `POST /reset`, `POST /history/seed`, `GET /suggestions`. The
+    expire-session, revoke-admin and magic-link routes are one line each
+    over `support/db.ts` / `support/maildev.ts` and land with the flows of
+    the native-login task, so no route ships untested.
+  - **`support/test-ids.ts` unchanged.** The flows are YAML and cannot
+    import it; the three new names live in `(tabs)/_layout.tsx` and the
+    flows only.
+  - **`apps/mobile/.eslintrc.js` ignores `expo-env.d.ts`.** `expo start`
+    (the e2e Metro) writes that git-ignored file without a final newline,
+    which turned `pnpm lint` red after a mobile run.
+
 ## Implementation Checkboxes
 
-- [ ] Shared starter (`environment.ts`, `services.ts`), Playwright `webServer` removed, two green `pnpm e2e:web`
-- [ ] `run-mobile.ts`: preflight, Metro, control server, maestro, teardown, root script, .gitignore
-- [ ] Dev build installed on the simulator (human, once)
-- [ ] `common/launch.yaml` + `common/reset.yaml` smoke green
-- [ ] scan-deep-link flow
-- [ ] Native testIDs + admin-entry-logged-out flow
-- [ ] brand-suggestion flow
-- [ ] history flow (per ruling)
-- [ ] login, admin-entry, moderation, session-expiry flows (per ruling)
-- [ ] Two consecutive green `pnpm e2e:mobile`
-- [ ] Gates: `pnpm lint`, `pnpm test`, `pnpm build`
-- [ ] README section: running the iOS suite
+- [x] Shared starter (`environment.ts`, `services.ts`), Playwright `webServer` removed, two green `pnpm e2e:web`
+- [x] `run-mobile.ts`: preflight, Metro, control server, maestro, teardown, root script, .gitignore
+- [x] Dev build installed on the simulator (local `expo run:ios`, approved)
+- [x] Launch subflows (`start-clean`, `load-bundle`, `open-link`) green
+- [x] scan-deep-link flow
+- [x] Native testIDs + admin-entry-logged-out flow
+- [x] brand-suggestion flow
+- [x] history flow (pre-filled stored history, per ruling)
+- [ ] ~~login, admin-entry, moderation, session-expiry flows~~ — moved to the native magic-link login task (ruling)
+- [x] Two consecutive green `pnpm e2e:mobile`
+- [x] Gates: `pnpm lint`, `pnpm test`, `pnpm build`
+- [x] README section: running the iOS suite
 
 ## Notes & Snippets
 
