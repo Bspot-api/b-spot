@@ -9,6 +9,11 @@
 import Constants from 'expo-constants';
 import { getSessionCookie } from '../features/auth/sessionStore';
 
+/** The header the API's `expo()` plugin reads as the Origin of a native request. */
+const APP_ORIGIN_HEADER = 'expo-origin';
+/** The production scheme (apps/mobile/app.json), when the manifest names none. */
+const DEFAULT_APP_SCHEME = 'bspot';
+
 export interface AuthRequestInit {
   credentials: RequestCredentials;
   headers: Record<string, string>;
@@ -18,7 +23,7 @@ export interface AuthRequestInit {
 function getAppScheme(): string {
   const scheme = Constants.expoConfig?.scheme;
   const first = Array.isArray(scheme) ? scheme[0] : scheme;
-  return first ?? 'bspot';
+  return first ?? DEFAULT_APP_SCHEME;
 }
 
 export async function getAuthRequestInit(): Promise<AuthRequestInit> {
@@ -26,7 +31,7 @@ export async function getAuthRequestInit(): Promise<AuthRequestInit> {
   return {
     credentials: 'omit',
     headers: {
-      'expo-origin': `${getAppScheme()}://`,
+      [APP_ORIGIN_HEADER]: `${getAppScheme()}://`,
       ...(cookie ? { cookie } : {}),
     },
   };

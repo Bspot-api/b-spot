@@ -6,6 +6,8 @@ import { showFeedback } from '../../src/components/feedback/showFeedback';
 import { readAuthCallback, type AuthCallback } from '../../src/features/auth/sessionCookie';
 import { saveSessionCookie } from '../../src/features/auth/sessionStore';
 
+const INVALID_LINK_TITLE = 'Connexion';
+const SPINNER_COLOR = '#27272a';
 const INVALID_LINK_MESSAGE = "Ce lien de connexion n'est plus valide. Demandez-en un nouveau.";
 
 /** Back to the screen under the login modal (the Scanner tab), or to it on a cold start. */
@@ -25,7 +27,7 @@ async function completeCallback(callback: AuthCallback, queryClient: QueryClient
     // A native alert, not a toast: the toast would sit under the login modal.
     leaveForHome();
     showFeedback({
-      title: 'Connexion',
+      title: INVALID_LINK_TITLE,
       message: INVALID_LINK_MESSAGE,
       type: 'error',
       onDismiss: () => router.push('/login'),
@@ -53,7 +55,7 @@ export default function AuthCallbackScreen() {
 
   return (
     <View className="flex-1 items-center justify-center bg-zinc-50" testID="auth-callback">
-      <ActivityIndicator size="small" color="#27272a" />
+      <ActivityIndicator size="small" color={SPINNER_COLOR} />
     </View>
   );
 }

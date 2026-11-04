@@ -9,9 +9,13 @@ const SESSION_COOKIE_KEY = 'bspot.session_cookie';
 
 let cached: Promise<string | null> | null = null;
 
-/** The stored session cookie, or null when logged out. */
+/** The stored session cookie, or null when logged out. A failed read is retried next time. */
 export function getSessionCookie(): Promise<string | null> {
-  cached ??= SecureStore.getItemAsync(SESSION_COOKIE_KEY).catch(() => null);
+  cached ??= SecureStore.getItemAsync(SESSION_COOKIE_KEY).catch((error: unknown) => {
+    console.warn('[auth] could not read the stored session', error);
+    cached = null;
+    return null;
+  });
   return cached;
 }
 

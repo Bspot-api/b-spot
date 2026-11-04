@@ -59,14 +59,14 @@ export interface AuthCallbackParams {
   error?: SearchParam;
 }
 
-function firstValue(param: SearchParam): string | undefined {
+function pickFirstValue(param: SearchParam): string | undefined {
   return Array.isArray(param) ? param[0] : param;
 }
 
 /** What the `auth/callback` deep link carries: a session, Better-Auth's error code, or nothing usable. */
 export function readAuthCallback(params: AuthCallbackParams): AuthCallback {
-  const error = firstValue(params.error);
+  const error = pickFirstValue(params.error);
   if (error) return { kind: 'error', code: error };
-  const cookie = extractSessionCookie(firstValue(params.cookie) ?? '');
+  const cookie = extractSessionCookie(pickFirstValue(params.cookie) ?? '');
   return cookie ? { kind: 'session', cookie } : { kind: 'invalid' };
 }

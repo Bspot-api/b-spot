@@ -25,7 +25,10 @@ fetch does not send. Decided by the human on 2026-11-04, in the task
 - **Only trusted schemes receive the cookie.** The plugin appends it only
   when the redirect's scheme is a trusted origin. `AUTH_APP_ORIGINS`
   defaults to `bspot://`; `bspot-dev://` is trusted only where the
-  environment says so (local dev, e2e).
+  environment says so (local dev, e2e). Under `NODE_ENV=development` the
+  plugin also trusts `exp://` (Expo Go): a development API would hand a
+  session to Expo Go. B-Spot uses its own dev build; production is not
+  affected.
 - **Origin checks run everywhere**, `NODE_ENV=test` included
   (`advanced.disableOriginCheck: false`), so the e2e suites see what
   production enforces.
