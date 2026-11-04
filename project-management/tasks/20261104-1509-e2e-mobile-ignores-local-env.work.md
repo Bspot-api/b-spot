@@ -3,7 +3,7 @@
 Created by the Crewmate at the plan step, 2026-11-04. Spec:
 `project-management/tasks/20261104-1509-e2e-mobile-ignores-local-env.spec.md`.
 
-**Plan:** waiting for the Architect's reading.
+**Plan:** approved by the Architect, 2026-11-04 (see Rulings).
 
 ## Program Design
 
@@ -227,6 +227,22 @@ The worktree's `apps/mobile/.env` held `EXPO_PUBLIC_API_URL=http://localhost:300
 - Upstream: in development, the client env module lets `.env` files win
   over the shell, while `@expo/env` and production inlining let the shell
   win. That is worth an Expo issue; out of scope here.
+
+### Rulings — Architect, 2026-11-04
+
+- **`resolver.blockList` behind the e2e gate, rather than `--no-dev`.**
+  Accepted. The spec allows an undocumented hook once its reason is
+  written, and it is. `--no-dev` would change what runs under test:
+  production React, `__DEV__` false, and slice 02's launch subflow. The
+  preflight guard is what makes relying on internals acceptable, because a
+  change in Expo fails loudly.
+- **`apps/e2e` test script** (`tsx --test`): yes. The guard's parsing runs
+  under `pnpm test`.
+- **`EXPO_NO_DOTENV=1` on the e2e Metro:** yes.
+- **Bundle fetched without `transform.bytecode`:** go ahead. If Metro still
+  answers with bytecode, revise the plan in this document and tell me.
+- **Reporting the precedence contradiction to Expo:** out of scope. Noted
+  for the human.
 
 ## Diff-Review Findings
 
