@@ -3,7 +3,7 @@
 Created by the Crewmate at the plan step, 2026-11-04. Spec:
 `project-management/tasks/20261104-1714-e2e-runner-lock-and-cleanup.spec.md`.
 
-**Plan:** waiting for the Architect's reading.
+**Plan:** approved by the Architect, 2026-11-04 (see Rulings).
 
 ## Program Design
 
@@ -387,6 +387,26 @@ lock.
 <tsx esm loader> probe.ts`. Each run: start in its own process group, wait
 for the probe to be ready, `kill -INT -- -<pgid>`, wait 6 s, read the
 probe's trace file. Results are in the table in Program Design.
+
+### Rulings — Architect, 2026-11-04
+
+- **Lock location:** the git common dir (`<common dir>/b-spot-e2e.lock.json`),
+  with `E2E_LOCK_FILE` as an override. Writing one untracked file inside the
+  main checkout's `.git` is accepted for real runs and their tests, nothing
+  else there. Never touch anything else in that `.git`, and never touch the
+  main checkout's working tree. Reported to the human.
+- **Busy-port preflight:** included in this task. It fails fast and names
+  the port and, when cheaply available, the pid holding it. It never kills
+  anything automatically.
+- **Stopping a container the run started:** checked in code review only.
+  Accepted.
+- **The kill-experiment script:** stays in the scratchpad, with its text in
+  the work document.
+- **Wait limit:** 20 minutes, overridable.
+- **Launcher:** switch to `node --import tsx`. Accepted.
+- **Branch:** merged with `feat/e2e-tests` at approval. That brings the
+  typecheck gate: `pnpm typecheck` must stay green. `apps/e2e/package.json`
+  gained a `typecheck` script.
 
 ## Diff-Review Findings
 
