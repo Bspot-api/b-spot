@@ -1,7 +1,7 @@
 # e2e runs take the lock themselves and clean up when killed — work
 
 Created by the Crewmate at the plan step, 2026-11-04. Spec:
-`project-management/tasks/20261104-1714-e2e-runner-lock-and-cleanup.spec.md`.
+`project-management/archive/20261104-1714-e2e-runner-lock-and-cleanup/20261104-1714-e2e-runner-lock-and-cleanup.spec.md`.
 
 **Plan:** approved by the Architect, 2026-11-04 (see Rulings).
 
@@ -383,6 +383,14 @@ lock.
     - No orphan had to be stopped by hand.
   - **README** (c3ca458): "One run at a time, and nothing left behind".
 
+- 2026-11-04 (review and close) — `code-review` ran (findings below). Fixes
+  committed in one step. Re-checked inside the manual lock:
+  - gates 0;
+  - `pnpm e2e:web` 25 passed (43.5 s);
+  - `pnpm e2e:mobile` 4/4 (1m 55s);
+  - kills: web × SIGINT during the run, mobile × SIGTERM during the run,
+    web × SIGTERM during `expo export`; all PASS, nothing left.
+
 ## Implementation Checkboxes
 
 - [x] Lock unit tests red, then `lock-file.ts` + `e2e-lock.ts` +
@@ -402,8 +410,8 @@ lock.
 - [x] `killed-run-leaves-nothing` + `containers-respected`: four kill
   runs, plus two during the preparation
 - [x] README "End-to-end tests" paragraph
-- [ ] `code-review`, findings below
-- [ ] Close
+- [x] `code-review`, findings below
+- [x] Close
 
 ## Notes & Snippets
 
@@ -522,4 +530,81 @@ exit $STATUS
 
 ## Diff-Review Findings
 
-_(empty until `code-review` runs)_
+`code-review` was run on `fd61276...HEAD` (commits d01cb0f, d4c29ae, df42a1e,
+c3ca458, 3a1c507), with two fresh reviewers, Standards and Spec.
+
+### Spec axis
+
+- **A step could still start a child or a service after a signal** (spec:
+  "every service the run started is stopped"). The cleanups run on a
+  snapshot. The normal path could still spawn the migration child, or a
+  detached service, while the teardown sat in `compose stop`. Then the lock
+  would be freed with that child alive. **Fixed:**
+  - `assertNotInterrupted(what)` in `interrupt.ts` refuses any new start
+    once a signal has arrived. `spawnService`, `runCommandForExitCode` and
+    `captureCommand` call it before `spawn`.
+  - Spawning and registering happen in the same tick, so a child is either
+    in the snapshot or refused.
+  - A late start that is refused throws. `withE2eEnvironment` turns that
+    into the signal's exit code.
+  - Tested: the interrupt probe tries a late start from a cleanup and
+    prints `refused`.
+- **The 45 s cleanup deadline frees the lock even if `compose stop` is
+  still running.** Answered, accepted: it only happens with a hung Docker,
+  and the log says the cleanup was cut short. The next run's busy-port
+  preflight still guards the ports, and containers hold no e2e port.
+- **The busy-port preflight is not in the spec** (scope creep and a
+  system-design divergence). Answered: the Architect ruled it in (see
+  "Rulings — Architect"). A line now records that ruling in the spec's
+  Notes.
+- **The env overrides, the temp-dir fallback, the `worktree` field, the
+  group kill when the leader is gone, `node --import tsx`.** Answered:
+  each one is either in the approved plan or needed for
+  `killed-run-leaves-nothing` (see Program Design). No change.
+- **`pnpm e2e:mobile` checks the simulator before it takes the lock.**
+  Answered: those checks only read and start nothing. No change.
+
+### Standards axis
+
+- **Function names must start with a verb** (`docs/agent-rules/common.md`,
+  "Start functions with a verb"). **Fixed:**
+  - `interruptSignal` → `getInterruptSignal`;
+  - `exitCodeForSignal` → `computeSignalExitCode`;
+  - `giveUp` → `buildGiveUpError`.
+
+  `onInterrupt` stays: its name reads as a registration, like an event
+  `on`.
+- **Fail fast on a bad `E2E_LOCK_WAIT_MINUTES`** (CLAUDE.md, "fail fast").
+  **Fixed:** it now throws, naming the variable and the value, and a test
+  covers it.
+- **Folder size** (CLAUDE.md, "max 10 sub-files per folder"). Answered:
+  `env/` holds 8 files and 3 folders, and `run-control/` holds 9 files and
+  1 folder. Counting files, both are within the limit. No change.
+- **Duplicated grace-kill logic** (`process.ts` and `services.ts`).
+  **Fixed:** there is one `terminateWithGrace(child, sendSignal)` in
+  `process.ts`. `services.ts` passes a process-group kill to it, and
+  `services.ts` no longer has its own `STOP_GRACE_MS`.
+- **The run-once-and-register pattern appears three times.** Answered, not
+  changed: the three shapes differ. One is a memoized teardown over shared
+  state, one a memoized service stop, one a per-child kill with no
+  memoization. A shared helper would hide those differences for little
+  gain.
+- **Data clump in `attemptLock(lockPath, holder, log)`** (common.md,
+  RO-RO). **Fixed:** it now takes `LockAttemptOptions`, which is
+  `Pick<LockOptions, 'path' | 'holder' | 'log'>`.
+- **Port list kept in `environment.ts`.** **Fixed:** `E2E_PORTS` moved to
+  `e2e-env.ts`, beside the ports themselves. This is a 9-line addition to
+  a file the native-login Crewmate may also touch; the merge is trivial.
+  The README keeps the numbers, because it is prose for humans.
+- **Speculative generality: `HeldLock.waitedMs` and the exported
+  `isHolderAlive`.** **Fixed:** both are removed or made private, and the
+  tests assert on the log line instead.
+- **Magic numbers** (`60_000`, `128`, `1000`/`60`). **Fixed:**
+  `MS_PER_MINUTE`, `SIGNAL_EXIT_CODE_BASE`, `MS_PER_SECOND` and
+  `SECONDS_PER_MINUTE`.
+- **`log: (message) => console.log(message)`, and the JSDoc on
+  `LOCK_FILE_NAME`.** The JSDoc is added. The arrow function is kept,
+  because `console.log` passed unbound reads less clearly here.
+
+After the fixes, `pnpm typecheck`, `pnpm lint`, `pnpm test` (apps/e2e: 26
+unit tests) and `pnpm build` all exit 0.

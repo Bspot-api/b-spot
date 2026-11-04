@@ -5,6 +5,41 @@ task — never generated.
 
 ## 2026-11-04
 
+- e2e runs take the lock themselves and clean up when killed
+  (`chore/e2e-runner-lock`).
+  - **The lock.** `pnpm e2e:web` and `pnpm e2e:mobile` take an exclusive
+    lock before starting anything, and release it on every exit path.
+    - It is one file, `b-spot-e2e.lock.json`, in the git common directory,
+      so every worktree shares it. It is published atomically with
+      `link(2)` and holds the pid, the command, the worktree and the start
+      time.
+    - A second run waits up to 20 minutes (`E2E_LOCK_WAIT_MINUTES`) and
+      says so. A lock whose holder is dead is taken over, with a message.
+  - **Killed runs.** On SIGINT or SIGTERM, the run stops everything it
+    started and exits 130 or 143:
+    - services (whole process groups), Metro, foreground children
+      (Playwright, Maestro, `expo export`);
+    - the containers it started itself, and no other.
+
+    Once a signal has arrived, no new start is allowed.
+  - **Found along the way.** The runners now start with
+    `node --import tsx`: under Ctrl-C, the `tsx` CLI's signal relay
+    SIGKILLs the runner before any cleanup (a probe showed it 4 times out
+    of 4). A service whose group leader had died of a signal could also
+    hang `stop()`; that is fixed.
+  - **Added by Architect ruling.** Before starting services, a busy-port
+    check fails, naming the port and its pid. It never kills anything.
+  - **Proof.** Nine scripted kill runs left nothing. Two runs started
+    together serialised. A stale lock was taken over. The suites still
+    pass: web 25, mobile 4/4. The gates are green.
+  - **Open.**
+    - `kill -9` still leaves the services running; the next run reports
+      the busy ports.
+    - Stopping a container the run started itself is checked in review
+      only.
+  - Documents:
+    `project-management/archive/20261104-1714-e2e-runner-lock-and-cleanup/`.
+
 - Typecheck gate (`chore/typecheck-gate`): `pnpm typecheck` runs
   `tsc --noEmit` in api, mobile and e2e, and exits 0.
   - Mobile was at 103 errors, all in its 7 test files and all missing

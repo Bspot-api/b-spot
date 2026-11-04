@@ -1,6 +1,6 @@
 # e2e runs take the lock themselves and clean up when killed
 
-**Status:** in-progress
+**Status:** done
 
 ---
 
@@ -38,18 +38,24 @@ cleanup code never runs. Crewmates have stopped the orphans by hand.
 
 ## Acceptance Criteria
 
-- [ ] **killed-run-leaves-nothing** — after SIGINT, and separately after
+- [x] **killed-run-leaves-nothing** — after SIGINT, and separately after
   SIGTERM, sent mid-run to `pnpm e2e:web` and to `pnpm e2e:mobile`, no
   process listens on 4010, 4011, 3101, 8182 or 8183, and the lock is free.
-- [ ] **runs-serialise** — two `pnpm e2e:web` started together both pass,
+  Evidence: six scripted kills, plus three more after the review: web and mobile, each with SIGINT to the group and with SIGTERM to pnpm, plus kills during `expo export`. Exit codes 130 and 143. Afterwards the five ports, the lock and the processes were all clear.
+- [x] **runs-serialise** — two `pnpm e2e:web` started together both pass,
   one after the other, and the second says it waited.
-- [ ] **stale-lock-recovered** — a lock whose holder pid is dead is taken
+  Evidence: two runs started together both passed 25. One logged `in use by pid …` and then `lock acquired after waiting 1m04s`.
+- [x] **stale-lock-recovered** — a lock whose holder pid is dead is taken
   over with a message, with no manual step.
-- [ ] **containers-respected** — containers that were already running
+  Evidence: with a hand-made lock holding a dead pid, the run logged `… is stale: that process is gone; taking it over` and passed 25. Unit tests cover it, including 8 processes racing for one stale lock.
+- [x] **containers-respected** — containers that were already running
   before a killed run are still running after it.
-- [ ] **suites-unchanged** — `pnpm e2e:web` (25) and `pnpm e2e:mobile` pass
+  Evidence: `maildev postgres` were running before and after every killed run. Stopping a container the run started is checked in code review only (Architect ruling).
+- [x] **suites-unchanged** — `pnpm e2e:web` (25) and `pnpm e2e:mobile` pass
   as before, twice each.
-- [ ] **suite-green** — `pnpm lint`, `pnpm test` and `pnpm build` pass.
+  Evidence: web passed 25, 25 and 25, and mobile 4/4, 4/4 and 4/4 (the third runs came after the review fixes).
+- [x] **suite-green** — `pnpm lint`, `pnpm test` and `pnpm build` pass.
+  Evidence: `pnpm typecheck`, `pnpm lint`, `pnpm test` and `pnpm build` all exit 0.
 
 ## Seams
 
@@ -68,6 +74,11 @@ cleanup code never runs. Crewmates have stopped the orphans by hand.
 
 ## Notes
 
+- 2026-11-04, Architect (recorded by the Crewmate at close): the busy-port
+  preflight was ruled into this task at plan approval. Before starting its
+  services, a run fails, naming the port and the pid, when an e2e port is
+  already taken. It never kills anything. See "Rulings — Architect" in the
+  work document.
 - 2026-11-04, Architect: proposed by several Crewmates (orphans after a
   kill, a lock left behind). The human asked for it to be launched.
 - Another Crewmate (native magic-link login) is working in `apps/e2e` at the
