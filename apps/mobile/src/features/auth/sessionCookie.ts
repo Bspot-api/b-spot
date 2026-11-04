@@ -11,6 +11,21 @@ const SESSION_COOKIE_NAME = /^(?:__Secure-)?[\w.-]*session_token$/;
 const COOKIE_SEPARATOR = /,\s*(?=[^;,=\s]+=)/;
 const MAX_AGE = /^max-age=(-?\d+)$/i;
 
+/**
+ * Better-Auth signs the cookie as `<token>.<base64 signature>`, URI-encoded
+ * (`+` → `%2B`, `/` → `%2F`, `=` → `%3D`). The deep link's params may come
+ * back decoded once more, with `+` even read as a space; base64 has no
+ * spaces, so this restores the exact value the API set.
+ */
+function canonicalizeValue(value: string): string {
+  const withPlus = value.replace(/ /g, '+');
+  try {
+    return encodeURIComponent(decodeURIComponent(withPlus));
+  } catch {
+    return encodeURIComponent(withPlus);
+  }
+}
+
 function isDeleted(attributes: string[]): boolean {
   return attributes.some((attribute) => {
     const match = MAX_AGE.exec(attribute.trim());
@@ -27,7 +42,7 @@ export function extractSessionCookie(setCookie: string): string | null {
     const name = pair.slice(0, separator).trim();
     const value = pair.slice(separator + 1).trim();
     if (!SESSION_COOKIE_NAME.test(name)) continue;
-    return value && !isDeleted(attributes) ? `${name}=${value}` : null;
+    return value && !isDeleted(attributes) ? `${name}=${canonicalizeValue(value)}` : null;
   }
   return null;
 }

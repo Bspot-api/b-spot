@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { QueryClient, useQueryClient } from '@tanstack/react-query';
-import { Toast } from '../../src/components/reacticx/Toast';
+import { showFeedback } from '../../src/components/feedback/showFeedback';
 import { readAuthCallback, type AuthCallback } from '../../src/features/auth/sessionCookie';
 import { saveSessionCookie } from '../../src/features/auth/sessionStore';
 
@@ -22,9 +22,14 @@ async function completeCallback(callback: AuthCallback, queryClient: QueryClient
     return;
   }
   if (callback.kind === 'error') {
-    Toast.show(INVALID_LINK_MESSAGE);
+    // A native alert, not a toast: the toast would sit under the login modal.
     leaveForHome();
-    router.push('/login');
+    showFeedback({
+      title: 'Connexion',
+      message: INVALID_LINK_MESSAGE,
+      type: 'error',
+      onDismiss: () => router.push('/login'),
+    });
     return;
   }
   leaveForHome();

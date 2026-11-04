@@ -34,7 +34,8 @@ export function useAuth() {
     staleTime: STALE_TIME,
   });
 
-  const adminProfileData = adminQuery.data ?? null;
+  // The cached profile outlives an ended session; without a session there is no admin.
+  const adminProfileData = session ? (adminQuery.data ?? null) : null;
   const adminProfile: AdminProfile | null = adminProfileData
     ? {
         adminId: adminProfileData.adminId,

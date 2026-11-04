@@ -59,6 +59,7 @@ export function SuggestionCard({ item, onAction, onDelete, onEdit }: SuggestionC
               hitSlop={8}
               className="active:opacity-50"
               testID="suggestion-edit"
+              accessibilityLabel={`Modifier ${item.brandName}`}
             >
               <Ionicons name="create-outline" size={18} color="#a1a1aa" />
             </Pressable>
@@ -67,6 +68,7 @@ export function SuggestionCard({ item, onAction, onDelete, onEdit }: SuggestionC
               hitSlop={8}
               className="active:opacity-50"
               testID="suggestion-delete"
+              accessibilityLabel={`Supprimer ${item.brandName}`}
             >
               <Ionicons name="trash-outline" size={18} color="#ef4444" />
             </Pressable>
@@ -82,6 +84,7 @@ export function SuggestionCard({ item, onAction, onDelete, onEdit }: SuggestionC
           <Pressable
             onPress={() => onAction(item.id, 'approved')}
             testID="suggestion-approve"
+            accessibilityLabel={`Approuver ${item.brandName}`}
             className="flex-1 rounded-lg bg-emerald-100 py-2 active:opacity-75"
           >
             <Text className="text-center text-xs font-medium text-emerald-700">Approuver</Text>
@@ -100,6 +103,7 @@ export function SuggestionCard({ item, onAction, onDelete, onEdit }: SuggestionC
           <Pressable
             onPress={confirmReject}
             testID="suggestion-reject"
+            accessibilityLabel={`Rejeter ${item.brandName}`}
             className="flex-1 rounded-lg bg-red-100 py-2 active:opacity-75"
           >
             <Text className="text-center text-xs font-medium text-red-600">Rejeter</Text>

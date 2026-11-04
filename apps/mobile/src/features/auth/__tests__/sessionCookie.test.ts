@@ -21,6 +21,19 @@ describe('extractSessionCookie', () => {
     expect(extractSessionCookie(header)).toBe(`better-auth.session_token=${TOKEN}`);
   });
 
+  it('restores the encoding of a signature the deep link decoded (+ / = or a space for +)', () => {
+    const encoded = 'tok.yhSbqeu60%2BQlfo%2FM%3D';
+    expect(extractSessionCookie('better-auth.session_token=tok.yhSbqeu60+Qlfo/M=')).toBe(
+      `better-auth.session_token=${encoded}`
+    );
+    expect(extractSessionCookie('better-auth.session_token=tok.yhSbqeu60 Qlfo/M=')).toBe(
+      `better-auth.session_token=${encoded}`
+    );
+    expect(extractSessionCookie(`better-auth.session_token=${encoded}`)).toBe(
+      `better-auth.session_token=${encoded}`
+    );
+  });
+
   it('returns null for a cookie being deleted', () => {
     expect(extractSessionCookie('better-auth.session_token=; Max-Age=0; Path=/')).toBeNull();
   });
