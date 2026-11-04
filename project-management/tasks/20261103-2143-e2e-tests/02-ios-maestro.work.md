@@ -37,12 +37,15 @@ apps/e2e/
                         readyUrl}) → {stop()}; waits on readyUrl, kills the
                         process group on stop. Replaces Playwright's webServer.
     run-web.ts          becomes: withE2eEnvironment({ web: true }, runPlaywright)
-    run-mobile.ts       (new) `pnpm e2e:mobile`: preflight, withE2eEnvironment
-                        ({ web: false }, …) + Metro + control server + maestro
-    metro.ts            (new) starts the e2e Metro for the dev client
-    simulator.ts        (new) preflight (booted device, app installed),
-                        seedScanHistory() (see History)
-    control-server.ts   (new) HTTP on 127.0.0.1:4011, in the run-mobile process
+    ios/                (new; layout as built after the review)
+      run-mobile.ts     `pnpm e2e:mobile`: preflight, withE2eEnvironment
+                        ({ hasWebApp: false }, …) + Metro + control server + maestro
+      metro.ts          starts the e2e Metro for the dev client
+      simulator.ts      preflight (booted device, app installed)
+      stored-history.ts the stored history entry and seedScanHistory()
+      control-server.ts HTTP on 127.0.0.1:4011, in the run-mobile process
+      maestro-env.ts    buildMaestroEnv()
+    web/                static-server.ts, web-build.ts (moved from env/)
     e2e-env.ts          + METRO_PORT 8183, CONTROL_PORT 4011,
                         IOS_BUNDLE_ID 'com.bspot.mobile.dev', DEV_SCHEME 'bspot-dev',
                         buildMaestroEnv()
@@ -389,6 +392,12 @@ Options:
   - **`apps/mobile/.eslintrc.js` ignores `expo-env.d.ts`.** `expo start`
     (the e2e Metro) writes that git-ignored file without a final newline,
     which turned `pnpm lint` red after a mobile run.
+- 2026-11-04 (review, close) — `code-review` findings and answers below;
+  fixes `58295ee`. After it: `pnpm e2e:web` 25 passed twice; `pnpm
+  e2e:mobile` run 4 failed once (`scan-deep-link`, unexplained, see the
+  findings), then runs 5, 6, 7 passed 4/4 consecutively. Logs in the
+  session scratchpad, `maestro/`. `pnpm lint` 0 errors, `pnpm test` (API 17
+  suites, mobile 6) and `pnpm build` green.
 
 ## Implementation Checkboxes
 
@@ -452,4 +461,63 @@ Architect:
 
 ## Diff-Review Findings
 
-_Written at the review step._
+`code-review` on `41d6c41...HEAD` (commits `d2f6e84` to `c30866f`), two
+fresh sub-agents, 2026-11-04. Fixes in `58295ee`, then two more
+`pnpm e2e:web` runs (25 passed each) and mobile runs 4–7 (see the last
+finding).
+
+### Standards
+
+- **`apps/e2e/env/` held 15 files** (`CLAUDE.md`, "max 10 sub-files per
+  folder") — fixed: the iOS runner files are in `env/ios/`, the web export
+  and static server in `env/web/`; `env/` holds 8 files and 2 folders.
+- **`simulator.ts` did three jobs** (`CLAUDE.md`, "one responsibility per
+  file") — fixed: `ios/simulator.ts` is the preflight only;
+  `ios/stored-history.ts` holds the history shape, entry and seeding; the
+  Maestro CLI lookup is in `ios/run-mobile.ts`.
+- **Names** (`docs/agent-rules/common.md`, verbs for functions, `is`/`has`
+  for booleans) — fixed: `runSimctl`, `prepareBuilds`,
+  `handleControlRequest`, option `hasWebApp`.
+- **No JSDoc on `RunningService` and `ControlServer`** — fixed.
+- **Speculative `readyTimeoutMs` and unused `nav-scanner-link`** — removed.
+- **`StoredScanEntry` and the storage key mirror the app's** — answered:
+  the e2e package never imports the app (slice 01's design); the file
+  header names both sources, and the history flow fails if they drift.
+- **Timeouts and UI copy written in YAML** — answered: Maestro YAML takes
+  no imports; values that identify data (links, names, emails) come
+  through `-e`; the visible copy is what the flow asserts, as on web.
+- **`reset.js` and `seed-history.js` look alike** — answered: three-line
+  GraalJS scripts; Maestro gives them no module system.
+- **Unchecked `JSON.parse` cast of `simctl --json`** — answered: a
+  wrong shape throws on the next line, in a harness, before anything runs.
+
+### Spec
+
+- **Brand suggestion reached through its own route's deep link** (parent
+  "Implementation Decisions": "the camera is bypassed by the existing
+  company route through its deep link") — **open, for the Architect**: the
+  spec names only the company deep link; the suggestion screen is reached
+  the same way (an existing route, the scanner's own params), so the API's
+  "unknown brand" answer is not exercised on iOS (it is on web). No other
+  way exists without a camera.
+- **Control server is a seam the spec's design does not draw** — **open,
+  for the Architect** (only its port was ruled on): it reuses
+  `support/db.ts`, so no second copy of the reset or seeding.
+- **Second Metro on 8183** — answered: the dev build loads its JS from a
+  Metro; that is where `EXPO_PUBLIC_API_URL` is set.
+- **Pinned compose project, `expo-env.d.ts` lint ignore,
+  `admin-entry-logged-out`** — answered: the first is an Architect ruling;
+  the second keeps `suite-green` after a mobile run; the third is the
+  smoke flow and claims no auth row.
+- **`seedScanHistory` replaces the whole AsyncStorage manifest** —
+  answered: documented, and only called after a `clearState` launch with
+  the app stopped.
+
+### One unexplained failure
+
+Mobile run 4 (first after `58295ee`): `scan-deep-link` failed. The
+company screen showed "Erreur serveur" (an `ApiError` ≥ 500), but the e2e
+API logged nothing for that request and the fixture server got no call;
+the three other flows of the run passed, and runs 5, 6 and 7 passed 4/4.
+Not reproduced; the cause is not found in the code. Kept as an open item
+(see the close report).

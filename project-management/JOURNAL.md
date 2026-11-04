@@ -40,6 +40,25 @@ task — never generated.
   - Documents:
     `project-management/archive/20261103-2256-repair-lint/`.
 
+## 2026-11-04
+
+- e2e-tests, slice 02 (iOS, Maestro): `pnpm e2e:mobile` is a new command.
+  - With a booted simulator and the dev build installed
+    (`APP_VARIANT=development expo run:ios`), it brings up the same
+    environment as `pnpm e2e:web`. Both runners now share one starter,
+    `apps/e2e/env/environment.ts`, which replaces Playwright's
+    `webServer`. Docker compose runs under the `b-spot` project name from
+    any worktree.
+  - The dev build loads its JavaScript from an e2e Metro (`:8183`), which
+    is where the e2e API URL is set. A control server (`:4011`) lets the
+    flows reset the database and pre-fill the app's stored history.
+  - Flows: logged-out admin entry, scan through the company deep link,
+    brand suggestion through its screen's deep link, history from a stored
+    entry. The four auth journeys move to the native magic-link login task:
+    as built, a magic link opened outside the app cannot log the iOS app in.
+  - Open: one unexplained failure of the scan flow in seven runs (a 5xx the
+    API did not log).
+
 ## 2026-11-03
 
 - e2e-tests, slice 01 (web, Playwright): `pnpm e2e:web` is a new command,
