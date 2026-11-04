@@ -84,6 +84,17 @@ See [CLAUDE.md](CLAUDE.md) for detailed architecture and [project-management/](p
    pnpm dev:mobile # Mobile app only
    ```
 
+### Admin login on a phone
+
+Admins log in with a magic link. In the native app, the emailed link opens
+in the browser, which hands the session back to the app through its scheme
+(`bspot://auth/callback`, `bspot-dev://` in the dev build). The API trusts
+the schemes listed in `AUTH_APP_ORIGINS` (`apps/api/.env.example` lists
+both; production keeps the default, `bspot://`). The mobile `dev` and
+`start` scripts set `APP_VARIANT=development`, so the app asks for the
+`bspot-dev://` callback the dev build answers. Why the session travels in
+that callback, and what that costs: `docs/adr/0001-native-session-through-custom-scheme-callback.md`.
+
 ## 🧪 End-to-end tests
 
 The critical journeys run against the real app, the real API and a real
@@ -145,9 +156,14 @@ It brings up the same environment as the web suite (no web build), plus a
 Metro on `:8183` that serves the app's JavaScript with
 `EXPO_PUBLIC_API_URL=http://localhost:3101`, and a control server on
 `127.0.0.1:4011` that the flows call to reset the database or pre-fill the
-app's stored history. Then it runs the flows of `apps/e2e/maestro/flows/`
+app's stored history, read the magic link from MailDev, expire a session
+or demote an admin. Then it runs the flows of `apps/e2e/maestro/flows/`
 and exits with Maestro's code. Each flow starts from a reset database and a
-wiped app. The simulator has no camera: the scan journey opens the company
+wiped app. The auth flows (tag `auth`) log in the way a user does: the link
+opens in Safari, which hands the session to the app through
+`bspot-dev://auth/callback`; the flows accept iOS's "Ouvrir dans « B-Spot
+Dev » ?" prompt. The API runs Better-Auth's production origin checks in
+every environment, e2e included. The simulator has no camera: the scan journey opens the company
 page's deep link (`bspot-dev://company/<siren>`), and the brand suggestion
 opens its own screen's link. Extra arguments go to `maestro test`. Reports
 and screenshots land in `apps/e2e/maestro-results/`.
