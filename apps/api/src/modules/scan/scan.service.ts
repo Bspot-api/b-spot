@@ -13,14 +13,26 @@ const QUOTA_UNAVAILABLE_MESSAGE =
   'Données entreprise temporairement indisponibles (quota Pappers atteint)';
 const PENDING_BRAND_MESSAGE = 'Correspondance marque trouvée, en attente de validation';
 
-type ResolvedBrandResolution = 'existing' | 'auto_active' | 'auto_pending';
+type ResolvedBrandResolution = Exclude<
+  NonNullable<BrandScanResultDto['brandResolution']>,
+  'needs_user_input'
+>;
 
-interface BrandLookup {
-  brand: Brand | null;
+/** A brand matched in the DB or created by auto discovery. */
+interface ResolvedBrandLookup {
+  brand: Brand;
   brandResolution: ResolvedBrandResolution;
+  discoveryConfidence?: number;
+}
+
+/** No brand could be matched: the caller asks the user for input. */
+interface UnresolvedBrandLookup {
+  brand: null;
   discoveryConfidence?: number;
   discoveryMessage?: string;
 }
+
+type BrandLookup = ResolvedBrandLookup | UnresolvedBrandLookup;
 
 @Injectable()
 export class ScanService {
@@ -60,7 +72,7 @@ export class ScanService {
     if (!lookup.brand) return this.suggestUnresolvedBrand(productDto, productDto.brandName, lookup);
 
     // Step 4: Fetch company from Pappers (cache-first)
-    const companyResult = await this.buildCompanyResult(lookup.brand, lookup);
+    const companyResult = await this.buildCompanyResult(lookup);
     return { product: productDto, ...companyResult };
   }
 
@@ -106,13 +118,13 @@ export class ScanService {
       };
     }
 
-    return this.buildCompanyResult(lookup.brand, lookup);
+    return this.buildCompanyResult(lookup);
   }
 
   private async suggestUnresolvedBrand(
     productDto: ProductDto,
     brandName: string,
-    lookup: BrandLookup,
+    lookup: UnresolvedBrandLookup,
   ): Promise<ScanResultDto> {
     const suggestion = await this.brandSuggestionService.createFromScan(productDto);
     return {
@@ -134,20 +146,22 @@ export class ScanService {
 
     this.logger.warn(`Brand not found in DB: "${brandName}" — trying auto discovery`);
     const discovery = await this.brandDiscoveryService.discoverAndPersistBrand(brandName);
+    if (!discovery.brand) {
+      return {
+        brand: null,
+        discoveryConfidence: discovery.confidence,
+        discoveryMessage: discovery.message,
+      };
+    }
+
     let brandResolution: ResolvedBrandResolution = 'existing';
     if (discovery.resolution === 'auto_active') brandResolution = 'auto_active';
     if (discovery.resolution === 'auto_pending') brandResolution = 'auto_pending';
-
-    return {
-      brand: discovery.brand ?? null,
-      brandResolution,
-      discoveryConfidence: discovery.confidence,
-      discoveryMessage: discovery.message,
-    };
+    return { brand: discovery.brand, brandResolution, discoveryConfidence: discovery.confidence };
   }
 
-  private async buildCompanyResult(brand: Brand, lookup: BrandLookup): Promise<BrandScanResultDto> {
-    const { brandResolution, discoveryConfidence } = lookup;
+  private async buildCompanyResult(lookup: ResolvedBrandLookup): Promise<BrandScanResultDto> {
+    const { brand, brandResolution, discoveryConfidence } = lookup;
     const company = await this.companyService.getOrCreateCompany(brand.siren);
     if (!company) {
       return {
