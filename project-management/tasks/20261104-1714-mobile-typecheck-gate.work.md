@@ -3,7 +3,7 @@
 Created by the Crewmate at the plan step, 2026-11-04. Spec:
 `project-management/tasks/20261104-1714-mobile-typecheck-gate.spec.md`.
 
-**Plan:** waiting for the Architect's reading.
+**Plan:** approved by the Architect, 2026-11-04 (see Rulings).
 
 ## Program Design
 
@@ -175,6 +175,19 @@ same `scripts` block. Both resolve by keeping both sides.
   types do not change `pnpm lint`.
 - The API's ESLint already uses `tsconfig.eslint.json`, the same file the
   API `typecheck` will use.
+
+### Rulings — Architect, 2026-11-04
+
+- **Jest types:** `@types/jest` in the mobile devDependencies, picked up
+  automatically. Jest globals being visible in app files is accepted.
+- **Typed routes:** accepted as they are. The §F line says route types are
+  only as fresh as the last `expo start`.
+- **e2e `lint`:** it keeps its own `tsc` for now. Remove the duplicate
+  later.
+- **`CLAUDE.md`:** not edited here. The Architect brings the gap to the
+  human.
+- **Spec mismatches:** 103 errors rather than 93, no real errors, and e2e
+  and the API already type-checked. Noted. The criteria are unchanged.
 
 ## Diff-Review Findings
 
